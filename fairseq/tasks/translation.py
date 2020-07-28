@@ -200,6 +200,10 @@ class TranslationTask(FairseqTask):
                                  'e.g., \'{"beam": 4, "lenpen": 0.6}\'')
         parser.add_argument('--eval-bleu-print-samples', action='store_true',
                             help='print sample generations during validation')
+        parser.add_argument('--mask-layer-type', type=str, default=None, help="enc-enc or enc-dec or dec-dec")
+        parser.add_argument('--mask-layer', type=int, default=0, metavar='N', help='Mask layer number')
+        parser.add_argument('--mask-head', type=int, default=0, metavar='N', help='Mask head number')
+
         # fmt: on
 
     def __init__(self, args, src_dict, tgt_dict):

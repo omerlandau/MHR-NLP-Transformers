@@ -38,8 +38,14 @@ class MultiheadAttention(nn.Module):
         encoder_decoder_attention=False,
         q_noise=0.0,
         qn_block_size=8,
+        mask_layer=None,
+        mask_head=None,
+        mask_layer_type=None,
     ):
         super().__init__()
+        self.mask_layer = mask_layer
+        self.mask_head = mask_head
+        self.mask_layer_type = mask_layer_type
         self.embed_dim = embed_dim
         self.kdim = kdim if kdim is not None else embed_dim
         self.vdim = vdim if vdim is not None else embed_dim
@@ -347,6 +353,11 @@ class MultiheadAttention(nn.Module):
         attn_weights_float = utils.softmax(
             attn_weights, dim=-1, onnx_trace=self.onnx_trace
         )
+
+        if self.mask_head is not None:
+            attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
+            attn_weights_float[self.mask_head, :, :, :] = float(0)
+            attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
         attn_probs = self.dropout_module(attn_weights)
 

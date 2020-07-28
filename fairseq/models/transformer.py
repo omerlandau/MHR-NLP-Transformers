@@ -345,7 +345,7 @@ class TransformerEncoder(FairseqEncoder):
         else:
             self.layers = nn.ModuleList([])
         self.layers.extend(
-            [self.build_encoder_layer(args) for i in range(args.encoder_layers)]
+            [self.build_encoder_layer(args, i) for i in range(args.encoder_layers)]
         )
         self.num_layers = len(self.layers)
 
@@ -586,7 +586,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             self.layers = nn.ModuleList([])
         self.layers.extend(
             [
-                self.build_decoder_layer(args, no_encoder_attn)
+                self.build_decoder_layer(args, _, no_encoder_attn)
                 for _ in range(args.decoder_layers)
             ]
         )
@@ -632,8 +632,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 self.output_projection.weight, mean=0, std=self.output_embed_dim ** -0.5
             )
 
-    def build_decoder_layer(self, args, no_encoder_attn=False):
-        return TransformerDecoderLayer(args, no_encoder_attn)
+    def build_decoder_layer(self, args, layer_index, no_encoder_attn=False):
+        return TransformerDecoderLayer(args, layer_index, no_encoder_attn)
 
     def forward(
         self,
