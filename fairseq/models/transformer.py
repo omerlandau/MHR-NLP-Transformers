@@ -358,8 +358,8 @@ class TransformerEncoder(FairseqEncoder):
         else:
             self.layernorm_embedding = None
 
-    def build_encoder_layer(self, args):
-        return TransformerEncoderLayer(args)
+    def build_encoder_layer(self, args, layer_index):
+        return TransformerEncoderLayer(args, layer_index)
 
     def forward_embedding(self, src_tokens):
         # embed tokens and positions
