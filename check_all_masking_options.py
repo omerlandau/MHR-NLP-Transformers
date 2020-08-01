@@ -14,20 +14,21 @@ def mask_all_heads_combination():
     mask_layer_combinations = ['enc-enc', 'enc-dec', 'dec-dec']
     results_dict = {i: np.zeros((number_of_transformer_layers, number_of_attention_heads)) for i in
                     mask_layer_combinations}
+    outF = open("mask_all_heads_combination.txt", "a")
     for i in mask_layer_combinations:
         for j in range(number_of_transformer_layers):
             for k in range(number_of_attention_heads):
                 args.model_overrides = str({"mask_layer": j, "mask_head": k, "mask_layer_type": i})
                 scorer = main(args)
                 results_dict[i][j][k] = float(parse_bleu_scoring(scorer.result_string()))
-
+                outF.write("type : {}, layer : {}, head : {}, result : {}".format(i, j, k, results_dict[i][j][k]))
     for name in mask_layer_combinations:
         print("table of score with masking {} attention head".format(name))
         print("rows are transformer layer number and columns are head number".format(name))
         df = pd.DataFrame(data=results_dict[name], index=[str(j) for j in range(number_of_transformer_layers)],
                           columns=[str(k) for k in range(number_of_attention_heads)])
         print(df)
-        df.to_csv(r' mask_all_heads_combination.csv', index=False)
+        df.to_csv(r' mask_all_heads_combination_{}.csv'.format(name), index=False)
 
 
 if __name__ == '__main__':
