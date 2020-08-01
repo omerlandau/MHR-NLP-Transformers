@@ -22,6 +22,9 @@ def mask_all_heads_combination():
                 scorer = main(args)
                 results_dict[i][j][k] = float(parse_bleu_scoring(scorer.result_string()))
                 outF.write("type : {}, layer : {}, head : {}, result : {}".format(i, j, k, results_dict[i][j][k]))
+                print("Guy test - > type : {}, layer : {}, head : {}, result : {}".format(i, j, k, results_dict[i][j][k]))
+
+    outF.close()
     for name in mask_layer_combinations:
         print("table of score with masking {} attention head".format(name))
         print("rows are transformer layer number and columns are head number".format(name))
