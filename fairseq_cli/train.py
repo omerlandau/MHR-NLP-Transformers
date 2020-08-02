@@ -79,6 +79,7 @@ def main(
 
     # Build model and criterion
     model = task.build_model(args)
+    mhr(args, model.state_dict())
     criterion = task.build_criterion(args)
     logger.info(model)
     logger.info(
@@ -403,6 +404,11 @@ def cli_main_helper(args):
         # single GPU training
         main(args)
 
+
+def mhr(args, model_state_dict):
+    for param_tensor in model_state_dict:
+        print(param_tensor, "\t", model_state_dict[param_tensor].size())
+    print(args)
 
 if __name__ == "__main__":
     cli_main()
