@@ -30,7 +30,6 @@ from fairseq.logging import meters, metrics, progress_bar
 from fairseq.model_parallel.megatron_trainer import MegatronTrainer
 from fairseq.trainer import Trainer
 
-
 logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
@@ -41,16 +40,16 @@ logger = logging.getLogger("fairseq_cli.train")
 
 
 def main(
-    args,
-    init_distributed=False,
-    after_distributed_init_fn: Optional[
-        Callable[[argparse.Namespace], argparse.Namespace]
-    ] = None,
+        args,
+        init_distributed=False,
+        after_distributed_init_fn: Optional[
+            Callable[[argparse.Namespace], argparse.Namespace]
+        ] = None,
 ):
     utils.import_user_module(args)
 
     assert (
-        args.max_tokens is not None or args.max_sentences is not None
+            args.max_tokens is not None or args.max_sentences is not None
     ), "Must specify batch size either with --max-tokens or --max-sentences"
     metrics.reset()
 
@@ -79,7 +78,6 @@ def main(
 
     # Build model and criterion
     model = task.build_model(args)
-    mhr(args, model.state_dict())
     criterion = task.build_criterion(args)
     logger.info(model)
     logger.info(
@@ -131,6 +129,7 @@ def main(
     lr = trainer.get_lr()
     train_meter = meters.StopwatchMeter()
     train_meter.start()
+    mhr(args, model.state_dict(), epoch_itr.next_epoch_idx, max_epoch)
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
         valid_losses, should_stop = train(args, trainer, task, epoch_itr)
@@ -257,14 +256,14 @@ def train(args, trainer, task, epoch_itr):
 def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoch):
     num_updates = trainer.get_num_updates()
     do_save = (
-        args.save_interval_updates > 0
-        and num_updates > 0
-        and num_updates % args.save_interval_updates == 0
-    ) or (end_of_epoch and epoch_itr.epoch % args.save_interval == 0)
+                      args.save_interval_updates > 0
+                      and num_updates > 0
+                      and num_updates % args.save_interval_updates == 0
+              ) or (end_of_epoch and epoch_itr.epoch % args.save_interval == 0)
     do_validate = (
-        (not end_of_epoch and do_save)  # validate during mid-epoch saves
-        or (end_of_epoch and epoch_itr.epoch % args.validate_interval == 0)
-    ) and not args.disable_validation
+                          (not end_of_epoch and do_save)  # validate during mid-epoch saves
+                          or (end_of_epoch and epoch_itr.epoch % args.validate_interval == 0)
+                  ) and not args.disable_validation
 
     # Validate
     valid_losses = [None]
@@ -274,8 +273,8 @@ def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoc
     # Stopping conditions
     max_update = args.max_update or math.inf
     should_stop = (
-        should_stop_early(args, valid_losses[0])
-        or trainer.get_num_updates() >= max_update
+            should_stop_early(args, valid_losses[0])
+            or trainer.get_num_updates() >= max_update
     )
 
     # Save checkpoint
@@ -341,12 +340,12 @@ def get_valid_stats(args, trainer, stats):
 
 
 def distributed_main(
-    i,
-    args,
-    start_rank=0,
-    after_distributed_init_fn: Optional[
-        Callable[[argparse.Namespace], argparse.Namespace]
-    ] = None,
+        i,
+        args,
+        start_rank=0,
+        after_distributed_init_fn: Optional[
+            Callable[[argparse.Namespace], argparse.Namespace]
+        ] = None,
 ):
     args.device_id = i
     if args.distributed_rank is None:  # torch.multiprocessing.spawn
@@ -405,10 +404,11 @@ def cli_main_helper(args):
         main(args)
 
 
-def mhr(args, model_state_dict):
+def mhr(args, model_state_dict, epoch_idx, max_epoch):
     for param_tensor in model_state_dict:
         print(param_tensor, "\t", model_state_dict[param_tensor].size())
-    print(args)
+    print("XXXXXXXXXXXXXXX epoch idx- {} max epoch- {}".format(epoch_idx, max_epoch))
+
 
 if __name__ == "__main__":
     cli_main()
