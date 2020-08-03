@@ -354,15 +354,20 @@ class MultiheadAttention(nn.Module):
             attn_weights, dim=-1, onnx_trace=self.onnx_trace
         )
 
-        if self.mask_head is not None:
-            attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
-            attn_weights_float[self.mask_head, :, :, :] = float(0)
-            attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
+        #if self.mask_head is not None:
+        #    attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
+        #    attn_weights_float[self.mask_head, :, :, :] = float(0)
+        #    attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
         attn_probs = self.dropout_module(attn_weights)
 
         assert v is not None
         attn = torch.bmm(attn_probs, v)
+        if self.mask_head is not None:
+            print("Should be here only during inference, when masking was chosen.")
+            attn = attn.view(self.num_heads, bsz, tgt_len, self.head_dim)
+            attn[self.mask_head, :, :, :] = float(0)
+            attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
         if self.onnx_trace and attn.size(1) == 1:
             # when ONNX tracing a single decoder step (sequence length == 1)
