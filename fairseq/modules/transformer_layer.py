@@ -66,7 +66,7 @@ class TransformerEncoderLayer(nn.Module):
 
     def build_self_attention(self, embed_dim, args):
         if args.mask_layer_type == 'enc-enc' and self.layer_index == args.mask_layer:
-            print("Guyyyyyyy. layer type {} layer index {} layer head {}".format(args.mask_layer_type,
+            print("Guyyyyyyy. type {} index {} layer {} head {}".format(args.mask_layer_type,
                                                                                  self.layer_index, args.mask_layer,
                                                                                  args.mask_head))
             return MultiheadAttention(
