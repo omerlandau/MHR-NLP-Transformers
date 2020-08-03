@@ -66,9 +66,6 @@ class TransformerEncoderLayer(nn.Module):
 
     def build_self_attention(self, embed_dim, args):
         if args.mask_layer_type == 'enc-enc' and self.layer_index == args.mask_layer:
-            print("Guyyyyyyy. type {} index {} layer {} head {}".format(args.mask_layer_type,
-                                                                                 self.layer_index, args.mask_layer,
-                                                                                 args.mask_head))
             return MultiheadAttention(
                 embed_dim,
                 args.encoder_attention_heads,
@@ -128,6 +125,9 @@ class TransformerEncoderLayer(nn.Module):
         residual = x
         if self.normalize_before:
             x = self.self_attn_layer_norm(x)
+        print("Guyyyyyyy. type {} index {} layer {} head {}".format(self.mask_layer_type,
+                                                                    self.layer_index, self.mask_layer,
+                                                                    self.mask_head))
         x, _ = self.self_attn(
             query=x,
             key=x,
@@ -151,6 +151,9 @@ class TransformerEncoderLayer(nn.Module):
         x = residual + x
         if not self.normalize_before:
             x = self.final_layer_norm(x)
+        print("Guyyyyyyy1. type {} index {} layer {} head {}".format(self.mask_layer_type,
+                                                                    self.layer_index, self.mask_layer,
+                                                                    self.mask_head))
         return x
 
 
