@@ -65,6 +65,7 @@ class TransformerEncoderLayer(nn.Module):
         return quant_noise(nn.Linear(input_dim, output_dim), p=q_noise, block_size=qn_block_size)
 
     def build_self_attention(self, embed_dim, args):
+        print("Guyyyyyyy. layer type {} layer index {}".format(args.mask_layer_type, self.layer_index))
         if args.mask_layer_type == 'enc-enc' and self.layer_index == args.mask_layer:
             return MultiheadAttention(
                 embed_dim,
