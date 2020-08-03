@@ -326,7 +326,8 @@ class MultiheadAttention(nn.Module):
 
         attn_weights = torch.bmm(q, k.transpose(1, 2))
         attn_weights = MultiheadAttention.apply_sparse_mask(attn_weights, tgt_len, src_len, bsz)
-
+        print("Guyyyyyyy3. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
+                                                            self.mask_head))
         assert list(attn_weights.size()) == [bsz * self.num_heads, tgt_len, src_len]
 
         if attn_mask is not None:
@@ -348,7 +349,8 @@ class MultiheadAttention(nn.Module):
                 attn_weights = attn_weights.masked_fill(key_padding_mask, float('-inf'))
                 attn_weights = attn_weights.transpose(0, 2)
             attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
-
+        print("Guyyyyyyy4. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
+                                                            self.mask_head))
         if before_softmax:
             return attn_weights, v
 
@@ -362,7 +364,7 @@ class MultiheadAttention(nn.Module):
         #    attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
         attn_probs = self.dropout_module(attn_weights)
-        print("Guyyyyyyy3. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
+        print("Guyyyyyyy5. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
                                                             self.mask_head))
         assert v is not None
         attn = torch.bmm(attn_probs, v)
