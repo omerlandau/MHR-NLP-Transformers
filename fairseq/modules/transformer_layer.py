@@ -82,9 +82,6 @@ class TransformerEncoderLayer(nn.Module):
                 args.encoder_attention_heads,
                 dropout=args.attention_dropout,
                 self_attention=True,
-                mask_layer=None,
-                mask_head=None,
-                mask_layer_type=None,
             )
 
     def upgrade_state_dict_named(self, state_dict, name):
