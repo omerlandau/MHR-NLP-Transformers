@@ -46,9 +46,8 @@ class MultiheadAttention(nn.Module):
         self.mask_layer = mask_layer
         self.mask_head = mask_head
         self.mask_layer_type = mask_layer_type
-        print("Guyyyyyyy2. type {} index {} layer {} head {}".format(self.mask_layer_type,
-                                                                    self.layer_index, self.mask_layer,
-                                                                     self.mask_head))
+        print("Guyyyyyyy2. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
+                                                            self.mask_head))
         self.embed_dim = embed_dim
         self.kdim = kdim if kdim is not None else embed_dim
         self.vdim = vdim if vdim is not None else embed_dim
