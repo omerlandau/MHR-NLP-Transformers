@@ -90,8 +90,7 @@ class MultiheadAttention(nn.Module):
         self.onnx_trace = False
         self.tpu = False
 
-        print("Guyyyyyyy21. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
-                                                        self.mask_head))
+
     def prepare_for_onnx_export_(self):
         self.onnx_trace = True
 
@@ -148,6 +147,8 @@ class MultiheadAttention(nn.Module):
                 weights for each head. Implies *need_weights*. Default:
                 return the average attention weights over all heads.
         """
+        print("Guyyyyyyy21. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
+                                                        self.mask_head))
         if need_head_weights:
             need_weights = True
 
