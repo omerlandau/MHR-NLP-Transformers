@@ -90,6 +90,8 @@ class MultiheadAttention(nn.Module):
         self.onnx_trace = False
         self.tpu = False
 
+        print("Guyyyyyyy21. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
+                                                        self.mask_head))
     def prepare_for_onnx_export_(self):
         self.onnx_trace = True
 
@@ -186,7 +188,8 @@ class MultiheadAttention(nn.Module):
                 k_proj_weight=self.k_proj.weight,
                 v_proj_weight=self.v_proj.weight,
             )
-
+        print("Guyyyyyyy22. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
+                                                            self.mask_head))
         if incremental_state is not None:
             saved_state = self._get_input_buffer(incremental_state)
             if saved_state is not None and "prev_key" in saved_state:
