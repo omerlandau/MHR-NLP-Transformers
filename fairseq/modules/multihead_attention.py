@@ -362,7 +362,8 @@ class MultiheadAttention(nn.Module):
         #    attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
         attn_probs = self.dropout_module(attn_weights)
-
+        print("Guyyyyyyy3. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
+                                                            self.mask_head))
         assert v is not None
         attn = torch.bmm(attn_probs, v)
         print("head -  {}, layer - {}, type - {}".format(self.mask_head, self.mask_layer, self.mask_layer_type))
