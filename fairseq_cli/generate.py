@@ -12,6 +12,8 @@ import math
 import os
 import sys
 
+import numpy as np
+
 import torch
 
 from fairseq import bleu, checkpoint_utils, options, tasks, utils
@@ -51,6 +53,11 @@ def _main(args, output_file):
         args.max_tokens = 12000
     logger.info(args)
 
+    # Fix seed for stochastic decoding
+    if args.seed is not None and not args.no_seed_provided:
+        np.random.seed(args.seed)
+        torch.manual_seed(args.seed)
+
     use_cuda = torch.cuda.is_available() and not args.cpu
 
     # Load dataset splits
@@ -66,19 +73,16 @@ def _main(args, output_file):
 
     # Load ensemble
     logger.info('loading model(s) from {}'.format(args.path))
-    print("Guy comment- Inside 'generate.py->_main'")
     models, _model_args = checkpoint_utils.load_model_ensemble(
         utils.split_paths(args.path),
         arg_overrides=eval(args.model_overrides),
         task=task,
+        suffix=getattr(args, "checkpoint_suffix", ""),
     )
-    print("Guy comment- Inside 'generate.py->_main'. Model args are: {} ".format(_model_args))
+
     # Optimize ensemble for generation
     for model in models:
-        model.make_generation_fast_(
-            beamable_mm_beam_size=None if args.no_beamable_mm else args.beam,
-            need_attn=args.print_alignment,
-        )
+        model.prepare_for_inference_(args)
         if args.fp16:
             model.half()
         if use_cuda:
@@ -115,7 +119,6 @@ def _main(args, output_file):
     generator = task.build_generator(models, args)
 
     # Handle tokenization and BPE
-    print("Guy comment- Inside 'generate.py->_main'. Encoding")
     tokenizer = encoders.build_tokenizer(args)
     bpe = encoders.build_bpe(args)
 
@@ -182,9 +185,9 @@ def _main(args, output_file):
 
             if not args.quiet:
                 if src_dict is not None:
-                    print('S-{}\t{}'.format(sample_id, src_str).encode('latin-1', 'replace'), file=output_file)
+                    print('S-{}\t{}'.format(sample_id, src_str), file=output_file)
                 if has_target:
-                    print('T-{}\t{}'.format(sample_id, target_str).encode('latin-1', 'replace'), file=output_file)
+                    print('T-{}\t{}'.format(sample_id, target_str), file=output_file)
 
             # Process top predictions
             for j, hypo in enumerate(hypos[i][:args.nbest]):
@@ -203,9 +206,9 @@ def _main(args, output_file):
                 if not args.quiet:
                     score = hypo['score'] / math.log(2)  # convert to base 2
                     # original hypothesis (after tokenization and BPE)
-                    print('H-{}\t{}\t{}'.format(sample_id, score, hypo_str).encode('latin-1', 'replace'), file=output_file)
+                    print('H-{}\t{}\t{}'.format(sample_id, score, hypo_str), file=output_file)
                     # detokenized hypothesis
-                    print('D-{}\t{}\t{}'.format(sample_id, score, detok_hypo_str).encode('latin-1', 'replace'), file=output_file)
+                    print('D-{}\t{}\t{}'.format(sample_id, score, detok_hypo_str), file=output_file)
                     print('P-{}\t{}'.format(
                         sample_id,
                         ' '.join(map(
@@ -213,16 +216,16 @@ def _main(args, output_file):
                             # convert from base e to base 2
                             hypo['positional_scores'].div_(math.log(2)).tolist(),
                         ))
-                    ).encode('latin-1', 'replace'), file=output_file)
+                    ), file=output_file)
 
                     if args.print_alignment:
                         print('A-{}\t{}'.format(
                             sample_id,
                             ' '.join(['{}-{}'.format(src_idx, tgt_idx) for src_idx, tgt_idx in alignment])
-                        ).encode('latin-1', 'replace'), file=output_file)
+                        ), file=output_file)
 
                     if args.print_step:
-                        print('I-{}\t{}'.format(sample_id, hypo['steps']).encode('latin-1', 'replace'), file=output_file)
+                        print('I-{}\t{}'.format(sample_id, hypo['steps']), file=output_file)
 
                     if getattr(args, 'retain_iter_history', False):
                         for step, h in enumerate(hypo['history']):
@@ -234,15 +237,16 @@ def _main(args, output_file):
                                 tgt_dict=tgt_dict,
                                 remove_bpe=None,
                             )
-                            print('E-{}_{}\t{}'.format(sample_id, step, h_str).encode('latin-1', 'replace'), file=output_file)
+                            print('E-{}_{}\t{}'.format(sample_id, step, h_str), file=output_file)
 
                 # Score only the top hypothesis
                 if has_target and j == 0:
                     if align_dict is not None or args.remove_bpe is not None:
                         # Convert back to tokens for evaluation with unk replacement and/or without BPE
                         target_tokens = tgt_dict.encode_line(target_str, add_if_not_exist=True)
+                        hypo_tokens = tgt_dict.encode_line(detok_hypo_str, add_if_not_exist=True)
                     if hasattr(scorer, 'add_string'):
-                        scorer.add_string(target_str, hypo_str)
+                        scorer.add_string(target_str, detok_hypo_str)
                     else:
                         scorer.add(target_tokens, hypo_tokens)
 
@@ -254,6 +258,11 @@ def _main(args, output_file):
     logger.info('Translated {} sentences ({} tokens) in {:.1f}s ({:.2f} sentences/s, {:.2f} tokens/s)'.format(
         num_sentences, gen_timer.n, gen_timer.sum, num_sentences / gen_timer.sum, 1. / gen_timer.avg))
     if has_target:
+        if args.bpe and not args.sacrebleu:
+            if args.remove_bpe:
+                logger.warning("BLEU score is being computed by splitting detokenized string on spaces, this is probably not what you want. Use --sacrebleu for standard 13a BLEU tokenization")
+            else:
+                logger.warning("If you are using BPE on the target side, the BLEU score is computed on BPE tokens, not on proper words.  Use --sacrebleu for standard 13a BLEU tokenization")
         logger.info('Generate {} with beam={}: {}'.format(args.gen_subset, args.beam, scorer.result_string()))
 
     return scorer
