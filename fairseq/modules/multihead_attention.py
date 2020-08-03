@@ -363,6 +363,7 @@ class MultiheadAttention(nn.Module):
 
         assert v is not None
         attn = torch.bmm(attn_probs, v)
+        print("head -  {}, layer - {}, type - {}".format(self.mask_head, self.mask_layer, self.mask_layer_type))
         if self.mask_head is not None:
             print("Should be here only during inference, when masking was chosen.")
             attn = attn.view(self.num_heads, bsz, tgt_len, self.head_dim)
