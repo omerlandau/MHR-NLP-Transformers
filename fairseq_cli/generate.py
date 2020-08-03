@@ -79,7 +79,8 @@ def _main(args, output_file):
         task=task,
         suffix=getattr(args, "checkpoint_suffix", ""),
     )
-
+    print("Guyyyyy inside generation. type {} layer {} head {}".format(args.mask_layer_type, args.mask_layer,
+                                                        args.mask_head))
     # Optimize ensemble for generation
     for model in models:
         model.prepare_for_inference_(args)
