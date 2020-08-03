@@ -129,7 +129,7 @@ def main(
     lr = trainer.get_lr()
     train_meter = meters.StopwatchMeter()
     train_meter.start()
-    mhr(args, model.state_dict(), epoch_itr.next_epoch_idx, max_epoch)
+    mhr(args, model, epoch_itr.next_epoch_idx, max_epoch)
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
         valid_losses, should_stop = train(args, trainer, task, epoch_itr)
@@ -404,9 +404,11 @@ def cli_main_helper(args):
         main(args)
 
 
-def mhr(args, model_state_dict, epoch_idx, max_epoch):
-    for param_tensor in model_state_dict:
-        print(param_tensor, "\t", model_state_dict[param_tensor].size())
+def mhr(args, model, epoch_idx, max_epoch):
+
+    print(model)
+    for param_tensor in model.state_dict():
+        print(param_tensor, "\t", model.state_dict()[param_tensor].size())
     print("XXXXXXXXXXXXXXX epoch idx- {} max epoch- {}".format(epoch_idx, max_epoch))
 
 
