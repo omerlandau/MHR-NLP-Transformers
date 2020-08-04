@@ -77,7 +77,6 @@ class TransformerEncoderLayer(nn.Module):
 
             )
         else:
-            print("Guyyyyyy, not masked")
             return MultiheadAttention(
                 embed_dim,
                 args.encoder_attention_heads,
