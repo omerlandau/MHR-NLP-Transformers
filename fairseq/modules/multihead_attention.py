@@ -38,7 +38,6 @@ class MultiheadAttention(nn.Module):
         mask_layer_type=None,
     ):
         super().__init__()
-        print("Guy comment - inside fairseq->modules->MultiheadAttention constructor, mask layer - {}, mask head - {}, mask_layer_type - {}".format(mask_layer,mask_head,mask_layer_type))
         self.mask_layer = mask_layer
         self.mask_head = mask_head
         self.mask_layer_type = mask_layer_type
