@@ -195,16 +195,13 @@ class MultiheadAttention(nn.Module):
             q = self.q_proj(query)
             k = self.k_proj(query)
             v = self.v_proj(query)
-            #print("Guy - self_attention")
         elif self.encoder_decoder_attention:
-            #print("Guy - encoder_decoder_attention")
             # encoder-decoder attention
             q = self.q_proj(query)
             if key is None:
                 assert value is None
                 k = v = None
             else:
-                #print("Guy - else")
                 k = self.k_proj(key)
                 v = self.v_proj(key)
 
@@ -341,12 +338,12 @@ class MultiheadAttention(nn.Module):
         attn_weights_float = utils.softmax(
             attn_weights, dim=-1, onnx_trace=self.onnx_trace
         )
-        if self.mask_head is not None:
-            print("Guy comment - > should be here! layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
-                                                                                      self.mask_layer_type))
-            attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
-            attn_weights_float[self.mask_head, :, :, :] = float(0)
-            attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
+        #if self.mask_head is not None:
+            #print("Guy comment - > should be here! layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
+                                                                                      #self.mask_layer_type))
+            #attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
+            #attn_weights_float[self.mask_head, :, :, :] = float(0)
+            #attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
@@ -355,10 +352,10 @@ class MultiheadAttention(nn.Module):
         )
         assert v is not None
         attn = torch.bmm(attn_probs, v) # Thats what I called 'Z' in my summary.
-        #if self.mask_head is not None:
-        #    attn = attn.view(self.num_heads, bsz, tgt_len, self.head_dim)
-        #    attn[self.mask_head, :, :, :] = float(0)
-        #    attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
+        if self.mask_head is not None:
+            attn = attn.view(self.num_heads, bsz, tgt_len, self.head_dim)
+            attn[self.mask_head, :, :, :] = float(0)
+            attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
         if self.onnx_trace and attn.size(1) == 1:
             # when ONNX tracing a single decoder step (sequence length == 1)

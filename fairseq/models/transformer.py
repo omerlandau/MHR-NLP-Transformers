@@ -307,7 +307,6 @@ class TransformerEncoder(FairseqEncoder):
     """
 
     def __init__(self, args, dictionary, embed_tokens):
-        print("Guy comment- Inside fairseq->models->transformer->TransformerEncoder->__init__")
         super().__init__(dictionary)
         self.register_buffer("version", torch.Tensor([3]))
 
@@ -334,7 +333,6 @@ class TransformerEncoder(FairseqEncoder):
         )
 
         self.layer_wise_attention = getattr(args, "layer_wise_attention", False)
-        print("Guy comment - layers to create - {}, heads in each layer - {}".format(args.encoder_layers,args.encoder_attention_heads))
         self.layers = nn.ModuleList([])
         self.layers.extend(
             [self.build_encoder_layer(args, i) for i in range(args.encoder_layers)]
