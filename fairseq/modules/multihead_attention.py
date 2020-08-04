@@ -342,7 +342,7 @@ class MultiheadAttention(nn.Module):
             attn_weights, dim=-1, onnx_trace=self.onnx_trace
         )
         if self.mask_head is not None:
-            print"Guy comment - > should be here!"
+            print("Guy comment - > should be here!")
             attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
             attn_weights_float[self.mask_head, :, :, :] = float(0)
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
