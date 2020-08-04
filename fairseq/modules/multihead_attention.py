@@ -8,14 +8,11 @@ from typing import Dict, Optional, Tuple
 
 import torch
 import torch.nn.functional as F
+from fairseq import utils
 from torch import Tensor, nn
 from torch.nn import Parameter
-
-from fairseq import utils
 from fairseq.incremental_decoding_utils import with_incremental_state
-from fairseq.modules.fairseq_dropout import FairseqDropout
-from fairseq.modules.quant_noise import quant_noise
-
+import numpy as np
 
 @with_incremental_state
 class MultiheadAttention(nn.Module):
@@ -36,28 +33,22 @@ class MultiheadAttention(nn.Module):
         add_zero_attn=False,
         self_attention=False,
         encoder_decoder_attention=False,
-        q_noise=0.0,
-        qn_block_size=8,
         mask_layer=None,
         mask_head=None,
         mask_layer_type=None,
     ):
         super().__init__()
+        print("Guy comment - inside fairseq->modules->MultiheadAttention constructor, mask layer - {}, mask head - {}, mask_layer_type - {}".format(mask_layer,mask_head,mask_layer_type))
         self.mask_layer = mask_layer
         self.mask_head = mask_head
         self.mask_layer_type = mask_layer_type
-        print("Guyyyyyyy2. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
-                                                            self.mask_head))
         self.embed_dim = embed_dim
         self.kdim = kdim if kdim is not None else embed_dim
         self.vdim = vdim if vdim is not None else embed_dim
         self.qkv_same_dim = self.kdim == embed_dim and self.vdim == embed_dim
 
         self.num_heads = num_heads
-        self.dropout_module = FairseqDropout(
-            dropout, module_name=self.__class__.__name__
-        )
-
+        self.dropout = dropout
         self.head_dim = embed_dim // num_heads
         assert (
             self.head_dim * num_heads == self.embed_dim
@@ -71,11 +62,11 @@ class MultiheadAttention(nn.Module):
             "Self-attention requires query, key and " "value to be of the same size"
         )
 
-        self.k_proj = quant_noise(nn.Linear(self.kdim, embed_dim, bias=bias), q_noise, qn_block_size)
-        self.v_proj = quant_noise(nn.Linear(self.vdim, embed_dim, bias=bias), q_noise, qn_block_size)
-        self.q_proj = quant_noise(nn.Linear(embed_dim, embed_dim, bias=bias), q_noise, qn_block_size)
+        self.k_proj = nn.Linear(self.kdim, embed_dim, bias=bias)
+        self.v_proj = nn.Linear(self.vdim, embed_dim, bias=bias)
+        self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
-        self.out_proj = quant_noise(nn.Linear(embed_dim, embed_dim, bias=bias), q_noise, qn_block_size)
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
         if add_bias_kv:
             self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
@@ -88,14 +79,15 @@ class MultiheadAttention(nn.Module):
         self.reset_parameters()
 
         self.onnx_trace = False
-        self.tpu = False
 
+        self.enable_torch_version = False
+        #if hasattr(F, "multi_head_attention_forward"):
+        #    self.enable_torch_version = True
+        #else:
+        #    self.enable_torch_version = False
 
     def prepare_for_onnx_export_(self):
         self.onnx_trace = True
-
-    def prepare_for_tpu_(self, **kwargs):
-        self.tpu = True
 
     def reset_parameters(self):
         if self.qkv_same_dim:
@@ -147,8 +139,6 @@ class MultiheadAttention(nn.Module):
                 weights for each head. Implies *need_weights*. Default:
                 return the average attention weights over all heads.
         """
-        print("Guyyyyyyy21. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
-                                                        self.mask_head))
         if need_head_weights:
             need_weights = True
 
@@ -157,8 +147,8 @@ class MultiheadAttention(nn.Module):
         assert list(query.size()) == [tgt_len, bsz, embed_dim]
 
         if (
-            not self.onnx_trace
-            and not self.tpu  # don't use PyTorch version on TPUs
+            self.enable_torch_version
+            and not self.onnx_trace
             and incremental_state is None
             and not static_kv
             # A workaround for quantization to work. Otherwise JIT compilation
@@ -177,10 +167,10 @@ class MultiheadAttention(nn.Module):
                 self.bias_k,
                 self.bias_v,
                 self.add_zero_attn,
-                self.dropout_module.p,
+                self.dropout,
                 self.out_proj.weight,
                 self.out_proj.bias,
-                self.training or self.dropout_module.apply_during_inference,
+                self.training,
                 key_padding_mask,
                 need_weights,
                 attn_mask,
@@ -189,8 +179,7 @@ class MultiheadAttention(nn.Module):
                 k_proj_weight=self.k_proj.weight,
                 v_proj_weight=self.v_proj.weight,
             )
-        print("Guyyyyyyy22. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
-                                                            self.mask_head))
+
         if incremental_state is not None:
             saved_state = self._get_input_buffer(incremental_state)
             if saved_state is not None and "prev_key" in saved_state:
@@ -206,13 +195,16 @@ class MultiheadAttention(nn.Module):
             q = self.q_proj(query)
             k = self.k_proj(query)
             v = self.v_proj(query)
+            #print("Guy - self_attention")
         elif self.encoder_decoder_attention:
+            #print("Guy - encoder_decoder_attention")
             # encoder-decoder attention
             q = self.q_proj(query)
             if key is None:
                 assert value is None
                 k = v = None
             else:
+                #print("Guy - else")
                 k = self.k_proj(key)
                 v = self.v_proj(key)
 
@@ -257,7 +249,6 @@ class MultiheadAttention(nn.Module):
                 .view(-1, bsz * self.num_heads, self.head_dim)
                 .transpose(0, 1)
             )
-
         if saved_state is not None:
             # saved states are stored with shape (bsz, num_heads, seq_len, head_dim)
             if "prev_key" in saved_state:
@@ -330,10 +321,7 @@ class MultiheadAttention(nn.Module):
 
         attn_weights = torch.bmm(q, k.transpose(1, 2))
         attn_weights = MultiheadAttention.apply_sparse_mask(attn_weights, tgt_len, src_len, bsz)
-        print("Guyyyyyyy3. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
-                                                            self.mask_head))
         assert list(attn_weights.size()) == [bsz * self.num_heads, tgt_len, src_len]
-
         if attn_mask is not None:
             attn_mask = attn_mask.unsqueeze(0)
             if self.onnx_trace:
@@ -343,41 +331,32 @@ class MultiheadAttention(nn.Module):
         if key_padding_mask is not None:
             # don't attend to padding symbols
             attn_weights = attn_weights.view(bsz, self.num_heads, tgt_len, src_len)
-            if not self.tpu:
-                attn_weights = attn_weights.masked_fill(
-                    key_padding_mask.unsqueeze(1).unsqueeze(2).to(torch.bool),
-                    float("-inf")
-                )
-            else:
-                attn_weights = attn_weights.transpose(0, 2)
-                attn_weights = attn_weights.masked_fill(key_padding_mask, float('-inf'))
-                attn_weights = attn_weights.transpose(0, 2)
+            attn_weights = attn_weights.masked_fill(
+                key_padding_mask.unsqueeze(1).unsqueeze(2).to(torch.bool), float("-inf")
+            )
             attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
-        print("Guyyyyyyy4. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
-                                                            self.mask_head))
         if before_softmax:
             return attn_weights, v
 
         attn_weights_float = utils.softmax(
             attn_weights, dim=-1, onnx_trace=self.onnx_trace
         )
-
-        #if self.mask_head is not None:
-        #    attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
-        #    attn_weights_float[self.mask_head, :, :, :] = float(0)
-        #    attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
-        attn_weights = attn_weights_float.type_as(attn_weights)
-        attn_probs = self.dropout_module(attn_weights)
-        print("Guyyyyyyy5. type {} layer {} head {}".format(self.mask_layer_type, self.mask_layer,
-                                                            self.mask_head))
-        assert v is not None
-        attn = torch.bmm(attn_probs, v)
-        print("head -  {}, layer - {}, type - {}".format(self.mask_head, self.mask_layer, self.mask_layer_type))
         if self.mask_head is not None:
-            print("Should be here only during inference, when masking was chosen.")
-            attn = attn.view(self.num_heads, bsz, tgt_len, self.head_dim)
-            attn[self.mask_head, :, :, :] = float(0)
-            attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
+            attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
+            attn_weights_float[self.mask_head, :, :, :] = float(0)
+            attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
+        attn_weights = attn_weights_float.type_as(attn_weights)
+        attn_probs = F.dropout(
+            attn_weights_float.type_as(attn_weights),
+            p=self.dropout,
+            training=self.training,
+        )
+        assert v is not None
+        attn = torch.bmm(attn_probs, v) # Thats what I called 'Z' in my summary.
+        #if self.mask_head is not None:
+        #    attn = attn.view(self.num_heads, bsz, tgt_len, self.head_dim)
+        #    attn[self.mask_head, :, :, :] = float(0)
+        #    attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
         if self.onnx_trace and attn.size(1) == 1:
             # when ONNX tracing a single decoder step (sequence length == 1)
@@ -394,7 +373,6 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-
         return attn, attn_weights
 
     @staticmethod
