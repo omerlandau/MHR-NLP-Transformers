@@ -211,6 +211,7 @@ class MultiheadAttention(nn.Module):
             k = self.k_proj(key)
             v = self.v_proj(value)
         q *= self.scaling
+        print("Guy comment -> q 1 shape is {}".format(q.shape))
 
         if self.bias_k is not None:
             assert self.bias_v is not None
@@ -233,7 +234,7 @@ class MultiheadAttention(nn.Module):
             .view(tgt_len, bsz * self.num_heads, self.head_dim)
             .transpose(0, 1)
         )
-        print("Guy comment -> q shape is {}".format(q.shape))
+        print("Guy comment -> q 2 shape is {}".format(q.shape))
         if k is not None:
             k = (
                 k.contiguous()
@@ -356,6 +357,7 @@ class MultiheadAttention(nn.Module):
         attn = torch.bmm(attn_probs, v) # Thats what I called 'Z' in my summary.
         if self.mask_head is not None:
             attn = attn.view(self.num_heads, bsz, tgt_len, self.head_dim)
+            print("Guy comment - > inside MHA, attn shape is : {}".format(attn_weights.size()))
             attn[self.mask_head, :, :, :] = float(0)
             attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
