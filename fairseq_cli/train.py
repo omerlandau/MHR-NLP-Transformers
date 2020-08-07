@@ -232,7 +232,7 @@ def train(args, trainer, task, epoch_itr, model, src_parameters, dst_parameters,
 
     num_heads = args.decoder_attention_heads
     head_dim = args.decoder_embed_dim // num_heads
-    if epoch_itr.epoch == 0:
+    if epoch_itr.epoch == 1:
         mhr(model, head_dim, num_heads, src_parameters, dst_parameters,
             src_head, dst_head)
         print("Guy comment -> Swapped!!! , before epoch number {}".format(epoch_itr.epoch))
