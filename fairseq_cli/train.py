@@ -440,7 +440,7 @@ def get_parameters(model, src_param_names, dst_param_names):
     return src_parameters, dst_parameters
 
 
-def mhr(model, num_heads, bsz, src_parameters, dst_parameters, src_head, dst_head):
+def mhr(model, head_dim, num_heads, bsz, src_parameters, dst_parameters, src_head, dst_head):
     for i, key in enumerate(src_parameters.keys()):
         # one source parameter(holds all heads)
         src_parameter = model.state_dict()[key]
@@ -449,19 +449,18 @@ def mhr(model, num_heads, bsz, src_parameters, dst_parameters, src_head, dst_hea
         # Change parameter shape to be able getting specific head
         orig_src_shape = src_parameter.shape
         orig_dst_shape = dst_parameter.shape
-        print("Guy comment -> orig_src_shape shape is {}".format(orig_src_shape))
-        print("Guy comment -> orig_dst_shape shape is {}".format(orig_dst_shape))
-        src_parameter = src_parameter.view(num_heads, bsz, -1)
-        dst_parameter = dst_parameter.view(num_heads, bsz, -1)
+        src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
+        dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
+
         # Get specific head parameters
         src_head_parameter = src_parameter[src_head, :, :]
         dst_head_parameter = dst_parameter[dst_head, :, :]
-        #perform the rotation
+        # perform the rotation
         dst_parameter[dst_head, :, :] = src_head_parameter
-        src_parameter[dst_head, :, :] = dst_head_parameter
+        src_parameter[src_head, :, :] = dst_head_parameter
         # Change parameter shape back
-        src_parameter = src_parameter.view(orig_src_shape[0], orig_src_shape[1])
-        dst_parameter = dst_parameter.view(orig_dst_shape[0], orig_dst_shape[1])
+        src_parameter = src_parameter.transpose(0, 1).view(-1, num_heads, head_dim)
+        dst_parameter = dst_parameter.transpose(0, 1).view(-1, num_heads, head_dim)
         # Insert the swapped parameters into the state_dict
         model.state_dict()[key] = src_parameter
         model.state_dict()[list(dst_parameters.keys())[i]] = dst_parameter
