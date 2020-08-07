@@ -339,6 +339,7 @@ class MultiheadAttention(nn.Module):
         attn_weights_float = utils.softmax(
             attn_weights, dim=-1, onnx_trace=self.onnx_trace
         )
+        print("Guy comment - > inside MHA, attn_weights shape after softmax is : {}".format(attn_weights.size()))
         #if self.mask_head is not None:
             #print("Guy comment - > should be here! layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
                                                                                       #self.mask_layer_type))
