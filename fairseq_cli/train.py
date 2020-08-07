@@ -129,7 +129,7 @@ def main(
     lr = trainer.get_lr()
     train_meter = meters.StopwatchMeter()
     train_meter.start()
-    #mhr(args, model, epoch_itr.next_epoch_idx, max_epoch)
+    # mhr(args, model, epoch_itr.next_epoch_idx, max_epoch)
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         src_param_names, dst_param_names = get_parameter_names(model=model, src_layer='0',
                                                                src_layer_module='self_attn',
@@ -143,7 +143,7 @@ def main(
 
         # train for one epoch
         valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, src_parameters,
-                             dst_parameters, src_head=0, dst_head=0)
+                                          dst_parameters, src_head=0, dst_head=0)
         print("Guy comment -> trained with MHR!!!")
         if should_stop:
             break
@@ -230,6 +230,13 @@ def train(args, trainer, task, epoch_itr, model, src_parameters, dst_parameters,
         default_log_format=("tqdm" if not args.no_progress_bar else "simple"),
     )
 
+    num_heads = args.decoder_attention_heads
+    head_dim = args.decoder_embed_dim // num_heads
+    if epoch_itr.epoch == 0:
+        mhr(model, head_dim, num_heads, src_parameters, dst_parameters,
+            src_head, dst_head)
+        print("Guy comment -> Swapped!!! , before epoch number {}".format(epoch_itr.epoch))
+
     trainer.begin_epoch(epoch_itr.epoch)
 
     valid_subsets = args.valid_subset.split(",")
@@ -237,12 +244,6 @@ def train(args, trainer, task, epoch_itr, model, src_parameters, dst_parameters,
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples)
-            num_heads = args.decoder_attention_heads
-            head_dim = args.decoder_embed_dim // num_heads
-            bsz = samples[0]['nsentences']
-            mhr(model, head_dim, num_heads, bsz, src_parameters, dst_parameters,
-                src_head, dst_head)
-            print("Guy comment -> Swapped!!!")
             if log_output is None:  # OOM, overflow, ...
                 continue
 
@@ -260,6 +261,7 @@ def train(args, trainer, task, epoch_itr, model, src_parameters, dst_parameters,
         valid_losses, should_stop = validate_and_save(
             args, trainer, task, epoch_itr, valid_subsets, end_of_epoch
         )
+
         if should_stop:
             break
 
@@ -443,7 +445,7 @@ def get_parameters(model, src_param_names, dst_param_names):
     return src_parameters, dst_parameters
 
 
-def mhr(model, head_dim, num_heads, bsz, src_parameters, dst_parameters, src_head, dst_head):
+def mhr(model, head_dim, num_heads, src_parameters, dst_parameters, src_head, dst_head):
     for i, key in enumerate(src_parameters.keys()):
         # one source parameter(holds all heads)
         src_parameter = model.state_dict()[key]
@@ -452,8 +454,6 @@ def mhr(model, head_dim, num_heads, bsz, src_parameters, dst_parameters, src_hea
         # Change parameter shape to be able getting specific head
         orig_src_shape = src_parameter.shape
         orig_dst_shape = dst_parameter.shape
-        print("Guy comment -> orig_src_shape shape is {}".format(orig_src_shape))
-        print("Guy comment -> orig_dst_shape shape is {}".format(orig_dst_shape))
         src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
         dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
 
@@ -469,7 +469,6 @@ def mhr(model, head_dim, num_heads, bsz, src_parameters, dst_parameters, src_hea
         # Insert the swapped parameters into the state_dict
         model.state_dict()[key] = src_parameter
         model.state_dict()[list(dst_parameters.keys())[i]] = dst_parameter
-
 
 
 if __name__ == "__main__":
