@@ -131,8 +131,20 @@ def main(
     train_meter.start()
     #mhr(args, model, epoch_itr.next_epoch_idx, max_epoch)
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
+        src_param_names, dst_param_names = get_parameter_names(model=model, src_layer='0',
+                                                               src_layer_module='self_attn',
+                                                               src_transformer_module='encoder',
+                                                               dst_layer='1',
+                                                               dst_layer_module='self_attn',
+                                                               dst_transformer_module='encoder')
+        src_parameters, dst_parameters = get_parameters(model=model,
+                                                        src_param_names=src_param_names,
+                                                        dst_param_names=dst_param_names)
+
         # train for one epoch
-        valid_losses, should_stop = train(args, trainer, task, epoch_itr)
+        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, src_parameters,
+                             dst_parameters, src_head=0, dst_head=0)
+        print("Guy comment -> trained with MHR!!!")
         if should_stop:
             break
 
@@ -191,7 +203,8 @@ def tpu_data_loader(args, itr):
 
 
 @metrics.aggregate("train")
-def train(args, trainer, task, epoch_itr):
+def train(args, trainer, task, epoch_itr, model, src_parameters, dst_parameters, src_head,
+          dst_head):
     """Train the model for one epoch and return validation losses."""
     # Initialize data iterator
     itr = epoch_itr.next_epoch_itr(
@@ -223,7 +236,8 @@ def train(args, trainer, task, epoch_itr):
     should_stop = False
     for i, samples in enumerate(progress):
         bsz = samples[0]['net_input']['src_lengths'].shape[0]
-        print("Guy comment -> testing bsz. bsz = {}".format(bsz))
+        mhr(model, args.decoder_attention_heads, bsz, src_parameters, dst_parameters,
+            src_head, dst_head)
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples)
             if log_output is None:  # OOM, overflow, ...
@@ -406,14 +420,49 @@ def cli_main_helper(args):
         main(args)
 
 
-def mhr(args, model, epoch_idx, max_epoch):
+def get_parameter_names(model, src_layer, src_layer_module,
+                        src_transformer_module, dst_layer, dst_layer_module,
+                        dst_transformer_module):
+    model_parms_list = list(model.state_dict().keys())
+    src_param_names = [str for str in model_parms_list if src_layer in str and
+                       src_transformer_module in str and src_layer_module in str and
+                       "bias" not in str and "norm" not in str]
+    dst_param_names = [str for str in model_parms_list if dst_layer in str
+                       and dst_transformer_module in str
+                       and dst_layer_module in str
+                       and "bias" not in str and "norm" not in str]
+    return src_param_names, dst_param_names
 
-    model_parameters = list(model.state_dict().keys())
 
-    for param_tensor in model.state_dict():
-        print(param_tensor, "\t", model.state_dict()[param_tensor].size())
-    print("XXXXXXXXXXXXXXX epoch idx- {} max epoch- {}".format(epoch_idx, max_epoch))
+def get_parameters(model, src_param_names, dst_param_names):
+    src_parameters = {src_param_name: model.state_dict()[src_param_name] for src_param_name in src_param_names}
+    dst_parameters = {dst_param_name: model.state_dict()[dst_param_name] for dst_param_name in dst_param_names}
+    return src_parameters, dst_parameters
 
+
+def mhr(model, num_heads, bsz, src_parameters, dst_parameters, src_head, dst_head):
+    for i, key in enumerate(src_parameters.keys()):
+        # one source parameter(holds all heads)
+        src_parameter = model.state_dict()[key]
+        # one destination parameter(holds all heads)
+        dst_parameter = model.state_dict()[list(dst_parameters.keys())[i]]
+        # Change parameter shape to be able getting specific head
+        orig_src_shape = src_parameter.shape
+        orig_dst_shape = dst_parameter.shape
+        src_parameter = src_parameter.view(num_heads, bsz, -1)
+        dst_parameter = dst_parameter.view(num_heads, bsz, -1)
+        # Get specific head parameters
+        src_head_parameter = src_parameter[src_head, :, :]
+        dst_head_parameter = dst_parameter[dst_head, :, :]
+        #perform the rotation
+        dst_parameter[dst_head, :, :] = src_head_parameter
+        src_parameter[dst_head, :, :] = dst_head_parameter
+        # Change parameter shape back
+        src_parameter = src_parameter.view(orig_src_shape[0], orig_src_shape[1])
+        dst_parameter = dst_parameter.view(orig_dst_shape[0], orig_dst_shape[1])
+        # Insert the swapped parameters into the state_dict
+        model.state_dict()[key] = src_parameter
+        model.state_dict()[list(dst_parameters.keys())[i]] = dst_parameter
 
 
 
