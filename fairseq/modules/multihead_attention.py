@@ -234,6 +234,7 @@ class MultiheadAttention(nn.Module):
             .view(tgt_len, bsz * self.num_heads, self.head_dim)
             .transpose(0, 1)
         )
+        print("Guy comment -> q shape is {}".format(q.shape))
         if k is not None:
             k = (
                 k.contiguous()
