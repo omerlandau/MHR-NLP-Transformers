@@ -237,8 +237,10 @@ def train(args, trainer, task, epoch_itr, model, src_parameters, dst_parameters,
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples)
+            num_heads = args.decoder_attention_heads
+            head_dim = args.decoder_embed_dim // num_heads
             bsz = samples[0]['nsentences']
-            mhr(model, args.decoder_attention_heads, bsz, src_parameters, dst_parameters,
+            mhr(model, head_dim, num_heads, bsz, src_parameters, dst_parameters,
                 src_head, dst_head)
             if log_output is None:  # OOM, overflow, ...
                 continue
