@@ -222,6 +222,8 @@ def train(args, trainer, task, epoch_itr):
     valid_subsets = args.valid_subset.split(",")
     should_stop = False
     for i, samples in enumerate(progress):
+        bsz = samples[0]['net_input']['src_lengths'].shape[0]
+        print("Guy comment -> testing bsz. bsz = {}".format(bsz))
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples)
             if log_output is None:  # OOM, overflow, ...
@@ -406,10 +408,16 @@ def cli_main_helper(args):
 
 def mhr(args, model, epoch_idx, max_epoch):
 
-    print(model)
+    model_parameters = list(model.state_dict().keys())
+
     for param_tensor in model.state_dict():
         print(param_tensor, "\t", model.state_dict()[param_tensor].size())
     print("XXXXXXXXXXXXXXX epoch idx- {} max epoch- {}".format(epoch_idx, max_epoch))
+
+def copy_parameters(model,src_layer,dst_layer,src_head,dst_head):
+    model_param_names = list(model.state_dict().keys())
+    model_param_names = [model_param_name if model_param_name]
+    model.state_dict()[dst_key] = model.state_dict()[src_key]
 
 
 if __name__ == "__main__":
