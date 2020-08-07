@@ -414,10 +414,7 @@ def mhr(args, model, epoch_idx, max_epoch):
         print(param_tensor, "\t", model.state_dict()[param_tensor].size())
     print("XXXXXXXXXXXXXXX epoch idx- {} max epoch- {}".format(epoch_idx, max_epoch))
 
-def copy_parameters(model,src_layer,dst_layer,src_head,dst_head):
-    model_param_names = list(model.state_dict().keys())
-    model_param_names = [model_param_name if model_param_name]
-    model.state_dict()[dst_key] = model.state_dict()[src_key]
+
 
 
 if __name__ == "__main__":
