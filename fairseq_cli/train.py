@@ -242,6 +242,7 @@ def train(args, trainer, task, epoch_itr, model, src_parameters, dst_parameters,
             bsz = samples[0]['nsentences']
             mhr(model, head_dim, num_heads, bsz, src_parameters, dst_parameters,
                 src_head, dst_head)
+            print("Guy comment -> Swapped!!!")
             if log_output is None:  # OOM, overflow, ...
                 continue
 
@@ -451,6 +452,8 @@ def mhr(model, head_dim, num_heads, bsz, src_parameters, dst_parameters, src_hea
         # Change parameter shape to be able getting specific head
         orig_src_shape = src_parameter.shape
         orig_dst_shape = dst_parameter.shape
+        print("Guy comment -> orig_src_shape shape is {}".format(orig_src_shape))
+        print("Guy comment -> orig_dst_shape shape is {}".format(orig_dst_shape))
         src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
         dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
 
