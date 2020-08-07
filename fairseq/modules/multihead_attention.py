@@ -142,7 +142,6 @@ class MultiheadAttention(nn.Module):
             need_weights = True
 
         tgt_len, bsz, embed_dim = query.size()
-        print("Guy comment - > inside MHA, batch size is : {}".format(bsz))
         print("Guy comment - > inside MHA, query size is : {}".format(query.size()))
         assert embed_dim == self.embed_dim
         assert list(query.size()) == [tgt_len, bsz, embed_dim]
@@ -316,7 +315,7 @@ class MultiheadAttention(nn.Module):
                     ],
                     dim=1,
                 )
-
+        print("Guy comment - > inside MHA, batch size is : {}".format(bsz))
         attn_weights = torch.bmm(q, k.transpose(1, 2))
         attn_weights = MultiheadAttention.apply_sparse_mask(attn_weights, tgt_len, src_len, bsz)
         assert list(attn_weights.size()) == [bsz * self.num_heads, tgt_len, src_len]
