@@ -142,6 +142,7 @@ class MultiheadAttention(nn.Module):
             need_weights = True
 
         tgt_len, bsz, embed_dim = query.size()
+        print("Guy comment - > inside MHA, batch size is : {}".format(bsz))
         assert embed_dim == self.embed_dim
         assert list(query.size()) == [tgt_len, bsz, embed_dim]
 
