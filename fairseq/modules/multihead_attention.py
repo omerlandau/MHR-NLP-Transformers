@@ -143,7 +143,7 @@ class MultiheadAttention(nn.Module):
 
         tgt_len, bsz, embed_dim = query.size()
         print("Guy comment - > inside MHA, batch size is : {}".format(bsz))
-        print("Guy comment - > inside MHA, query size is : {}".format(query.size()))        
+        print("Guy comment - > inside MHA, query size is : {}".format(query.size()))
         assert embed_dim == self.embed_dim
         assert list(query.size()) == [tgt_len, bsz, embed_dim]
 
@@ -229,7 +229,6 @@ class MultiheadAttention(nn.Module):
                     ],
                     dim=1,
                 )
-        print("Guy comment -> q_proj shape is {}".format(self.q_proj.shape))
         q = (
             q.contiguous()
             .view(tgt_len, bsz * self.num_heads, self.head_dim)

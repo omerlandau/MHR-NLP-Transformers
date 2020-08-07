@@ -449,6 +449,8 @@ def mhr(model, num_heads, bsz, src_parameters, dst_parameters, src_head, dst_hea
         # Change parameter shape to be able getting specific head
         orig_src_shape = src_parameter.shape
         orig_dst_shape = dst_parameter.shape
+        print("Guy comment -> orig_src_shape shape is {}".format(orig_src_shape))
+        print("Guy comment -> orig_dst_shape shape is {}".format(orig_dst_shape))
         src_parameter = src_parameter.view(num_heads, bsz, -1)
         dst_parameter = dst_parameter.view(num_heads, bsz, -1)
         # Get specific head parameters
