@@ -221,7 +221,8 @@ def train(args, trainer, task, epoch_itr, model, experiment):
     num_heads = args.decoder_attention_heads
     head_dim = args.decoder_embed_dim // num_heads
     if experiment == 'enc-dec last layer swapping':
-        if epoch_itr.epoch <= 10 and epoch_itr.epoch - 1 % 3 == 0:
+        print("Guy comment -> epoch number {}".format(epoch_itr.epoch))
+        if epoch_itr.epoch <= 10 and (epoch_itr.epoch - 1) % 3 == 0:
             mhr(model, experiment, head_dim, num_heads)
 
     trainer.begin_epoch(epoch_itr.epoch)
