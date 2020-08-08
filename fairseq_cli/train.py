@@ -428,6 +428,9 @@ def cli_main_helper(args):
 def get_parameter_names(model, src_layer, src_layer_module,
                         src_transformer_module, dst_layer, dst_layer_module,
                         dst_transformer_module):
+    '''
+    Get the parameter names of only k,q,v,w_o weights.
+    '''
     model_parms_list = list(model.state_dict().keys())
     src_param_names = [str for str in model_parms_list if src_layer in str and
                        src_transformer_module in str and src_layer_module in str and
@@ -440,12 +443,18 @@ def get_parameter_names(model, src_layer, src_layer_module,
 
 
 def get_parameters(model, src_param_names, dst_param_names):
+    '''
+    Return dictionaries which their keys are param_names and values are the model parameters of those keys.
+    '''
     src_parameters = {src_param_name: model.state_dict()[src_param_name] for src_param_name in src_param_names}
     dst_parameters = {dst_param_name: model.state_dict()[dst_param_name] for dst_param_name in dst_param_names}
     return src_parameters, dst_parameters
 
 
 def mhr(model, head_dim, num_heads, src_parameters, dst_parameters, src_head, dst_head):
+    '''
+    Swap k,q,v,w_o weights between src and dst heads.
+    '''
     for i, key in enumerate(src_parameters.keys()):
         # one source parameter(holds all heads)
         src_parameter = model.state_dict()[key]
