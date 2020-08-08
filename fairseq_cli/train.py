@@ -221,7 +221,7 @@ def train(args, trainer, task, epoch_itr, model, experiment):
     num_heads = args.decoder_attention_heads
     head_dim = args.decoder_embed_dim // num_heads
     if experiment == 'enc-dec last layer swapping':
-        if epoch_itr.epoch <= 10 and epoch_itr.epoch % 3 == 0:
+        if epoch_itr.epoch <= 10 and epoch_itr.epoch - 1 % 3 == 0:
             mhr(model, experiment, head_dim, num_heads)
 
     trainer.begin_epoch(epoch_itr.epoch)
@@ -415,6 +415,17 @@ def cli_main_helper(args):
 def get_parameter_names(model, src_layer, src_layer_module,
                         src_transformer_module, dst_layer, dst_layer_module,
                         dst_transformer_module):
+    '''
+
+    :param model: Our transformer model.
+    :param src_layer: Source layer.
+    :param src_layer_module: Source layer module. i.e - self_attn,encoder_attn etc.
+    :param src_transformer_module: Encoder\Decoder
+    :param dst_layer: Destination layer.
+    :param dst_layer_module: Destination layer module. i.e - self_attn,encoder_attn etc.
+    :param dst_transformer_module:  Encoder\Decoder
+    :return: The q,k,v,out weights parameters names.
+    '''
     model_parms_list = list(model.state_dict().keys())
     src_param_names = [str for str in model_parms_list if src_layer in str and
                        src_transformer_module in str and src_layer_module in str and
@@ -427,6 +438,13 @@ def get_parameter_names(model, src_layer, src_layer_module,
 
 
 def get_parameters(model, src_param_names, dst_param_names):
+    '''
+
+    :param model: Our transformer model.
+    :param src_param_names: Source parameters names.
+    :param dst_param_names: Destination parameters names.
+    :return: Two dictionaries that hold the q,k,v,out weights parameters.
+    '''
     src_parameters = {src_param_name: model.state_dict()[src_param_name] for src_param_name in src_param_names}
     dst_parameters = {dst_param_name: model.state_dict()[dst_param_name] for dst_param_name in dst_param_names}
     return src_parameters, dst_parameters
@@ -434,6 +452,19 @@ def get_parameters(model, src_param_names, dst_param_names):
 
 def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, src_head, dst_head, src_layer,
                     dst_layer):
+    '''
+
+    :param model: Our transformer model.
+    :param head_dim: Head's dimension.
+    :param num_heads: Amount of heads in each MHA mechanism.
+    :param src_parameters: Source q,k,v,out weights parameters.
+    :param dst_parameters: Destination q,k,v,out weights parameters.
+    :param src_head: Source head.
+    :param dst_head: Destination head.
+    :param src_layer: Source layer.
+    :param dst_layer: Destination layer.
+    :return: Nothing. Performs the parameter swapping between two heads.
+    '''
     print(
         "Start swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
                                                                                           dst_layer))
@@ -463,6 +494,14 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
 
 
 def mhr(model, experiment, head_dim, num_heads):
+    '''
+
+    :param model: Our transformer model.
+    :param experiment: A specific experiment of parameter swapping.
+    :param head_dim: Head's dimension.
+    :param num_heads: Amount of heads in each MHA mechanism.
+    :return: Nothing. Performs the experiments.
+    '''
     print("Start an experiment phase. The experiment is {}".format(experiment))
     start = time.time()
     if experiment == 'enc-dec last layer swapping':
