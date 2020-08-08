@@ -14,7 +14,7 @@ import os
 import random
 import sys
 from typing import Callable, Optional
-
+import time
 import numpy as np
 import torch
 from fairseq import (
@@ -129,22 +129,11 @@ def main(
     lr = trainer.get_lr()
     train_meter = meters.StopwatchMeter()
     train_meter.start()
+    experiment = 'enc-dec last layer swapping'
     # mhr(args, model, epoch_itr.next_epoch_idx, max_epoch)
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
-        src_param_names, dst_param_names = get_parameter_names(model=model, src_layer='0',
-                                                               src_layer_module='self_attn',
-                                                               src_transformer_module='encoder',
-                                                               dst_layer='1',
-                                                               dst_layer_module='self_attn',
-                                                               dst_transformer_module='encoder')
-        src_parameters, dst_parameters = get_parameters(model=model,
-                                                        src_param_names=src_param_names,
-                                                        dst_param_names=dst_param_names)
-
         # train for one epoch
-        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, src_parameters,
-                                          dst_parameters, src_head=0, dst_head=0)
-        print("Guy comment -> trained with MHR!!!")
+        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment)
         if should_stop:
             break
 
@@ -203,8 +192,7 @@ def tpu_data_loader(args, itr):
 
 
 @metrics.aggregate("train")
-def train(args, trainer, task, epoch_itr, model, src_parameters, dst_parameters, src_head,
-          dst_head):
+def train(args, trainer, task, epoch_itr, model, experiment):
     """Train the model for one epoch and return validation losses."""
     # Initialize data iterator
     itr = epoch_itr.next_epoch_itr(
@@ -232,10 +220,9 @@ def train(args, trainer, task, epoch_itr, model, src_parameters, dst_parameters,
 
     num_heads = args.decoder_attention_heads
     head_dim = args.decoder_embed_dim // num_heads
-    if epoch_itr.epoch == 1:
-        mhr(model, head_dim, num_heads, src_parameters, dst_parameters,
-            src_head, dst_head)
-        print("Guy comment -> Swapped!!! , before epoch number {}".format(epoch_itr.epoch))
+    if experiment == 'enc-dec last layer swapping':
+        if epoch_itr.epoch <= 10 and epoch_itr.epoch % 3 == 0:
+            mhr(model, experiment, head_dim, num_heads)
 
     trainer.begin_epoch(epoch_itr.epoch)
 
@@ -428,9 +415,6 @@ def cli_main_helper(args):
 def get_parameter_names(model, src_layer, src_layer_module,
                         src_transformer_module, dst_layer, dst_layer_module,
                         dst_transformer_module):
-    '''
-    Get the parameter names of only k,q,v,w_o weights.
-    '''
     model_parms_list = list(model.state_dict().keys())
     src_param_names = [str for str in model_parms_list if src_layer in str and
                        src_transformer_module in str and src_layer_module in str and
@@ -443,29 +427,24 @@ def get_parameter_names(model, src_layer, src_layer_module,
 
 
 def get_parameters(model, src_param_names, dst_param_names):
-    '''
-    Return dictionaries which their keys are param_names and values are the model parameters of those keys.
-    '''
     src_parameters = {src_param_name: model.state_dict()[src_param_name] for src_param_name in src_param_names}
     dst_parameters = {dst_param_name: model.state_dict()[dst_param_name] for dst_param_name in dst_param_names}
     return src_parameters, dst_parameters
 
 
-def mhr(model, head_dim, num_heads, src_parameters, dst_parameters, src_head, dst_head):
-    '''
-    Swap k,q,v,w_o weights between src and dst heads.
-    '''
+def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, src_head, dst_head, src_layer,
+                    dst_layer):
+    print(
+        "Start swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
+                                                                                          dst_layer))
     for i, key in enumerate(src_parameters.keys()):
         # one source parameter(holds all heads)
         src_parameter = model.state_dict()[key]
         # one destination parameter(holds all heads)
         dst_parameter = model.state_dict()[list(dst_parameters.keys())[i]]
         # Change parameter shape to be able getting specific head
-        orig_src_shape = src_parameter.shape
-        orig_dst_shape = dst_parameter.shape
         src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
         dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
-
         # Get specific head parameters
         src_head_parameter = src_parameter[src_head, :, :]
         dst_head_parameter = dst_parameter[dst_head, :, :]
@@ -478,6 +457,34 @@ def mhr(model, head_dim, num_heads, src_parameters, dst_parameters, src_head, ds
         # Insert the swapped parameters into the state_dict
         model.state_dict()[key] = src_parameter
         model.state_dict()[list(dst_parameters.keys())[i]] = dst_parameter
+    print(
+        "Done swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
+                                                                                         dst_layer))
+
+
+def mhr(model, experiment, head_dim, num_heads):
+    print("Start an experiment phase. The experiment is {}".format(experiment))
+    start = time.time()
+    if experiment == 'enc-dec last layer swapping':
+        for i in range(4):
+            src_head = i
+            src_layer = '5'
+            src_layer_module = 'encoder_attn'
+            src_transformer_module = 'decoder'
+            dst_head = i
+            dst_layer = '1'
+            dst_layer_module = 'encoder_attn'
+            dst_transformer_module = 'decoder'
+
+            src_param_names, dst_param_names = get_parameter_names(model, src_layer, src_layer_module,
+                                                                   src_transformer_module, dst_layer,
+                                                                   dst_layer_module, dst_transformer_module)
+            src_parameters, dst_parameters = get_parameters(model, src_param_names, dst_param_names)
+            mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, src_head, dst_head,
+                            src_layer,
+                            dst_layer)
+    end = time.time()
+    print("The experiment phase(a swapping) took {} minuets".format(str((end - start) / 60)))
 
 
 if __name__ == "__main__":
