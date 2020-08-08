@@ -129,7 +129,7 @@ def main(
     lr = trainer.get_lr()
     train_meter = meters.StopwatchMeter()
     train_meter.start()
-    experiment = 'enc-dec last layer swapping'
+    experiment = args.mhr_experiment
     # mhr(args, model, epoch_itr.next_epoch_idx, max_epoch)
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch

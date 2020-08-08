@@ -203,14 +203,8 @@ class TranslationTask(FairseqTask):
         parser.add_argument('--mask-layer-type', type=str, default=None, help="enc-enc or enc-dec or dec-dec")
         parser.add_argument('--mask-layer', type=int, default=0, metavar='N', help='Mask layer number')
         parser.add_argument('--mask-head', type=int, default=0, metavar='N', help='Mask head number')
-        parser.add_argument('--mhr-source-layer-type', type=str, default=None, help="enc or dec")
-        parser.add_argument('--mhr-destination-layer-type', type=str, default=None, help="enc or dec")
-        parser.add_argument('--mhr-source-layer', type=int, default=0, metavar='N', help='MHR source layer number')
-        parser.add_argument('--mhr-destination-layer', type=int, default=0, metavar='N',
-                            help='MHR destination layer number')
-        parser.add_argument('--mhr-source-head', type=int, default=0, metavar='N', help='MHR source head number')
-        parser.add_argument('--mhr-destination-head', type=int, default=0, metavar='N',
-                            help='MHR destination head number')
+        parser.add_argument('--mhr-experiment', type=str, default=None, help="some mhr supported experiment. e.g. "
+                                                                             "'enc-dec last layer swapping'")
 
         # fmt: on
 
