@@ -525,7 +525,6 @@ def mhr(model, swaps, head_dim, num_heads, num_epoch):
         dst_layer_module = s['d_layer_module']
         dst_transformer_module = s['d_transformer_module']
         print("src_layer = {0}, src_head= {1}, src_lm = {2}, src_tm = {3}, dst_layer = {4}, dst_head = {5}, dst_lm ={6}, dst_tm={7}".format(src_layer,src_head,src_layer_module,src_transformer_module,dst_layer,dst_head,dst_layer_module,dst_transformer_module))
-        exit()
         src_param_names, dst_param_names = get_parameter_names(model, src_layer, src_layer_module,
                                                                src_transformer_module, dst_layer,
                                                                dst_layer_module, dst_transformer_module)
