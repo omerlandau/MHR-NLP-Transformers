@@ -29,6 +29,7 @@ from fairseq.data import iterators
 from fairseq.logging import meters, metrics, progress_bar
 from fairseq.model_parallel.megatron_trainer import MegatronTrainer
 from fairseq.trainer import Trainer
+import json
 
 logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
@@ -129,11 +130,10 @@ def main(
     lr = trainer.get_lr()
     train_meter = meters.StopwatchMeter()
     train_meter.start()
-    experiment = args.mhr_experiment
-    # mhr(args, model, epoch_itr.next_epoch_idx, max_epoch)
+    experiment_path = args.mhr_experiment
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
-        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment)
+        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
         if should_stop:
             break
 
@@ -192,7 +192,7 @@ def tpu_data_loader(args, itr):
 
 
 @metrics.aggregate("train")
-def train(args, trainer, task, epoch_itr, model, experiment):
+def train(args, trainer, task, epoch_itr, model, experiment_path):
     """Train the model for one epoch and return validation losses."""
     # Initialize data iterator
     itr = epoch_itr.next_epoch_itr(
@@ -220,10 +220,14 @@ def train(args, trainer, task, epoch_itr, model, experiment):
 
     num_heads = args.decoder_attention_heads
     head_dim = args.decoder_embed_dim // num_heads
+    swaps = json.load(experiment_path)
+    mhr(model, swaps, head_dim, num_heads, epoch_itr.epoch)
+    """
     if experiment == 'enc-dec last layer swapping':
         print("Guy comment -> epoch number {}".format(epoch_itr.epoch))
         if epoch_itr.epoch <= 10 and (epoch_itr.epoch - 1) % 3 == 0:
             mhr(model, experiment, head_dim, num_heads)
+    """
 
     trainer.begin_epoch(epoch_itr.epoch)
 
@@ -454,7 +458,6 @@ def get_parameters(model, src_param_names, dst_param_names):
 def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, src_head, dst_head, src_layer,
                     dst_layer):
     '''
-
     :param model: Our transformer model.
     :param head_dim: Head's dimension.
     :param num_heads: Amount of heads in each MHA mechanism.
@@ -466,6 +469,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
     :param dst_layer: Destination layer.
     :return: Nothing. Performs the parameter swapping between two heads.
     '''
+
     print(
         "Start swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
                                                                                           dst_layer))
@@ -494,15 +498,38 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
                                                                                          dst_layer))
 
 
-def mhr(model, experiment, head_dim, num_heads):
+def mhr(model, swaps, head_dim, num_heads, num_epoch):
     '''
 
     :param model: Our transformer model.
-    :param experiment: A specific experiment of parameter swapping.
+    :param swaps: A specific experiment of parameter swapping.
     :param head_dim: Head's dimension.
     :param num_heads: Amount of heads in each MHA mechanism.
+    :param num_epoch: string, a key for the epoch on which the swap should be made.
     :return: Nothing. Performs the experiments.
     '''
+
+    try:
+        s_epoch = swaps['{0}'.format(num_epoch)]
+    except:
+        return
+
+    for s in s_epoch:
+        src_layer = s['s_layer']
+        src_head = s['s_head']
+        src_layer_module = s['s_layer_module']
+        src_transformer_module = s['s_transformer_module']
+        dst_layer = s['d_layer']
+        dst_layer_module = s['d_layer_module']
+        dst_transformer_module = s['d_transformer_module']
+        src_param_names, dst_param_names = get_parameter_names(model, src_layer, src_layer_module,
+                                                               src_transformer_module, dst_layer,
+                                                               dst_layer_module, dst_transformer_module)
+        src_parameters, dst_parameters = get_parameters(model, src_param_names, dst_param_names)
+        mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, src_head, dst_head,
+                        src_layer,
+                        dst_layer)
+    """
     print("Start an experiment phase. The experiment is {}".format(experiment))
     start = time.time()
     if experiment == 'enc-dec last layer swapping':
@@ -525,7 +552,7 @@ def mhr(model, experiment, head_dim, num_heads):
                             dst_layer)
     end = time.time()
     print("The experiment phase(a swapping) took {} minuets".format(str((end - start) / 60)))
-
+    """
 
 if __name__ == "__main__":
     cli_main()
