@@ -54,6 +54,7 @@ def _main(args, output_file):
     logger.info(args)
 
     # Fix seed for stochastic decoding
+    print("Guy comment - > before if seed = {}".format(args.seed ))
     if args.seed is not None and not args.no_seed_provided:
         print("Guy comment - > args.seed = {}".format(args.seed))
         np.random.seed(args.seed)
