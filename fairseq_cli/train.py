@@ -130,7 +130,7 @@ def main(
     lr = trainer.get_lr()
     train_meter = meters.StopwatchMeter()
     train_meter.start()
-    experiment_path = args.mhr_experiment
+    experiment_path = args.mhr_experiment #path for experiment config
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
         valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
