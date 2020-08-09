@@ -55,8 +55,10 @@ def _main(args, output_file):
 
     # Fix seed for stochastic decoding
     if args.seed is not None and not args.no_seed_provided:
+        print("Guy comment - > args.seed = {}".format(args.seed))
         np.random.seed(args.seed)
         torch.manual_seed(args.seed)
+        print("Guy comment - > seed = {}".format(torch.manual_seed(args.seed)))
 
     use_cuda = torch.cuda.is_available() and not args.cpu
 
