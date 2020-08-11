@@ -486,6 +486,8 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         print(dst_head_parameter)
         # perform the rotation
         dst_parameter[dst_head, :, :] = src_head_parameter
+        del src_head_parameter
+        torch.cuda.empty_cache()
         print("############# dst_parameter_after ###############")
         print(dst_parameter[dst_head, :, :])
         print("############# dst_head_parameter_2 ###############")
