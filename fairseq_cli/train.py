@@ -479,12 +479,14 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
         # Get specific head parameters
         src_head_parameter = torch.tensor(src_parameter[src_head, :, :], requires_grad=True)
+        print("############# dst_paramete_before ###############")
+        print(dst_parameter[dst_head, :, :])
         dst_head_parameter = torch.tensor(dst_parameter[dst_head, :, :], requires_grad=True)
         print("############# dst_head_parameter_1 ###############")
         print(dst_head_parameter)
         # perform the rotation
         dst_parameter[dst_head, :, :] = src_head_parameter
-        print("############# dst_parameter ###############")
+        print("############# dst_parameter_after ###############")
         print(dst_parameter[dst_head, :, :])
         print("############# dst_head_parameter_2 ###############")
         print(dst_head_parameter)
