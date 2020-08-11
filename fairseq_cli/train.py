@@ -472,7 +472,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
     for i, key in enumerate(src_parameters.keys()):
         print(list(dst_parameters.keys())[i])
         print(key)
-        print(model[key])
+        print(src_parameters.keys())
         print(model.state_dict().keys())
         exit()
         # one source parameter(holds all heads)
