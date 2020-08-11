@@ -470,43 +470,44 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         "Start swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
                                                                                           dst_layer))
     for s_key, d_key in zip(src_parameters.keys(), dst_parameters.keys()):
-        print(s_key)
-        print(d_key)
 
-        """
-        # one source parameter(holds all heads)
-        src_parameter = model.state_dict()[key]
-        # one destination parameter(holds all heads)
-        dst_parameter = model.state_dict()[list(dst_parameters.keys())[i]]
-        # Change parameter shape to be able getting specific head
-        src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
-        dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
-        # Get specific head parameters
-        src_head_parameter = src_parameter[src_head, :, :].clone()
-        print("############# dst_paramete_before ###############")
-        print(dst_parameter[dst_head, :, :])
-        dst_head_parameter = dst_parameter[dst_head, :, :].clone()
-        print("############# dst_head_parameter_1 ###############")
-        print(dst_head_parameter)
-        # perform the rotation
-        dst_parameter[dst_head, :, :] = src_head_parameter
-        del src_head_parameter
-        torch.cuda.empty_cache()
-        print("############# dst_parameter_after ###############")
-        print(dst_parameter[dst_head, :, :])
-        print("############# dst_head_parameter_2 ###############")
-        print(dst_head_parameter)
-        src_parameter[src_head, :, :] = dst_head_parameter
-        del dst_head_parameter
-        torch.cuda.empty_cache()
-        # Change parameter shape back
-        src_parameter = src_parameter.transpose(0, 1).view(-1, num_heads, head_dim)
-        dst_parameter = dst_parameter.transpose(0, 1).view(-1, num_heads, head_dim)
-        # Insert the swapped parameters into the state_dict
-        model.state_dict()[key] = src_parameter
-        model.state_dict()[list(dst_parameters.keys())[i]] = dst_parameter
-        """
-    exit()
+        with torch.no_grad():
+
+            # one source parameter(holds all heads)
+            print(model.state_dict()[s_key].size)
+            src_parameter = model.state_dict()[s_key]
+            # one destination parameter(holds all heads)
+            dst_parameter = model.state_dict()[d_key]
+            # Change parameter shape to be able getting specific head
+            src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
+            dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
+            print(model.state_dict()[s_key].size)
+            exit()
+            # Get specific head parameters
+            src_head_parameter = src_parameter[src_head, :, :].clone()
+            print("############# dst_paramete_before ###############")
+            print(dst_parameter[dst_head, :, :])
+            dst_head_parameter = dst_parameter[dst_head, :, :].clone()
+            print("############# dst_head_parameter_1 ###############")
+            print(dst_head_parameter)
+            # perform the rotation
+            dst_parameter[dst_head, :, :] = src_head_parameter
+            del src_head_parameter
+            torch.cuda.empty_cache()
+            print("############# dst_parameter_after ###############")
+            print(dst_parameter[dst_head, :, :])
+            print("############# dst_head_parameter_2 ###############")
+            print(dst_head_parameter)
+            src_parameter[src_head, :, :] = dst_head_parameter
+            del dst_head_parameter
+            torch.cuda.empty_cache()
+            # Change parameter shape back
+            src_parameter = src_parameter.transpose(0, 1).view(-1, num_heads, head_dim)
+            dst_parameter = dst_parameter.transpose(0, 1).view(-1, num_heads, head_dim)
+            # Insert the swapped parameters into the state_dict
+            model.state_dict()[key] = src_parameter
+            model.state_dict()[list(dst_parameters.keys())[i]] = dst_parameter
+
     print(
         "Done swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
                                                                                          dst_layer))
