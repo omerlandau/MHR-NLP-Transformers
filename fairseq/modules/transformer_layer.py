@@ -76,7 +76,7 @@ class TransformerEncoderLayer(nn.Module):
                 mask_layer_type=args.mask_layer_type,
 
             )
-        if self.layer_index ==0 or self.layer_index ==5 :
+        if self.layer_index == 0 or self.layer_index == 5:
             return MultiheadAttention(
                 embed_dim,
                 args.encoder_attention_heads,
@@ -179,7 +179,7 @@ class TransformerDecoderLayer(nn.Module):
     """
 
     def __init__(
-        self, args, layer_index, no_encoder_attn=False, add_bias_kv=False, add_zero_attn=False
+            self, args, layer_index, no_encoder_attn=False, add_bias_kv=False, add_zero_attn=False
     ):
         super().__init__()
         self.layer_index = layer_index
@@ -284,22 +284,21 @@ class TransformerDecoderLayer(nn.Module):
                 encoder_decoder_attention=True,
             )
 
-
     def prepare_for_onnx_export_(self):
         self.onnx_trace = True
 
     def forward(
-        self,
-        x,
-        encoder_out: Optional[torch.Tensor] = None,
-        encoder_padding_mask: Optional[torch.Tensor] = None,
-        incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
-        prev_self_attn_state: Optional[List[torch.Tensor]] = None,
-        prev_attn_state: Optional[List[torch.Tensor]] = None,
-        self_attn_mask: Optional[torch.Tensor] = None,
-        self_attn_padding_mask: Optional[torch.Tensor] = None,
-        need_attn: bool = False,
-        need_head_weights: bool = False,
+            self,
+            x,
+            encoder_out: Optional[torch.Tensor] = None,
+            encoder_padding_mask: Optional[torch.Tensor] = None,
+            incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
+            prev_self_attn_state: Optional[List[torch.Tensor]] = None,
+            prev_attn_state: Optional[List[torch.Tensor]] = None,
+            self_attn_mask: Optional[torch.Tensor] = None,
+            self_attn_padding_mask: Optional[torch.Tensor] = None,
+            need_attn: bool = False,
+            need_head_weights: bool = False,
     ):
         """
         Args:
@@ -332,9 +331,9 @@ class TransformerDecoderLayer(nn.Module):
             self.self_attn._set_input_buffer(incremental_state, saved_state)
         _self_attn_input_buffer = self.self_attn._get_input_buffer(incremental_state)
         if self.cross_self_attention and not (
-            incremental_state is not None
-            and _self_attn_input_buffer is not None
-            and "prev_key" in _self_attn_input_buffer
+                incremental_state is not None
+                and _self_attn_input_buffer is not None
+                and "prev_key" in _self_attn_input_buffer
         ):
             if self_attn_mask is not None:
                 assert encoder_out is not None
