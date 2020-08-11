@@ -483,7 +483,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             #src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
             #print(src_parameter.size())
             #dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
-            print(model.state_dict()[s_key].size())
+            print(m[s_key].size())
             exit()
             # Get specific head parameters
             src_head_parameter = src_parameter[src_head, :, :].clone()
