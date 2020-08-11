@@ -469,12 +469,11 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
     print(
         "Start swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
                                                                                           dst_layer))
-    for i, key in enumerate(src_parameters.keys()):
-        print(list(dst_parameters.keys())[i])
-        print(key)
-        print(src_parameters.keys())
-        print(model.state_dict().keys())
-        exit()
+    for s_key, d_key in zip(src_parameters.keys(), dst_parameter.keys()):
+        print(s_key)
+        print(d_key)
+
+        """
         # one source parameter(holds all heads)
         src_parameter = model.state_dict()[key]
         # one destination parameter(holds all heads)
@@ -506,6 +505,8 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         # Insert the swapped parameters into the state_dict
         model.state_dict()[key] = src_parameter
         model.state_dict()[list(dst_parameters.keys())[i]] = dst_parameter
+        """
+    exit()
     print(
         "Done swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
                                                                                          dst_layer))
