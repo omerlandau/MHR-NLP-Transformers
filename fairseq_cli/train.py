@@ -111,6 +111,9 @@ def main(
         "training on {} devices (GPUs/TPUs)".format(args.distributed_world_size)
     )
     logger.info(
+        "training on {} devices (GPUs/TPUs)".format(args.distributed_world_size)
+    )
+    logger.info(
         "max tokens per GPU = {} and max sentences per GPU = {}".format(
             args.max_tokens, args.max_sentences
         )
