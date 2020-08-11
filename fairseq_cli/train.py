@@ -476,6 +476,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             # one source parameter(holds all heads)
             print(d_key)
             print(model.state_dict()[d_key])
+            m = model.state_dict()
             m[s_key] = m[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
             #model.load_state_dict(m)
             # one destination parameter(holds all heads)
@@ -488,6 +489,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             src_head_parameter = m[s_key][src_head, :, :].clone()
             print(src_head_parameter)
             m[d_key][dst_head, :, :] = src_head_parameter
+            m[s_key] = m[s_key].transpose(0, 1).view(-1, num_heads, head_dim)
             print(model.state_dict()[d_key])
             print("############# dst_paramete_before ###############")
             print(dst_parameter[dst_head, :, :])
