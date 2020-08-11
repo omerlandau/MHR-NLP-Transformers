@@ -493,7 +493,6 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         print(dst_parameter.requires_grad)
         print("############# dst_head_parameter_2 ###############")
         print(dst_head_parameter)
-        exit()
         src_parameter[src_head, :, :] = dst_head_parameter
         # Change parameter shape back
         src_parameter = src_parameter.transpose(0, 1).view(-1, num_heads, head_dim)
