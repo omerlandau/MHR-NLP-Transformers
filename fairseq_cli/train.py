@@ -491,6 +491,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             print(model.state_dict()[d_key])
             print("############# dst_paramete_before ###############")
             print(dst_parameter[dst_head, :, :])
+            exit()
             dst_head_parameter = dst_parameter[dst_head, :, :].clone()
             print("############# dst_head_parameter_1 ###############")
             print(dst_head_parameter)
