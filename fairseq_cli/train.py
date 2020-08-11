@@ -475,16 +475,16 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             # one source parameter(holds all heads)
             print("######## before #########")
             print(d_key)
-            print(model.decoder.layers[1].encoder_attn.k_proj.weight)
-            print(model.decoder.layers[1].encoder_attn.k_proj.weight.size())
+            print(model.state_dict()[d_key])
+            print(model.state_dict()[d_key].size())
             print(s_key)
-            print(model.decoder.layers[5].encoder_attn.k_proj.weight)
-            print(model.decoder.layers[5].encoder_attn.k_proj.weight.size())
-            m = model.state_dict()
+            print(model.state_dict()[s_key])
+            print(model.state_dict()[s_key].size())
+            ms = model.state_dict()
             #all source layer heads
-            src_parameter = m[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
+            src_parameter = ms[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
             #all dst layer heads
-            dst_parameter = m[d_key].view(-1, num_heads, head_dim).transpose(0, 1)
+            dst_parameter = ms[d_key].view(-1, num_heads, head_dim).transpose(0, 1)
             # Get specific head parameters
             src_head_parameter = src_parameter[src_head, :, :].clone()
             dst_head_parameter = dst_parameter[dst_head, :, :].clone()
@@ -495,39 +495,12 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             torch.cuda.empty_cache()
             print("######## after #########")
             print(d_key)
-            print(model.decoder.layers[1].encoder_attn.k_proj.weight)
-            print(model.decoder.layers[1].encoder_attn.k_proj.weight.size())
+            print(model.state_dict()[d_key])
+            print(model.state_dict()[d_key].size())
             print(s_key)
-            print(model.decoder.layers[5].encoder_attn.k_proj.weight)
-            print(model.decoder.layers[5].encoder_attn.k_proj.weight.size())
-            exit()
-            #m[s_key] = m[s_key].transpose(0, 1).view(-1, num_heads, head_dim)
-            print("############# dst_paramete_after ###############")
-            print(model.decoder.layers[1].encoder_attn.k_proj.weight)
-            exit()
-            print("############# dst_paramete_before ###############")
-            print(dst_parameter[dst_head, :, :])
+            print(model.state_dict()[s_key])
+            print(model.state_dict()[s_key].size())
 
-            dst_head_parameter = dst_parameter[dst_head, :, :].clone()
-            print("############# dst_head_parameter_1 ###############")
-            print(dst_head_parameter)
-            # perform the rotation
-            dst_parameter[dst_head, :, :] = src_head_parameter
-            del src_head_parameter
-            torch.cuda.empty_cache()
-            print("############# dst_parameter_after ###############")
-            print(dst_parameter[dst_head, :, :])
-            print("############# dst_head_parameter_2 ###############")
-            print(dst_head_parameter)
-            src_parameter[src_head, :, :] = dst_head_parameter
-            del dst_head_parameter
-            torch.cuda.empty_cache()
-            # Change parameter shape back
-            src_parameter = src_parameter.transpose(0, 1).view(-1, num_heads, head_dim)
-            dst_parameter = dst_parameter.transpose(0, 1).view(-1, num_heads, head_dim)
-            # Insert the swapped parameters into the state_dict
-            model.state_dict()[key] = src_parameter
-            model.state_dict()[list(dst_parameters.keys())[i]] = dst_parameter
 
     print(
         "Done swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
