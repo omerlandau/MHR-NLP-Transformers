@@ -436,11 +436,11 @@ def get_parameter_names(model, src_layer, src_layer_module,
     model_parms_list = list(model.state_dict().keys())
     src_param_names = [str for str in model_parms_list if src_layer in str and
                        src_transformer_module in str and src_layer_module in str and
-                       "bias" not in str and "norm" not in str]
+                       "bias" not in str and "norm" not in str and "out_proj" not in str]
     dst_param_names = [str for str in model_parms_list if dst_layer in str
                        and dst_transformer_module in str
                        and dst_layer_module in str
-                       and "bias" not in str and "norm" not in str]
+                       and "bias" not in str and "norm" not in str and "out_proj" not in str]
     return src_param_names, dst_param_names
 
 
