@@ -74,7 +74,6 @@ class TransformerEncoderLayer(nn.Module):
                 mask_layer=args.mask_layer,
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
-
             )
         if self.layer_index == 0 or self.layer_index == 5:
             return MultiheadAttention(
