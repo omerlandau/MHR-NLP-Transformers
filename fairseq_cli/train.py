@@ -474,15 +474,9 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         with torch.no_grad():
 
             # one source parameter(holds all heads)
-            print(s_key)
-            print(model.state_dict()[s_key].size())
-            m = model.state_dict()
-            print(model.state_dict()[s_key])
-            m[s_key].zero_()
-            print(model.state_dict()[s_key])
-            exit()
+            print(d_key)
+            print(model.state_dict()[d_key])
             m[s_key] = m[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
-            print(model.decoder.layers[5].encoder_attn.k_proj.weight)
             #model.load_state_dict(m)
             # one destination parameter(holds all heads)
             #dst_parameter = model.state_dict()[d_key]
@@ -490,10 +484,11 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             #src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
             #print(src_parameter.size())
             #dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
-            print(model.decoder.size())
-            exit()
             # Get specific head parameters
-            src_head_parameter = src_parameter[src_head, :, :].clone()
+            src_head_parameter = m[s_key][src_head, :, :].clone()
+            print(src_head_parameter)
+            m[d_key][dst_head, :, :] = src_head_parameter
+            print(model.state_dict()[d_key])
             print("############# dst_paramete_before ###############")
             print(dst_parameter[dst_head, :, :])
             dst_head_parameter = dst_parameter[dst_head, :, :].clone()
