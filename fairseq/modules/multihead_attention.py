@@ -355,7 +355,8 @@ class MultiheadAttention(nn.Module):
         assert v is not None
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
         if self.guy_test:
-            print("Z in layer {} is {}".format(self.guy_test_layer_index, attn))
+            attn = attn.view(self.num_heads, bsz, tgt_len, self.head_dim)
+            print("Z in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
             if(self.guy_test_layer_index==5):
                 exit()
         if self.mask_head is not None:
