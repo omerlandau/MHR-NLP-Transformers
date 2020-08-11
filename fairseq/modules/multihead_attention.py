@@ -347,11 +347,13 @@ class MultiheadAttention(nn.Module):
         # attn_weights_float[self.mask_head, :, :, :] = float(0)
         # attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
+        """
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
             p=self.dropout,
             training=self.training,
         )
+        """
         assert v is not None
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
         if self.guy_test:
