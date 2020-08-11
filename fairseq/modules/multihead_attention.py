@@ -319,17 +319,7 @@ class MultiheadAttention(nn.Module):
                     dim=1,
                 )
         attn_weights = torch.bmm(q, k.transpose(1, 2))
-
-        if self.guy_test:
-            attn2 = attn_weights.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
-            print("Z in layer {} is {}".format(self.guy_test_layer_index, attn2[0, :, :, :]))
-            if self.guy_test_layer_index == 5:
-                exit()
-
         attn_weights = MultiheadAttention.apply_sparse_mask(attn_weights, tgt_len, src_len, bsz)
-
-
-
         assert list(attn_weights.size()) == [bsz * self.num_heads, tgt_len, src_len]
         if attn_mask is not None:
             attn_mask = attn_mask.unsqueeze(0)
@@ -364,6 +354,11 @@ class MultiheadAttention(nn.Module):
         )
         assert v is not None
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
+        if self.guy_test:
+            attn2 = attn.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
+            print("Z in layer {} is {}".format(self.guy_test_layer_index, attn2[0, :, : , :]))
+            if self.guy_test_layer_index == 5:
+                exit()
         if self.mask_head is not None:
 
             attn = attn.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
