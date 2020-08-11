@@ -474,7 +474,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         with torch.no_grad():
 
             # one source parameter(holds all heads)
-            print(model[0])
+            print(model.d_key)
             exit()
             print(model.state_dict()[s_key].size())
             m = model.state_dict()[s_key]
