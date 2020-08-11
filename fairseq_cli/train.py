@@ -476,7 +476,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             # one source parameter(holds all heads)
             print(s_key)
             print(model.state_dict()[s_key].size())
-            m = copy.deepcopy(model.state_dict())
+            m = model.state_dict()
             m[s_key] = m[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
             model.load_state_dict(m)
             # one destination parameter(holds all heads)
