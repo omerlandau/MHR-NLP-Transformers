@@ -478,7 +478,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             print(model.state_dict()[s_key].size())
             m = model.state_dict()
             print(model.state_dict()[s_key])
-            m.state_dict()[s_key].zero_()
+            m[s_key].zero_()
             print(model.state_dict()[s_key])
             exit()
             m[s_key] = m[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
