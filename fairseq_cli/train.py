@@ -493,7 +493,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             m[d_key][dst_head, :, :] = src_head_parameter
             #m[s_key] = m[s_key].transpose(0, 1).view(-1, num_heads, head_dim)
             print("############# dst_paramete_after ###############")
-            print(model.state_dict()[d_key])
+            print(model.decoder.layers[1].encoder_attn.k_proj.weight)
             exit()
             print("############# dst_paramete_before ###############")
             print(dst_parameter[dst_head, :, :])
