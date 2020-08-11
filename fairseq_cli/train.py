@@ -480,7 +480,6 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         # Get specific head parameters
         src_head_parameter = src_parameter[src_head, :, :].clone()
         print("############# dst_paramete_before ###############")
-        print(dst_parameter.requires_grad)
         print(dst_parameter[dst_head, :, :])
         dst_head_parameter = dst_parameter[dst_head, :, :].clone()
         print("############# dst_head_parameter_1 ###############")
@@ -490,7 +489,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         del src_head_parameter
         torch.cuda.empty_cache()
         print("############# dst_parameter_after ###############")
-        print(dst_parameter.requires_grad)
+        print(dst_parameter[dst_head, :, :])
         print("############# dst_head_parameter_2 ###############")
         print(dst_head_parameter)
         src_parameter[src_head, :, :] = dst_head_parameter
