@@ -75,15 +75,6 @@ class TransformerEncoderLayer(nn.Module):
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
             )
-        if self.layer_index == 0 or self.layer_index == 5:
-            return MultiheadAttention(
-                embed_dim,
-                args.encoder_attention_heads,
-                dropout=args.attention_dropout,
-                self_attention=True,
-                guy_test=True,
-                guy_test_layer_index=self.layer_index,
-            )
         else:
             return MultiheadAttention(
                 embed_dim,
@@ -272,6 +263,15 @@ class TransformerDecoderLayer(nn.Module):
                 mask_layer=args.mask_layer,
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
+            )
+        if self.layer_index == 1 or self.layer_index == 5:
+            return MultiheadAttention(
+                embed_dim,
+                args.encoder_attention_heads,
+                dropout=args.attention_dropout,
+                self_attention=True,
+                guy_test=True,
+                guy_test_layer_index=self.layer_index,
             )
         else:
             return MultiheadAttention(
