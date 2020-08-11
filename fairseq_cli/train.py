@@ -477,28 +477,26 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             print(d_key)
             print(model.decoder.layers[1].encoder_attn.k_proj.weight)
             print(s_key)
-            print(model.decoder.layers[1].encoder_attn.k_proj.weight)
-            exit()
-            print("############# dst_paramete_before ###############")
-            print(model.state_dict()[d_key])
+            print(model.decoder.layers[5].encoder_attn.k_proj.weight)
             m = model.state_dict()
+            #all source layer heads
             src_parameter = m[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
+            #all dst layer heads
             dst_parameter = m[d_key].view(-1, num_heads, head_dim).transpose(0, 1)
-            #model.load_state_dict(m)
-            # one destination parameter(holds all heads)
-            #dst_parameter = model.state_dict()[d_key]
-            # Change parameter shape to be able getting specific head
-            #src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
-            #print(src_parameter.size())
-            #dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
             # Get specific head parameters
             src_head_parameter = src_parameter[src_head, :, :].clone()
-            print(src_head_parameter)
-            print(dst_parameter[dst_head, :, :].size())
+            dst_head_parameter = dst_parameter[dst_head, :, :].clone()
             dst_parameter[dst_head, :, :] = src_head_parameter
+            src_parameter[src_head, :, :] = dst_head_parameter
+            del src_parameter
             del dst_parameter
-            del m
             torch.cuda.empty_cache()
+            print("######## after #########")
+            print(d_key)
+            print(model.decoder.layers[1].encoder_attn.k_proj.weight)
+            print(s_key)
+            print(model.decoder.layers[5].encoder_attn.k_proj.weight)
+            exit()
             #m[s_key] = m[s_key].transpose(0, 1).view(-1, num_heads, head_dim)
             print("############# dst_paramete_after ###############")
             print(model.decoder.layers[1].encoder_attn.k_proj.weight)
