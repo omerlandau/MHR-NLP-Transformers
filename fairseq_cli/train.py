@@ -478,8 +478,8 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         src_parameter = src_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
         dst_parameter = dst_parameter.view(-1, num_heads, head_dim).transpose(0, 1)
         # Get specific head parameters
-        src_head_parameter = src_parameter[src_head, :, :]
-        dst_head_parameter = dst_parameter[dst_head, :, :]
+        src_head_parameter = src_parameter[src_head, :, :].copy()
+        dst_head_parameter = dst_parameter[dst_head, :, :].copy()
         print("############# dst_head_parameter_1 ###############")
         print(dst_head_parameter)
         # perform the rotation
