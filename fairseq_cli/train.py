@@ -474,11 +474,9 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         with torch.no_grad():
 
             # one source parameter(holds all heads)
-            print(model(d_key))
-            exit()
             print(model.state_dict()[s_key].size())
-            m = model.state_dict()[s_key]
-            model.state_dict()[s_key] = m.view(-1, num_heads, head_dim).transpose(0, 1)
+            m = model.state_dict()
+            m.view_(-1, num_heads, head_dim).transpose(0, 1)
             # one destination parameter(holds all heads)
             #dst_parameter = model.state_dict()[d_key]
             # Change parameter shape to be able getting specific head
