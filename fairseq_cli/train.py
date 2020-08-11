@@ -489,7 +489,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         del src_head_parameter
         torch.cuda.empty_cache()
         print("############# dst_parameter_after ###############")
-        print(dst_parameter[dst_head, :, :])
+        print(dst_parameter[dst_head, :, :].requires_grad)
         print("############# dst_head_parameter_2 ###############")
         print(dst_head_parameter)
         exit()
