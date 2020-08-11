@@ -396,7 +396,7 @@ class TransformerEncoder(FairseqEncoder):
 
         # B x T x C -> T x B x C
         x = x.transpose(0, 1)
-        print("Ome landau is gay {}".format(x.size()))
+        print("Omer landau is a dushbag {}".format(x.size()))
         # compute padding mask
         encoder_padding_mask = src_tokens.eq(self.padding_idx)
 
