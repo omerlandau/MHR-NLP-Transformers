@@ -476,7 +476,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             # one source parameter(holds all heads)
             print(model.state_dict()[s_key].size())
             m = model.state_dict()
-            m.view_(-1, num_heads, head_dim).transpose(0, 1)
+            m[s_key].view_(-1, num_heads, head_dim).transpose(0, 1)
             # one destination parameter(holds all heads)
             #dst_parameter = model.state_dict()[d_key]
             # Change parameter shape to be able getting specific head
