@@ -29,7 +29,7 @@ class MultiheadAttention(nn.Module):
             kdim=None,
             vdim=None,
             dropout=0.0,
-            bias=False, #changed bias to false omer, guy is loser
+            bias=False,  # changed bias to false omer, guy is loser
             add_bias_kv=False,
             add_zero_attn=False,
             self_attention=False,
@@ -356,13 +356,11 @@ class MultiheadAttention(nn.Module):
 
         assert v is not None
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
+        print("god pls let it work {}".format(attn.size()))
         if self.guy_test:
-            attn2 = attn.view(bsz,self.num_heads , tgt_len, self.head_dim).transpose(0, 1)
-            print("Z in layer {} is {}".format(self.guy_test_layer_index, attn2[0, :, : , :]))
-            if self.guy_test_layer_index == 5:
-                exit()
+            attn2 = attn.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
+            print("Z in layer {} is {}".format(self.guy_test_layer_index, attn2[0, :, :, :]))
         if self.mask_head is not None:
-
             attn = attn.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
             attn[self.mask_head, :, :, :] = float(0)
             attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
