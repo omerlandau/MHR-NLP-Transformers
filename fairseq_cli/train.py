@@ -31,6 +31,9 @@ from fairseq.model_parallel.megatron_trainer import MegatronTrainer
 from fairseq.trainer import Trainer
 import json
 
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
 logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
