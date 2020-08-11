@@ -267,9 +267,11 @@ class TransformerDecoderLayer(nn.Module):
         if self.layer_index == 1 or self.layer_index == 5:
             return MultiheadAttention(
                 embed_dim,
-                args.encoder_attention_heads,
+                args.decoder_attention_heads,
+                kdim=getattr(args, "encoder_embed_dim", None),
+                vdim=getattr(args, "encoder_embed_dim", None),
                 dropout=args.attention_dropout,
-                self_attention=True,
+                encoder_decoder_attention=True,
                 guy_test=True,
                 guy_test_layer_index=self.layer_index,
             )
