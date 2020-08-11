@@ -478,7 +478,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             print(model.state_dict()[s_key].size())
             m = model.state_dict()
             m[s_key] = m[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
-            model.decoder.layers[5].encoder_attn.k_proj.weight = model.decoder.layers[5].encoder_attn.k_proj.weight.view(-1, num_heads, head_dim).transpose(0, 1)
+            model.decoder.layers[5].encoder_attn.k_proj = model.decoder.layers[5].encoder_attn.k_proj.view(-1, num_heads, head_dim).transpose(0, 1)
             print(model.decoder.layers[5].encoder_attn.k_proj.weight.size())
             #model.load_state_dict(m)
             # one destination parameter(holds all heads)
