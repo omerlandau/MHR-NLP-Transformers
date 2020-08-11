@@ -479,13 +479,13 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
 
         with torch.no_grad():
             # one source parameter(holds all heads)
-            print("######## before #########")
-            print(d_key)
-            print(model.state_dict()[d_key])
-            print(model.state_dict()[d_key].size())
-            print(s_key)
-            print(model.state_dict()[s_key])
-            print(model.state_dict()[s_key].size())
+            #print("######## before #########")
+            #print(d_key)
+            #print(model.state_dict()[d_key])
+            #print(model.state_dict()[d_key].size())
+            #print(s_key)
+            #print(model.state_dict()[s_key])
+            #print(model.state_dict()[s_key].size())
             ms = model.state_dict()
             #all source layer heads
             src_parameter = ms[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
@@ -499,13 +499,13 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             del src_parameter
             del dst_parameter
             torch.cuda.empty_cache()
-            print("######## after #########")
-            print(d_key)
-            print(model.state_dict()[d_key])
-            print(model.state_dict()[d_key].size())
-            print(s_key)
-            print(model.state_dict()[s_key])
-            print(model.state_dict()[s_key].size())
+            #print("######## after #########")
+            #print(d_key)
+            #print(model.state_dict()[d_key])
+            #print(model.state_dict()[d_key].size())
+            #print(s_key)
+            #print(model.state_dict()[s_key])
+            #print(model.state_dict()[s_key].size())
 
 
     print(
