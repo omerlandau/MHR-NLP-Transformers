@@ -202,7 +202,7 @@ class MultiheadAttention(nn.Module):
         elif self.encoder_decoder_attention:
             print("Inside enc-dec MHA")
             # encoder-decoder attention
-            print("q_proj : {}".format(self.q_proj))
+            print("q_proj : {}".format(list(self.q_proj.parameters())))
             q = self.q_proj(query)
             if key is None:
                 assert value is None
