@@ -490,11 +490,14 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             ms = model.state_dict()
             print("src parms size before view : {}".format(ms[s_key].size()))
             #all source layer heads
-            src_parameter = ms[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
-            print("src parms size after view : {}".format(src_parameter.size()))
+            #src_parameter = ms[s_key].view(-1, num_heads, head_dim).transpose(0, 1) # omer old
+            src_parameter = ms[s_key]
+            print("src_parameter size after view : {}".format(src_parameter.size()))
 
             #all dst layer heads
-            dst_parameter = ms[d_key].view(-1, num_heads, head_dim).transpose(0, 1)
+            #dst_parameter = ms[d_key].view(-1, num_heads, head_dim).transpose(0, 1)  # omer old
+            dst_parameter = ms[d_key]
+            print("dst_parameter size after view : {}".format(dst_parameter.size()))
             # Get specific head parameters
             src_head_parameter = src_parameter[src_head, :, :].clone()
             dst_head_parameter = dst_parameter[dst_head, :, :].clone()
