@@ -362,8 +362,11 @@ class MultiheadAttention(nn.Module):
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
         print("Guy comment - > attn size {}".format(attn.size()))
         if self.guy_test:
-            attn2 = attn.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
-            print("Z in layer {} is {}".format(self.guy_test_layer_index, attn2[0, :, :, :]))
+            test_vec = torch.zeros(self.num_heads)
+            test_vec[0] = 1
+            test_vec = test_vec.view(1, self.num_heads, 1, 1)
+            head = attn.view(bsz, self.num_heads, tgt_len, self.head_dim) * test_vec
+            print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, head))
             if self.guy_test_layer_index == 5:
                 exit()
         '''
