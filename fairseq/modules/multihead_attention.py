@@ -241,9 +241,6 @@ class MultiheadAttention(nn.Module):
                 .view(tgt_len, bsz * self.num_heads, self.head_dim)
                 .transpose(0, 1)
         )
-        if self.guy_test:
-            print("q test is {}".format(q[0]))
-            print("q test size is {}".format(q[0].size()))
         if k is not None:
             k = (
                 k.contiguous()
@@ -326,7 +323,12 @@ class MultiheadAttention(nn.Module):
                     dim=1,
                 )
         if self.guy_test:
-            print("q3 shape is {}".format(q.size()))
+            print("q test is {}".format(q[0]))
+            print("q test size is {}".format(q[0].size()))
+            print("k test is {}".format(k[0]))
+            print("k test size is {}".format(k[0].size()))
+            print("v test is {}".format(v[0]))
+            print("v test size is {}".format(v[0].size()))
         attn_weights = torch.bmm(q, k.transpose(1, 2))
         attn_weights = MultiheadAttention.apply_sparse_mask(attn_weights, tgt_len, src_len, bsz)
         assert list(attn_weights.size()) == [bsz * self.num_heads, tgt_len, src_len]
