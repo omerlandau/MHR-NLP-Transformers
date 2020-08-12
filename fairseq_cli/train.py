@@ -491,7 +491,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             print("src parms size before view : {}".format(ms[s_key].size()))
             #all source layer heads
             src_parameter = ms[s_key].view(-1, num_heads, head_dim).transpose(0, 1)
-            print("src parms size after view : {}".format(ms[s_key].size()))
+            print("src parms size after view : {}".format(src_parameter.size()))
 
             #all dst layer heads
             dst_parameter = ms[d_key].view(-1, num_heads, head_dim).transpose(0, 1)
