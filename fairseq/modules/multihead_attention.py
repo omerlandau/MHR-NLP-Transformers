@@ -209,7 +209,7 @@ class MultiheadAttention(nn.Module):
                 k = self.k_proj(key)
                 v = self.v_proj(key)
             print("query is : {}, query size : {}".format(query, query.size()))
-            print("self.q_proj is :{}, self.q_proj size : {}".format(self.q_proj, self.q_proj.size()))
+            print("self.q_proj is :{}, self.q_proj size : {}".format(self.q_proj, self.q_proj.shape()))
             print("q is :{}, q size : {}".format(q, q.size()))
         else:
             assert key is not None and value is not None
