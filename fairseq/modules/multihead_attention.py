@@ -212,7 +212,6 @@ class MultiheadAttention(nn.Module):
             if self.guy_test:
                 print("query size : {}".format(query.size()))
                 print("q size : {}".format(q.size()))
-                print("q is :{}".format(q))
         else:
             assert key is not None and value is not None
             q = self.q_proj(query)
@@ -326,8 +325,11 @@ class MultiheadAttention(nn.Module):
             print("q test size is {}".format(q[0].size()))
             print("k test size is {}".format(k[0].size()))
             print("v test size is {}".format(v[0].size()))
+
         attn_weights = torch.bmm(q, k.transpose(1, 2))
         attn_weights = MultiheadAttention.apply_sparse_mask(attn_weights, tgt_len, src_len, bsz)
+        if self.guy_test:
+            print("attn_weights test size is {}".format(attn_weights[0].size()))
         assert list(attn_weights.size()) == [bsz * self.num_heads, tgt_len, src_len]
         if attn_mask is not None:
             attn_mask = attn_mask.unsqueeze(0)
@@ -349,6 +351,8 @@ class MultiheadAttention(nn.Module):
             attn_weights, dim=-1, onnx_trace=self.onnx_trace
         )
 
+        if self.guy_test:
+            print("attn_weights after softmax test size is {}".format(attn_weights_float[0].size()))
         if self.mask_head is not None:
             print("Guy comment - > layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
                                                                       self.mask_layer_type))
