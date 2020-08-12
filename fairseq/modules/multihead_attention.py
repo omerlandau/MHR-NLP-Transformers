@@ -345,8 +345,7 @@ class MultiheadAttention(nn.Module):
             print("Guy comment - > layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
                                                                       self.mask_layer_type))
             head_masking_vector = torch.ones(self.num_heads)
-            for head_idx in self.mask_heads:
-                self._head_mask[head_idx] = 0
+            head_masking_vector[self.mask_head] = 0
             head_masking_vector.view(1, self.num_heads, 1, 1).to(attn_weights_float.device)
             attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
             attn_weights_float = attn_weights_float.view(bsz, self.num_heads, tgt_len, src_len) * head_masking_vector
@@ -373,6 +372,7 @@ class MultiheadAttention(nn.Module):
             attn = attn.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
             attn[self.mask_head, :, :, :] = float(0)
             attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
+        '''
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
         if self.onnx_trace and attn.size(1) == 1:
             # when ONNX tracing a single decoder step (sequence length == 1)
