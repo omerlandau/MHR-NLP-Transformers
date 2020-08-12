@@ -372,10 +372,11 @@ class MultiheadAttention(nn.Module):
 
         assert v is not None
         if self.guy_test:
-            print("attn_probs  size is {} and in spot zero {}".format(attn_probs, attn_probs[0].size()))
+            print("attn_probs  size is {} and in spot zero {}".format(attn_probs.size(), attn_probs[0].size()))
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
         if self.guy_test:
             print("Guy comment - > attn size {}".format(attn.size()))
+            print("Guy comment - > attn size in spot zero {}".format(attn[0].size()))
             test_vec = torch.zeros(self.num_heads)
             test_vec[0] = 1
             test_vec = test_vec.view(1, self.num_heads, 1, 1).to(attn.device)

@@ -391,7 +391,6 @@ class TransformerEncoder(FairseqEncoder):
         """
         if self.layer_wise_attention:
             return_all_hiddens = True
-        print("src tokents : {}".format(src_tokens))
         x, encoder_embedding = self.forward_embedding(src_tokens)
 
         # B x T x C -> T x B x C
