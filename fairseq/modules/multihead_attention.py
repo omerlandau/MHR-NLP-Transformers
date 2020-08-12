@@ -202,7 +202,8 @@ class MultiheadAttention(nn.Module):
         elif self.encoder_decoder_attention:
             print("Inside enc-dec MHA")
             # encoder-decoder attention
-            print("q_proj : {}".format(list(self.q_proj.parameters())))
+            if self.guy_test:
+                print("q_proj : {}".format(list(self.q_proj.parameters())))
             q = self.q_proj(query)
             if key is None:
                 assert value is None
@@ -377,7 +378,7 @@ class MultiheadAttention(nn.Module):
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
         if self.guy_test:
             print("Guy comment - > attn size {}".format(attn.size()))
-            print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
+            #print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
             print("Head 0 size {}".format(attn[0].size()))
             if self.guy_test_layer_index == 5:
                 exit()
