@@ -504,8 +504,8 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             src_head_parameter = src_parameter[:, (src_head - 1) * head_dim:src_head * head_dim].clone()
             dst_head_parameter = dst_parameter[:, (dst_head - 1) * head_dim:dst_head * head_dim].clone()
 
-            print("src head after : {}".format(src_head_parameter[:, 0:128]))
-            print("dst head after : {}".format(dst_head_parameter[:, 0:128]))
+            print("src head after : {}".format(src_head_parameter))
+            print("dst head after : {}".format(dst_head_parameter))
             dst_parameter[:, (dst_head - 1) * head_dim:dst_head * head_dim] = src_head_parameter
             src_parameter[:, (src_head - 1) * head_dim:src_head * head_dim] = dst_head_parameter
             del src_parameter
