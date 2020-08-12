@@ -29,7 +29,7 @@ class MultiheadAttention(nn.Module):
             kdim=None,
             vdim=None,
             dropout=0.0,
-            bias=False,  # changed bias to false omer, guy is loser
+            bias=False, #changed bias to false omer, guy is loser
             add_bias_kv=False,
             add_zero_attn=False,
             self_attention=False,
@@ -369,10 +369,10 @@ class MultiheadAttention(nn.Module):
                 exit()
         '''
         if self.mask_head is not None:
+
             attn = attn.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
             attn[self.mask_head, :, :, :] = float(0)
             attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
-        '''
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
         if self.onnx_trace and attn.size(1) == 1:
             # when ONNX tracing a single decoder step (sequence length == 1)
