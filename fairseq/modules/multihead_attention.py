@@ -242,8 +242,8 @@ class MultiheadAttention(nn.Module):
                 .transpose(0, 1)
         )
         if self.guy_test:
-            print("q2 shape is {}".format(q.size()))
-            print("q is {}".format(q))
+            print("q test is {}".format(q[0]))
+            print("q test size is {}".format(q[0].size()))
         if k is not None:
             k = (
                 k.contiguous()
