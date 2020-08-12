@@ -595,7 +595,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             self.layers = LayerDropModuleList(p=self.decoder_layerdrop)
         else:
             self.layers = nn.ModuleList([])
-        print("Guy comment - > number of layers to create : {}".format(len(self.layers)))
+        print("Guy comment - > number of layers to create : {}".format(args.decoder_layers))
         self.layers.extend(
             [
                 self.build_decoder_layer(args, _, no_encoder_attn)
