@@ -29,7 +29,7 @@ class MultiheadAttention(nn.Module):
             kdim=None,
             vdim=None,
             dropout=0.0,
-            bias=False, #changed bias to false omer, guy is loser
+            bias=False,  # changed bias to false omer, guy is loser
             add_bias_kv=False,
             add_zero_attn=False,
             self_attention=False,
@@ -208,7 +208,9 @@ class MultiheadAttention(nn.Module):
             else:
                 k = self.k_proj(key)
                 v = self.v_proj(key)
-
+            print("query is : {}, query size : {}".format(query, query.size()))
+            print("self.q_proj is :{}, self.q_proj size : {}".format(self.q_proj, self.q_proj.size()))
+            print("q is :{}, q size : {}".format(q, q.size()))
         else:
             assert key is not None and value is not None
             q = self.q_proj(query)
@@ -237,6 +239,8 @@ class MultiheadAttention(nn.Module):
                 .view(tgt_len, bsz * self.num_heads, self.head_dim)
                 .transpose(0, 1)
         )
+
+        print("q2 is :{}, q2 size : {}".format(q, q.size()))
         if k is not None:
             k = (
                 k.contiguous()
