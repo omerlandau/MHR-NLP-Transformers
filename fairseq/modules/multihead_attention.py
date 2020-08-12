@@ -208,9 +208,9 @@ class MultiheadAttention(nn.Module):
             else:
                 k = self.k_proj(key)
                 v = self.v_proj(key)
-            print("query is : {}, query size : {}".format(query, query.size()))
-            print("self.q_proj is :{}, self.q_proj size : {}".format(self.q_proj, self.q_proj.shape()))
-            print("q is :{}, q size : {}".format(q, q.size()))
+            print("query size : {}".format(query.size()))
+            print("self.q_proj size : {}".format(self.q_proj.shape()))
+            print("q size : {}".format(q.size()))
         else:
             assert key is not None and value is not None
             q = self.q_proj(query)
@@ -240,7 +240,7 @@ class MultiheadAttention(nn.Module):
                 .transpose(0, 1)
         )
 
-        print("q2 is :{}, q2 size : {}".format(q, q.size()))
+        print("q2 size : {}".format(q.size()))
         if k is not None:
             k = (
                 k.contiguous()
