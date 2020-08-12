@@ -200,6 +200,7 @@ class MultiheadAttention(nn.Module):
             k = self.k_proj(query)
             v = self.v_proj(query)
         elif self.encoder_decoder_attention:
+            print("Inside enc-dec MHA")
             # encoder-decoder attention
             q = self.q_proj(query)
             if key is None:
@@ -239,7 +240,6 @@ class MultiheadAttention(nn.Module):
                 .transpose(0, 1)
         )
 
-        print("q2 size : {}".format(q.size()))
         if k is not None:
             k = (
                 k.contiguous()

@@ -265,7 +265,6 @@ class TransformerDecoderLayer(nn.Module):
                 mask_layer_type=args.mask_layer_type,
             )
         if self.layer_index == 1 or self.layer_index == 5:
-            print("enc-dec attn create - 1")
             return MultiheadAttention(
                 embed_dim,
                 args.decoder_attention_heads,
