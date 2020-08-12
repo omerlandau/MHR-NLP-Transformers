@@ -29,7 +29,7 @@ class MultiheadAttention(nn.Module):
             kdim=None,
             vdim=None,
             dropout=0.0,
-            bias=False, #changed bias to false omer, guy is loser
+            bias=False,  # changed bias to false omer, guy is loser
             add_bias_kv=False,
             add_zero_attn=False,
             self_attention=False,
@@ -340,12 +340,17 @@ class MultiheadAttention(nn.Module):
         attn_weights_float = utils.softmax(
             attn_weights, dim=-1, onnx_trace=self.onnx_trace
         )
-        # if self.mask_head is not None:
-        # print("Guy comment - > should be here! layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
-        # self.mask_layer_type))
-        # attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
-        # attn_weights_float[self.mask_head, :, :, :] = float(0)
-        # attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
+
+        if self.mask_head is not None:
+            print("Guy comment - > layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
+                                                                      self.mask_layer_type))
+            head_masking_vector = torch.ones(self.num_heads)
+            for head_idx in self.mask_heads:
+                self._head_mask[head_idx] = 0
+            head_masking_vector.view(1, self.num_heads, 1, 1).to(attn_weights_float.device)
+            attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
+            attn_weights_float = attn_weights_float.view(bsz, self.num_heads, tgt_len, src_len) * head_masking_vector
+            attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
 
         attn_probs = F.dropout(
@@ -356,17 +361,18 @@ class MultiheadAttention(nn.Module):
 
         assert v is not None
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
-        print("gos pls let it work {}".format(attn.size()))
+        print("Guy comment - > attn size {}".format(attn.size()))
         if self.guy_test:
-            attn2 = attn.view(bsz,self.num_heads , tgt_len, self.head_dim).transpose(0, 1)
-            print("Z in layer {} is {}".format(self.guy_test_layer_index, attn2[0, :, : , :]))
+            attn2 = attn.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
+            print("Z in layer {} is {}".format(self.guy_test_layer_index, attn2[0, :, :, :]))
             if self.guy_test_layer_index == 5:
                 exit()
+        '''
         if self.mask_head is not None:
-
             attn = attn.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
             attn[self.mask_head, :, :, :] = float(0)
             attn = attn.view(bsz * self.num_heads, tgt_len, self.head_dim)
+        '''
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
         if self.onnx_trace and attn.size(1) == 1:
             # when ONNX tracing a single decoder step (sequence length == 1)
