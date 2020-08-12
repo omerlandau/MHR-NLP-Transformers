@@ -364,7 +364,7 @@ class MultiheadAttention(nn.Module):
         if self.guy_test:
             test_vec = torch.zeros(self.num_heads)
             test_vec[0] = 1
-            test_vec = test_vec.view(1, self.num_heads, 1, 1)
+            test_vec = test_vec.view(1, self.num_heads, 1, 1).to(attn.device)
             head = attn.view(bsz, self.num_heads, tgt_len, self.head_dim) * test_vec
             print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, head))
             if self.guy_test_layer_index == 5:
