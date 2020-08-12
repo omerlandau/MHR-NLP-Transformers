@@ -209,8 +209,10 @@ class MultiheadAttention(nn.Module):
             else:
                 k = self.k_proj(key)
                 v = self.v_proj(key)
-            print("query size : {}".format(query.size()))
-            print("q size : {}".format(q.size()))
+            if self.guy_test:
+                print("query size : {}".format(query.size()))
+                print("q size : {}".format(q.size()))
+                print("q is :".format(q))
         else:
             assert key is not None and value is not None
             q = self.q_proj(query)
@@ -241,6 +243,7 @@ class MultiheadAttention(nn.Module):
         )
         if self.guy_test:
             print("q2 shape is {}".format(q.size()))
+            print("q is {}".format(q))
         if k is not None:
             k = (
                 k.contiguous()
@@ -366,8 +369,8 @@ class MultiheadAttention(nn.Module):
 
         assert v is not None
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
-        print("Guy comment - > attn size {}".format(attn.size()))
         if self.guy_test:
+            print("Guy comment - > attn size {}".format(attn.size()))
             test_vec = torch.zeros(self.num_heads)
             test_vec[0] = 1
             test_vec = test_vec.view(1, self.num_heads, 1, 1).to(attn.device)
