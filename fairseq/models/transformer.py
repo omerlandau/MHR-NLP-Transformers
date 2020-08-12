@@ -391,12 +391,11 @@ class TransformerEncoder(FairseqEncoder):
         """
         if self.layer_wise_attention:
             return_all_hiddens = True
-
+        print("src tokents : {}".format(src_tokens))
         x, encoder_embedding = self.forward_embedding(src_tokens)
 
         # B x T x C -> T x B x C
         x = x.transpose(0, 1)
-        print("Omer landau is a dushbag {}".format(x.size()))
         # compute padding mask
         encoder_padding_mask = src_tokens.eq(self.padding_idx)
 
@@ -596,6 +595,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             self.layers = LayerDropModuleList(p=self.decoder_layerdrop)
         else:
             self.layers = nn.ModuleList([])
+        print("Guy comment - > number of layers to create : {}".format(len(self.layers)))
         self.layers.extend(
             [
                 self.build_decoder_layer(args, _, no_encoder_attn)
