@@ -137,7 +137,7 @@ def main(
     lr = trainer.get_lr()
     train_meter = meters.StopwatchMeter()
     train_meter.start()
-    experiment_path = args.mhr_experiment #path for experiment configuration
+    experiment_path = args.mhr_experiment  # path for experiment configuration
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
         valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
@@ -227,7 +227,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     num_heads = args.decoder_attention_heads
     head_dim = args.decoder_embed_dim // num_heads
-    with open(experiment_path,'r') as f:
+    with open(experiment_path, 'r') as f:
         swaps = json.load(f)
 
     mhr(model, swaps, head_dim, num_heads, epoch_itr.epoch)
@@ -477,7 +477,6 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
         "Start swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
                                                                                           dst_layer))
     for s_key, d_key in zip(src_parameters.keys(), dst_parameters.keys()):
-
         with torch.no_grad():
             # one source parameter(holds all heads)
             print("######## before #########")
@@ -489,31 +488,36 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             print(model.state_dict()[s_key].size())
             ms = model.state_dict()
             print("src parms size before view : {}".format(ms[s_key].size()))
-            #all source layer heads
-            #src_parameter = ms[s_key].view(-1, num_heads, head_dim).transpose(0, 1) # omer old
+            # all source layer heads
+            # src_parameter = ms[s_key].view(-1, num_heads, head_dim).transpose(0, 1) # omer old
             src_parameter = ms[s_key]
             print("src_parameter size after view : {}".format(src_parameter.size()))
 
-            #all dst layer heads
-            #dst_parameter = ms[d_key].view(-1, num_heads, head_dim).transpose(0, 1)  # omer old
+            # all dst layer heads
+            # dst_parameter = ms[d_key].view(-1, num_heads, head_dim).transpose(0, 1)  # omer old
             dst_parameter = ms[d_key]
             print("dst_parameter size after view : {}".format(dst_parameter.size()))
             # Get specific head parameters
-            src_head_parameter = src_parameter[src_head, :, :].clone()
-            dst_head_parameter = dst_parameter[dst_head, :, :].clone()
+            print("src head before : {}".format(src_parameter[:, 0:128]))
+            print("src head before : {}".format(dst_parameter[:, 0:128]))
+
+            src_head_parameter = src_parameter[:, (src_head - 1) * head_dim:src_head * head_dim].clone()
+            dst_head_parameter = dst_parameter[:, (dst_head - 1) * head_dim:dst_head * head_dim].clone()
+
+            print("src head after : {}".format(src_head_parameter[:, 0:128]))
+            print("src head after : {}".format(dst_head_parameter[:, 0:128]))
             dst_parameter[dst_head, :, :] = src_head_parameter
             src_parameter[src_head, :, :] = dst_head_parameter
             del src_parameter
             del dst_parameter
             torch.cuda.empty_cache()
-            #print("######## after #########")
-            #print(d_key)
-            #print(model.state_dict()[d_key])
-            #print(model.state_dict()[d_key].size())
-            #print(s_key)
-            #print(model.state_dict()[s_key])
-            #print(model.state_dict()[s_key].size())
-
+            # print("######## after #########")
+            # print(d_key)
+            # print(model.state_dict()[d_key])
+            # print(model.state_dict()[d_key].size())
+            # print(s_key)
+            # print(model.state_dict()[s_key])
+            # print(model.state_dict()[s_key].size())
 
     print(
         "Done swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
@@ -545,7 +549,10 @@ def mhr(model, swaps, head_dim, num_heads, num_epoch):
         dst_head = s['d_head']
         dst_layer_module = s['d_layer_module']
         dst_transformer_module = s['d_transformer_module']
-        print("src_layer = {0}, src_head = {1}, src_lm = {2}, src_tm = {3}, dst_layer = {4}, dst_head = {5}, dst_lm = {6}, dst_tm = {7}".format(src_layer,src_head,src_layer_module,src_transformer_module,dst_layer,dst_head,dst_layer_module,dst_transformer_module))
+        print(
+            "src_layer = {0}, src_head = {1}, src_lm = {2}, src_tm = {3}, dst_layer = {4}, dst_head = {5}, dst_lm = {6}, dst_tm = {7}".format(
+                src_layer, src_head, src_layer_module, src_transformer_module, dst_layer, dst_head, dst_layer_module,
+                dst_transformer_module))
         src_param_names, dst_param_names = get_parameter_names(model, src_layer, src_layer_module,
                                                                src_transformer_module, dst_layer,
                                                                dst_layer_module, dst_transformer_module)
@@ -555,6 +562,7 @@ def mhr(model, swaps, head_dim, num_heads, num_epoch):
                         dst_layer)
     end = time.time()
     print("The experiment swapping took {} minuets".format(str((end - start) / 60)))
+
 
 if __name__ == "__main__":
     cli_main()
