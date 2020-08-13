@@ -370,9 +370,10 @@ class TransformerDecoderLayer(nn.Module):
             x = self.self_attn_layer_norm(x)
 
         if self.encoder_attn is not None:
+            print("Guy comment - > inside forward enc-dec")
             residual = x
-            #if self.normalize_before: # guy test - > bring it back
-            #    x = self.encoder_attn_layer_norm(x) # guy test - > bring it back
+            if self.normalize_before: # guy test - remove the commenting
+                x = self.encoder_attn_layer_norm(x) # guy test - remove the commenting
             if prev_attn_state is not None:
                 prev_key, prev_value = prev_attn_state[:2]
                 saved_state: Dict[str, Optional[Tensor]] = {
@@ -396,8 +397,8 @@ class TransformerDecoderLayer(nn.Module):
             )
             x = self.dropout_module(x)
             x = residual + x
-            #if not self.normalize_before: # guy test - > bring it back
-            #    x = self.encoder_attn_layer_norm(x) # guy test - > bring it back
+            if not self.normalize_before:
+                x = self.encoder_attn_layer_norm(x)
 
         residual = x
         if self.normalize_before:
