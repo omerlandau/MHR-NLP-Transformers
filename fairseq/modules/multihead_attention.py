@@ -382,6 +382,7 @@ class MultiheadAttention(nn.Module):
         if self.guy_test:
             print("attn_probs  size is {} and in spot zero {}".format(attn_probs.size(), attn_probs[0].size()))
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
+        z = attn.clone()
         print("Guy comment - > attn size {}".format(attn.size()))
         if self.guy_test:
             #print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
@@ -412,7 +413,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights
+        return attn, attn_weights, z
 
     @staticmethod
     def _append_prev_key_padding_mask(
