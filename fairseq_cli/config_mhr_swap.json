@@ -1,6 +1,6 @@
  {
  	"1":[
- 		{"s_layer":"1", "s_head":0, "s_layer_module":"self_attn","s_transformer_module":"decoder", "d_layer":"1", "d_head":0,"d_layer_module":"self_attn", "d_transformer_module":"decoder"}
+ 		{"s_layer":"1", "s_head":1, "s_layer_module":"self_attn","s_transformer_module":"decoder", "d_layer":"1", "d_head":0,"d_layer_module":"self_attn", "d_transformer_module":"decoder"}
  	],
  	"4":[
  		{"s_layer":"1", "s_head":0, "s_layer_module":"self_attn","s_transformer_module":"decoder", "d_layer":"1", "d_head":0,"d_layer_module":"self_attn", "d_transformer_module":"decoder"},

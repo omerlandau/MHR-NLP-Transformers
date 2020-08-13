@@ -479,15 +479,15 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
     for s_key, d_key in zip(src_parameters.keys(), dst_parameters.keys()):
         with torch.no_grad():
             # one source parameter(holds all heads)
-            # print("######## before #########")
-            #print(d_key)
-            # print(model.state_dict()[d_key])
-            # print(model.state_dict()[d_key].size())
-            #print(s_key)
-            # print(model.state_dict()[s_key])
-            # print(model.state_dict()[s_key].size())
+            print("######## before #########")
+            print(d_key)
+            print(model.state_dict()[d_key])
+            print(model.state_dict()[d_key].size())
+            print(s_key)
+            print(model.state_dict()[s_key])
+            print(model.state_dict()[s_key].size())
             ms = model.state_dict()
-            # print("src parms size before view : {}".format(ms[s_key].size()))
+            #print("src parms size before view : {}".format(ms[s_key].size()))
             # all source layer heads
             # src_parameter = ms[s_key].view(-1, num_heads, head_dim).transpose(0, 1) # omer old
             src_parameter = ms[s_key]
@@ -505,18 +505,18 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             # print("dst head before : {}".format(dst_head_parameter))
             dst_parameter[:, dst_head * head_dim:(dst_head + 1) * head_dim] = src_head_parameter
             src_parameter[:, src_head * head_dim:(src_head + 1) * head_dim] = dst_head_parameter
-            print("{} shuold be inside the MHA {}".format(s_key, src_parameter))
-            print("{} shuold be inside the MHA {}".format(d_key, dst_parameter))
+            #print("{} shuold be inside the MHA {}".format(s_key, src_parameter))
+            #print("{} shuold be inside the MHA {}".format(d_key, dst_parameter))
             del src_parameter
             del dst_parameter
             torch.cuda.empty_cache()
-            # print("######## after #########")
-            # print(d_key)
-            # print(model.state_dict()[d_key])
-            # print(model.state_dict()[d_key].size())
-            # print(s_key)
-            # print(model.state_dict()[s_key])
-            # print(model.state_dict()[s_key].size())
+            print("######## after #########")
+            print(d_key)
+            print(model.state_dict()[d_key])
+            print(model.state_dict()[d_key].size())
+            print(s_key)
+            print(model.state_dict()[s_key])
+            print(model.state_dict()[s_key].size())
 
     print(
         "Done swapping parameters of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
