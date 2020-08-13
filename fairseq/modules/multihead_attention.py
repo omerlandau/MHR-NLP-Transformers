@@ -29,7 +29,7 @@ class MultiheadAttention(nn.Module):
             kdim=None,
             vdim=None,
             dropout=0.0,
-            bias=False,  # changed bias to false omer, guy is loser
+            bias=True,
             add_bias_kv=False,
             add_zero_attn=False,
             self_attention=False,
