@@ -196,6 +196,7 @@ class MultiheadAttention(nn.Module):
             saved_state = None
 
         if self.self_attention:
+            print("Inside self attn")
             q = self.q_proj(query)
             k = self.k_proj(query)
             v = self.v_proj(query)
@@ -215,6 +216,7 @@ class MultiheadAttention(nn.Module):
                 print("query size : {}".format(query.size()))
                 print("q size : {}".format(q.size()))
         else:
+            print("not self_attn and not enc-dec attn")
             assert key is not None and value is not None
             q = self.q_proj(query)
             k = self.k_proj(key)
