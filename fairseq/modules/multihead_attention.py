@@ -391,7 +391,7 @@ class MultiheadAttention(nn.Module):
             print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
             print("Head 1 in layer {} is {}".format(self.guy_test_layer_index, attn[1]))
             print("Head 0 size {}".format(attn[0].size()))
-            if self.guy_test_layer_index == 5:
+            if self.guy_test_layer_index == 1:
                 exit()
         '''
         if self.mask_head is not None:
