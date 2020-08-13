@@ -413,7 +413,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights, z
+        return attn, attn_weights
 
     @staticmethod
     def _append_prev_key_padding_mask(
