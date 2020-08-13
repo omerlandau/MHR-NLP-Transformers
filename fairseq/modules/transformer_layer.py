@@ -354,7 +354,7 @@ class TransformerDecoderLayer(nn.Module):
             y = torch.cat((encoder_out, x), dim=0)
         else:
             y = x
-
+        print("Guy comment - > start dec-dec")
         x, attn = self.self_attn(
             query=x,
             key=y,
