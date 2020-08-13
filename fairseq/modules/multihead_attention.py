@@ -384,6 +384,7 @@ class MultiheadAttention(nn.Module):
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
         print("Guy comment - > attn size {}".format(attn.size()))
         if self.guy_test:
+            print("query in layer {} is : {}".format(self.guy_test_layer_index, query))
             print("layer {} q_proj : {}".format(self.guy_test_layer_index, list(self.q_proj.parameters())))
             print("layer {} k_proj : {}".format(self.guy_test_layer_index, list(self.k_proj.parameters())))
             print("layer {} v_proj : {}".format(self.guy_test_layer_index, list(self.v_proj.parameters())))
