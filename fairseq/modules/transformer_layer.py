@@ -355,7 +355,7 @@ class TransformerDecoderLayer(nn.Module):
         else:
             y = x
         print("Guy comment - > start dec-dec self attention")
-        x, attn = self.self_attn(
+        x, attn, z = self.self_attn(
             query=x,
             key=y,
             value=y,
@@ -372,8 +372,8 @@ class TransformerDecoderLayer(nn.Module):
         if self.encoder_attn is not None:
             print("Guy comment - > inside forward enc-dec")
             residual = x
-            if self.normalize_before: # guy test - remove the commenting
-                x = self.encoder_attn_layer_norm(x) # guy test - remove the commenting
+            if self.normalize_before:  # guy test - remove the commenting
+                x = self.encoder_attn_layer_norm(x)  # guy test - remove the commenting
             if prev_attn_state is not None:
                 prev_key, prev_value = prev_attn_state[:2]
                 saved_state: Dict[str, Optional[Tensor]] = {
@@ -385,7 +385,7 @@ class TransformerDecoderLayer(nn.Module):
                 assert incremental_state is not None
                 self.encoder_attn._set_input_buffer(incremental_state, saved_state)
 
-            x, attn = self.encoder_attn(
+            x, attn, z = self.encoder_attn(
                 query=x,
                 key=encoder_out,
                 value=encoder_out,
@@ -423,7 +423,7 @@ class TransformerDecoderLayer(nn.Module):
             else:
                 self_attn_state = [saved_state["prev_key"], saved_state["prev_value"]]
             return x, attn, self_attn_state
-        return x, attn, None
+        return x, attn, z, None
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):
         self.need_attn = need_attn
