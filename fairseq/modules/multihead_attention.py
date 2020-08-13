@@ -196,12 +196,12 @@ class MultiheadAttention(nn.Module):
             saved_state = None
 
         if self.self_attention:
-            print("Inside self attn")
+            print("Guy comment -> Inside self attn")
             q = self.q_proj(query)
             k = self.k_proj(query)
             v = self.v_proj(query)
         elif self.encoder_decoder_attention:
-            print("Inside enc-dec MHA")
+            print("Guy comment ->Inside enc-dec MHA")
             # encoder-decoder attention
             # if self.guy_test:
             #    print("q_proj : {}".format(list(self.q_proj.parameters())))
@@ -382,8 +382,8 @@ class MultiheadAttention(nn.Module):
         if self.guy_test:
             print("attn_probs  size is {} and in spot zero {}".format(attn_probs.size(), attn_probs[0].size()))
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
+        print("Guy comment - > attn size {}".format(attn.size()))
         if self.guy_test:
-            print("Guy comment - > attn size {}".format(attn.size()))
             #print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
             # print("Head 1 in layer {} is {}".format(self.guy_test_layer_index, attn[1]))
             print("Head 0 size {}".format(attn[0].size()))
