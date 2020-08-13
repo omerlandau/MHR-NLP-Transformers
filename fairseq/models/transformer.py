@@ -415,8 +415,6 @@ class TransformerEncoder(FairseqEncoder):
             dropout_probability = torch.empty(1).uniform_()
             if not self.training or (dropout_probability > self.encoder_layerdrop):
                 x, layer_attn = layer(x, encoder_padding_mask)
-                print("Guy comment - > inside transformer forward, layer index {}, layer attn size {}".format(i,
-                                                                                                              layer_attn.size()))
                 if return_all_hiddens:
                     assert encoder_states is not None
                     encoder_states.append(x)
