@@ -385,9 +385,9 @@ class MultiheadAttention(nn.Module):
         print("Guy comment - > attn size {}".format(attn.size()))
         if self.guy_test:
             print("query in layer {} is : {}".format(self.guy_test_layer_index, query))
-            print("layer {} q_proj : {}".format(self.guy_test_layer_index, list(self.q_proj.parameters())))
-            print("layer {} k_proj : {}".format(self.guy_test_layer_index, list(self.k_proj.parameters())))
-            print("layer {} v_proj : {}".format(self.guy_test_layer_index, list(self.v_proj.parameters())))
+            #print("layer {} q_proj : {}".format(self.guy_test_layer_index, list(self.q_proj.parameters())))
+            #print("layer {} k_proj : {}".format(self.guy_test_layer_index, list(self.k_proj.parameters())))
+            #print("layer {} v_proj : {}".format(self.guy_test_layer_index, list(self.v_proj.parameters())))
             # print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
             # print("Head 1 in layer {} is {}".format(self.guy_test_layer_index, attn[1]))
             print("Head 0 size {}".format(attn[0].size()))
