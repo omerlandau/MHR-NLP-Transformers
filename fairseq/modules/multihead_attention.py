@@ -355,11 +355,13 @@ class MultiheadAttention(nn.Module):
 
         if self.guy_test:
             print("attn_weights after softmax test size is {}".format(attn_weights_float[0].size()))
-        if self.mask_head is not None:
-            print("Guy comment - > layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
-                                                                      self.mask_layer_type))
+        #if self.mask_head is not None:
+        if self.guy_test:
+            #print("Guy comment - > layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
+                                                                      #self.mask_layer_type))
             head_masking_vector = torch.ones(self.num_heads)
-            head_masking_vector[self.mask_head] = 0
+            #head_masking_vector[self.mask_head] = 0
+            head_masking_vector[0] = 0 #masking head 0 - for test, to delete
             head_masking_vector.view(1, self.num_heads, 1, 1).to(attn_weights_float.device)
             attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
             attn_weights_float = attn_weights_float.view(bsz, self.num_heads, tgt_len, src_len) * head_masking_vector
