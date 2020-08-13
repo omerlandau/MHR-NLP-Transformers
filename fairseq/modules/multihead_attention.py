@@ -364,6 +364,9 @@ class MultiheadAttention(nn.Module):
             head_masking_vector[0] = 0 #masking head 0 - for test, to delete
             head_masking_vector.view(1, self.num_heads, 1, 1).to(attn_weights_float.device)
             attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
+            print("head_masking_vector : {}, with size : {}".format(head_masking_vector,head_masking_vector.size()))
+            print("attn_weights_float size : {}".format(attn_weights_float.size()))
+
             attn_weights_float = attn_weights_float.view(bsz, self.num_heads, tgt_len, src_len) * head_masking_vector
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
