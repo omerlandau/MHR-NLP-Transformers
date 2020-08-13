@@ -479,34 +479,34 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
     for s_key, d_key in zip(src_parameters.keys(), dst_parameters.keys()):
         with torch.no_grad():
             # one source parameter(holds all heads)
-            #print("######## before #########")
-            print(d_key)
-            #print(model.state_dict()[d_key])
-            #print(model.state_dict()[d_key].size())
-            print(s_key)
-            #print(model.state_dict()[s_key])
-            #print(model.state_dict()[s_key].size())
+            # print("######## before #########")
+            #print(d_key)
+            # print(model.state_dict()[d_key])
+            # print(model.state_dict()[d_key].size())
+            #print(s_key)
+            # print(model.state_dict()[s_key])
+            # print(model.state_dict()[s_key].size())
             ms = model.state_dict()
-            #print("src parms size before view : {}".format(ms[s_key].size()))
+            # print("src parms size before view : {}".format(ms[s_key].size()))
             # all source layer heads
             # src_parameter = ms[s_key].view(-1, num_heads, head_dim).transpose(0, 1) # omer old
             src_parameter = ms[s_key]
-            #print("src_parameter size after view : {}".format(src_parameter.size()))
+            # print("src_parameter size after view : {}".format(src_parameter.size()))
 
             # all dst layer heads
             # dst_parameter = ms[d_key].view(-1, num_heads, head_dim).transpose(0, 1)  # omer old
             dst_parameter = ms[d_key]
-            #print("dst_parameter size after view : {}".format(dst_parameter.size()))
+            # print("dst_parameter size after view : {}".format(dst_parameter.size()))
             # Get specific head parameters
 
             src_head_parameter = src_parameter[:, src_head * head_dim:(src_head + 1) * head_dim].clone()
             dst_head_parameter = dst_parameter[:, dst_head * head_dim:(dst_head + 1) * head_dim].clone()
-            print("src head before : {}".format(src_head_parameter))
-            print("dst head before : {}".format(dst_head_parameter))
+            # print("src head before : {}".format(src_head_parameter))
+            # print("dst head before : {}".format(dst_head_parameter))
             dst_parameter[:, dst_head * head_dim:(dst_head + 1) * head_dim] = src_head_parameter
             src_parameter[:, src_head * head_dim:(src_head + 1) * head_dim] = dst_head_parameter
-            print("src_parameter after : {}".format(src_parameter))
-            print("dst head after : {}".format(dst_parameter))
+            print("{} shuold be inside the MHA {}".format(s_key, src_parameter))
+            print("{} shuold be inside the MHA {}".format(d_key, dst_parameter))
             del src_parameter
             del dst_parameter
             torch.cuda.empty_cache()
