@@ -318,8 +318,8 @@ class TransformerDecoderLayer(nn.Module):
             need_attn = True
 
         residual = x
-        #if self.normalize_before: # Guy test remove the commenting
-        #    x = self.self_attn_layer_norm(x) # Guy test remove the commenting
+        if self.normalize_before: # Guy test remove the commenting
+            x = self.self_attn_layer_norm(x) # Guy test remove the commenting
         if prev_self_attn_state is not None:
             prev_key, prev_value = prev_self_attn_state[:2]
             saved_state: Dict[str, Optional[Tensor]] = {
@@ -354,7 +354,7 @@ class TransformerDecoderLayer(nn.Module):
             y = torch.cat((encoder_out, x), dim=0)
         else:
             y = x
-        print("Guy comment - > start dec-dec")
+        print("Guy comment - > start dec-dec self attention")
         x, attn = self.self_attn(
             query=x,
             key=y,
