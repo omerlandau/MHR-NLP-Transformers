@@ -124,7 +124,6 @@ class TransformerEncoderLayer(nn.Module):
         residual = x
         if self.normalize_before:
             x = self.self_attn_layer_norm(x)
-        print("Guy comment -> inside transformer_layer forward, create self-attn")
         x, layer_attn = self.self_attn(
             query=x,
             key=x,
@@ -358,7 +357,6 @@ class TransformerDecoderLayer(nn.Module):
             x = self.self_attn_layer_norm(x)
 
         if self.encoder_attn is not None:
-            print("Guy comment - > inside forward enc-dec")
             residual = x
             if self.normalize_before:  # guy test - remove the commenting
                 x = self.encoder_attn_layer_norm(x)  # guy test - remove the commenting
