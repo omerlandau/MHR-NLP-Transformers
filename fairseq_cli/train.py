@@ -510,7 +510,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             del src_parameter
             del dst_parameter
             torch.cuda.empty_cache()
-            print("######## after #########")
+            print("######## after ########")
             print(d_key)
             print(model.state_dict()[d_key])
             print(model.state_dict()[d_key].size())
