@@ -362,7 +362,7 @@ class MultiheadAttention(nn.Module):
             head_masking_vector = torch.ones(self.num_heads)
             #head_masking_vector[self.mask_head] = 0
             head_masking_vector[0] = 0 #masking head 0 - for test, to delete
-            head_masking_vector.view(1, self.num_heads, 1, 1).to(attn_weights_float.device)
+            head_masking_vector = head_masking_vector.view(1, self.num_heads, 1, 1).to(attn_weights_float.device)
             attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
             print("head_masking_vector : {}, with size : {}".format(head_masking_vector,head_masking_vector.size()))
             print("attn_weights_float size : {}".format(attn_weights_float.size()))
