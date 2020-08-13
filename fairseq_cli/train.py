@@ -505,8 +505,8 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
             dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim , : ].clone()
             # print("src head before : {}".format(src_head_parameter))
             # print("dst head before : {}".format(dst_head_parameter))
-            dst_parameter[:, dst_head * head_dim:(dst_head + 1) * head_dim] = src_head_parameter
-            src_parameter[:, src_head * head_dim:(src_head + 1) * head_dim] = dst_head_parameter
+            dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :] = src_head_parameter
+            src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :] = dst_head_parameter
             #print("{} shuold be inside the MHA {}".format(s_key, src_parameter))
             #print("{} shuold be inside the MHA {}".format(d_key, dst_parameter))
             del src_parameter
