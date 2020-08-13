@@ -385,7 +385,10 @@ class MultiheadAttention(nn.Module):
         z = attn.clone()
         print("Guy comment - > attn size {}".format(attn.size()))
         if self.guy_test:
-            #print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
+            print("layer {} q_proj : {}".format(self.guy_test_layer_index, self.q_proj))
+            print("layer {} k_proj : {}".format(self.guy_test_layer_index, self.k_proj))
+            print("layer {} v_proj : {}".format(self.guy_test_layer_index, self.v_proj))
+            # print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
             # print("Head 1 in layer {} is {}".format(self.guy_test_layer_index, attn[1]))
             print("Head 0 size {}".format(attn[0].size()))
             if self.guy_test_layer_index == 5:
