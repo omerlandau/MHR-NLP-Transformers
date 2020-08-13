@@ -37,12 +37,8 @@ class MultiheadAttention(nn.Module):
             mask_layer=None,
             mask_head=None,
             mask_layer_type=None,
-            guy_test=None,
-            guy_test_layer_index=None,
     ):
         super().__init__()
-        self.guy_test = guy_test
-        self.guy_test_layer_index = guy_test_layer_index
         self.mask_layer = mask_layer
         self.mask_head = mask_head
         self.mask_layer_type = mask_layer_type
@@ -196,15 +192,11 @@ class MultiheadAttention(nn.Module):
             saved_state = None
 
         if self.self_attention:
-            print("Guy comment -> Inside self attn")
             q = self.q_proj(query)
             k = self.k_proj(query)
             v = self.v_proj(query)
         elif self.encoder_decoder_attention:
-            print("Guy comment ->Inside enc-dec MHA")
             # encoder-decoder attention
-            # if self.guy_test:
-            #    print("q_proj : {}".format(list(self.q_proj.parameters())))
             q = self.q_proj(query)
             if key is None:
                 assert value is None
@@ -212,11 +204,8 @@ class MultiheadAttention(nn.Module):
             else:
                 k = self.k_proj(key)
                 v = self.v_proj(key)
-            if self.guy_test:
-                print("query size : {}".format(query.size()))
-                print("q size : {}".format(q.size()))
         else:
-            print("not self_attn and not enc-dec attn")
+
             assert key is not None and value is not None
             q = self.q_proj(query)
             k = self.k_proj(key)
@@ -325,15 +314,10 @@ class MultiheadAttention(nn.Module):
                     ],
                     dim=1,
                 )
-        if self.guy_test:
-            print("q test size is {}".format(q[0].size()))
-            print("k test size is {}".format(k[0].size()))
-            print("v test size is {}".format(v[0].size()))
 
         attn_weights = torch.bmm(q, k.transpose(1, 2))
         attn_weights = MultiheadAttention.apply_sparse_mask(attn_weights, tgt_len, src_len, bsz)
-        if self.guy_test:
-            print("attn_weights test size is {}".format(attn_weights[0].size()))
+
         assert list(attn_weights.size()) == [bsz * self.num_heads, tgt_len, src_len]
         if attn_mask is not None:
             attn_mask = attn_mask.unsqueeze(0)
@@ -355,18 +339,11 @@ class MultiheadAttention(nn.Module):
             attn_weights, dim=-1, onnx_trace=self.onnx_trace
         )
 
-        if self.guy_test:
-            print("attn_weights after softmax test size is {}".format(attn_weights_float[0].size()))
         if self.mask_head is not None:
-            # if self.guy_test:
-            print("Guy comment - > layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
-                                                                      self.mask_layer_type))
             head_masking_vector = torch.ones(self.num_heads)
             head_masking_vector[self.mask_head] = 0
             head_masking_vector = head_masking_vector.view(1, self.num_heads, 1, 1).to(attn_weights_float.device)
             attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
-            print("head_masking_vector : {}, with size : {}".format(head_masking_vector, head_masking_vector.size()))
-            print("attn_weights_float size : {}".format(attn_weights_float.size()))
 
             attn_weights_float = attn_weights_float.view(bsz, self.num_heads, tgt_len, src_len) * head_masking_vector
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
@@ -379,20 +356,9 @@ class MultiheadAttention(nn.Module):
         )
 
         assert v is not None
-        if self.guy_test:
-            print("attn_probs  size is {} and in spot zero {}".format(attn_probs.size(), attn_probs[0].size()))
+
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
-        print("Guy comment - > attn size {}".format(attn.size()))
-        if self.guy_test:
-            print("query in layer {} is : {}".format(self.guy_test_layer_index, query))
-            #print("layer {} q_proj : {}".format(self.guy_test_layer_index, list(self.q_proj.parameters())))
-            #print("layer {} k_proj : {}".format(self.guy_test_layer_index, list(self.k_proj.parameters())))
-            #print("layer {} v_proj : {}".format(self.guy_test_layer_index, list(self.v_proj.parameters())))
-            print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
-            print("Head 1 in layer {} is {}".format(self.guy_test_layer_index, attn[1]))
-            print("Head 0 size {}".format(attn[0].size()))
-            if self.guy_test_layer_index == 1:
-                exit()
+
         '''
         if self.mask_head is not None:
 

@@ -241,17 +241,6 @@ class TransformerDecoderLayer(nn.Module):
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
             )
-        elif self.layer_index == 1 or self.layer_index == 5:
-            return MultiheadAttention(
-                embed_dim,
-                args.decoder_attention_heads,
-                dropout=args.attention_dropout,
-                add_bias_kv=add_bias_kv,
-                add_zero_attn=add_zero_attn,
-                self_attention=not getattr(args, "cross_self_attention", False),
-                guy_test=True,
-                guy_test_layer_index=self.layer_index,
-            )
         else:
             return MultiheadAttention(
                 embed_dim,
@@ -354,7 +343,6 @@ class TransformerDecoderLayer(nn.Module):
             y = torch.cat((encoder_out, x), dim=0)
         else:
             y = x
-        print("Guy comment - > start dec-dec self attention")
         x, attn = self.self_attn(
             query=x,
             key=y,
