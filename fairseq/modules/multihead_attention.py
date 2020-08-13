@@ -202,7 +202,7 @@ class MultiheadAttention(nn.Module):
         elif self.encoder_decoder_attention:
             print("Inside enc-dec MHA")
             # encoder-decoder attention
-            #if self.guy_test:
+            # if self.guy_test:
             #    print("q_proj : {}".format(list(self.q_proj.parameters())))
             q = self.q_proj(query)
             if key is None:
@@ -355,16 +355,15 @@ class MultiheadAttention(nn.Module):
 
         if self.guy_test:
             print("attn_weights after softmax test size is {}".format(attn_weights_float[0].size()))
-        #if self.mask_head is not None:
-        if self.guy_test:
-            #print("Guy comment - > layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
-                                                                      #self.mask_layer_type))
+        if self.mask_head is not None:
+            # if self.guy_test:
+            print("Guy comment - > layer {}, head {}, type {}".format(self.mask_layer, self.mask_head,
+                                                                      self.mask_layer_type))
             head_masking_vector = torch.ones(self.num_heads)
-            #head_masking_vector[self.mask_head] = 0
-            head_masking_vector[0] = 0 #masking head 0 - for test, to delete
+            head_masking_vector[self.mask_head] = 0
             head_masking_vector = head_masking_vector.view(1, self.num_heads, 1, 1).to(attn_weights_float.device)
             attn_weights_float = attn_weights_float.view(self.num_heads, bsz, tgt_len, src_len)
-            print("head_masking_vector : {}, with size : {}".format(head_masking_vector,head_masking_vector.size()))
+            print("head_masking_vector : {}, with size : {}".format(head_masking_vector, head_masking_vector.size()))
             print("attn_weights_float size : {}".format(attn_weights_float.size()))
 
             attn_weights_float = attn_weights_float.view(bsz, self.num_heads, tgt_len, src_len) * head_masking_vector
@@ -384,8 +383,7 @@ class MultiheadAttention(nn.Module):
         if self.guy_test:
             print("Guy comment - > attn size {}".format(attn.size()))
             print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
-            print("Head 1 in layer {} is {}".format(self.guy_test_layer_index, attn[1]))
-
+            # print("Head 1 in layer {} is {}".format(self.guy_test_layer_index, attn[1]))
             print("Head 0 size {}".format(attn[0].size()))
             if self.guy_test_layer_index == 5:
                 exit()
