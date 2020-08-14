@@ -29,7 +29,7 @@ class MultiheadAttention(nn.Module):
             kdim=None,
             vdim=None,
             dropout=0.0,
-            bias=False,
+            bias=True,
             add_bias_kv=False,
             add_zero_attn=False,
             self_attention=False,
