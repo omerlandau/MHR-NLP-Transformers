@@ -37,8 +37,12 @@ class MultiheadAttention(nn.Module):
             mask_layer=None,
             mask_head=None,
             mask_layer_type=None,
+            guy_test=None,
+            guy_test_layer_index=None,
     ):
         super().__init__()
+        self.guy_test = guy_test
+        self.guy_test_layer_index = guy_test_layer_index
         self.mask_layer = mask_layer
         self.mask_head = mask_head
         self.mask_layer_type = mask_layer_type
@@ -358,6 +362,17 @@ class MultiheadAttention(nn.Module):
         assert v is not None
 
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
+
+        if self.guy_test:
+            print("query in layer {} is : {}".format(self.guy_test_layer_index, query))
+            #print("layer {} q_proj : {}".format(self.guy_test_layer_index, list(self.q_proj.parameters())))
+            #print("layer {} k_proj : {}".format(self.guy_test_layer_index, list(self.k_proj.parameters())))
+            #print("layer {} v_proj : {}".format(self.guy_test_layer_index, list(self.v_proj.parameters())))
+            print("Head 0 in layer {} is {}".format(self.guy_test_layer_index, attn[0]))
+            print("Head 1 in layer {} is {}".format(self.guy_test_layer_index, attn[1]))
+            print("Head 0 size {}".format(attn[0].size()))
+            if self.guy_test_layer_index == 1:
+                exit()
 
         '''
         if self.mask_head is not None:
