@@ -1,15 +1,15 @@
  {
- 	"67":[
+ 	"7":[
  		{"s_layer":"1", "s_head":1, "s_layer_module":"self_attn","s_transformer_module":"encoder", "d_layer":"1", "d_head":4,"d_layer_module":"self_attn", "d_transformer_module":"encoder"},
 		{"s_layer":"1", "s_head":0, "s_layer_module":"self_attn","s_transformer_module":"encoder", "d_layer":"1", "d_head":5,"d_layer_module":"self_attn", "d_transformer_module":"encoder"}
  	],
- 	"612":[
+ 	"12":[
  		{"s_layer":"1", "s_head":1, "s_layer_module":"self_attn","s_transformer_module":"encoder", "d_layer":"1", "d_head":4,"d_layer_module":"self_attn", "d_transformer_module":"encoder"},
 		{"s_layer":"1", "s_head":0, "s_layer_module":"self_attn","s_transformer_module":"encoder", "d_layer":"1", "d_head":5,"d_layer_module":"self_attn", "d_transformer_module":"encoder"},
 		{"s_layer":"2", "s_head":1, "s_layer_module":"self_attn","s_transformer_module":"encoder", "d_layer":"3", "d_head":4,"d_layer_module":"self_attn", "d_transformer_module":"encoder"},
 		{"s_layer":"2", "s_head":0, "s_layer_module":"self_attn","s_transformer_module":"encoder", "d_layer":"2", "d_head":4,"d_layer_module":"self_attn", "d_transformer_module":"encoder"}
  	],
- 	"616":[
+ 	"16":[
 
 		{"s_layer":"2", "s_head":1, "s_layer_module":"self_attn","s_transformer_module":"encoder", "d_layer":"3", "d_head":4,"d_layer_module":"self_attn", "d_transformer_module":"encoder"},
 		{"s_layer":"2", "s_head":0, "s_layer_module":"self_attn","s_transformer_module":"encoder", "d_layer":"2", "d_head":4,"d_layer_module":"self_attn", "d_transformer_module":"encoder"}
