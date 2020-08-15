@@ -11,8 +11,8 @@ def mask_all_heads_combination():
     args = options.parse_args_and_arch(parser)
     number_of_transformer_layers = 6
     number_of_attention_heads = 8
-    #mask_layer_combinations = ['enc-enc', 'enc-dec', 'dec-dec']
-    mask_layer_combinations = ['enc-dec']
+    mask_layer_combinations = ['enc-enc', 'enc-dec', 'dec-dec']
+    #mask_layer_combinations = ['enc-dec']
     results_dict = {i: np.zeros((number_of_transformer_layers, number_of_attention_heads)) for i in
                     mask_layer_combinations}
     outF = open("mask_all_heads_combination.txt", "a")
