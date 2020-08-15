@@ -11,8 +11,9 @@ def mask_all_heads_combination():
     args = options.parse_args_and_arch(parser)
     number_of_transformer_layers = 6
     number_of_attention_heads = 8
+    experiment = "basline-16-heads-6l-no-changes"
     mask_layer_combinations = ['enc-enc', 'enc-dec', 'dec-dec']
-    #mask_layer_combinations = ['enc-dec']
+    # mask_layer_combinations = ['enc-dec']
     results_dict = {i: np.zeros((number_of_transformer_layers, number_of_attention_heads)) for i in
                     mask_layer_combinations}
     outF = open("mask_all_heads_combination.txt", "a")
@@ -22,8 +23,8 @@ def mask_all_heads_combination():
                 args.model_overrides = str({"mask_layer": j, "mask_head": k, "mask_layer_type": i})
                 scorer = main(args)
                 results_dict[i][j][k] = float(parse_bleu_scoring(scorer.result_string()))
-                outF.write("type : {}, layer : {}, head : {}, result : {}".format(i, j, k, results_dict[i][j][k]))
-                print("Guy test - > type : {}, layer : {}, head : {}, result : {}".format(i, j, k, results_dict[i][j][k]))
+                # outF.write("type : {}, layer : {}, head : {}, result : {}".format(i, j, k, results_dict[i][j][k]))
+                # print("Guy test - > type : {}, layer : {}, head : {}, result : {}".format(i, j, k, results_dict[i][j][k]))
 
     outF.close()
     for name in mask_layer_combinations:
@@ -32,7 +33,7 @@ def mask_all_heads_combination():
         df = pd.DataFrame(data=results_dict[name], index=[str(j) for j in range(number_of_transformer_layers)],
                           columns=[str(k) for k in range(number_of_attention_heads)])
         print(df)
-        df.to_csv(r' mask_all_heads_combination_{}.csv'.format(name), index=False)
+        df.to_csv(r' mask_all_heads_combination_{}_{}.csv'.format(experiment, name), index=False)
 
 
 if __name__ == '__main__':
