@@ -351,6 +351,13 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
 
+
+        z_i = attn_weights.view(self.num_heads,bsz,tgt_len, src_len)[0,0,:,:]
+
+        print(z_i)
+
+        exit()
+
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
             p=self.dropout,
@@ -361,11 +368,6 @@ class MultiheadAttention(nn.Module):
 
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
 
-        z_i = attn.view(bsz,self.num_heads,tgt_len, self.head_dim)[0,1,:,:]
-
-        print(z_i)
-
-        exit()
 
 
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
