@@ -361,6 +361,13 @@ class MultiheadAttention(nn.Module):
 
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
 
+        z_i = attn.view(bsz,self.num_heads,tgt_len, self.head_dim)[0,1,:,:]
+
+        print(z_i)
+
+        exit()
+
+
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
         if self.onnx_trace and attn.size(1) == 1:
             # when ONNX tracing a single decoder step (sequence length == 1)
