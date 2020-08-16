@@ -11,7 +11,7 @@ def mask_all_heads_combination():
     args = options.parse_args_and_arch(parser)
     number_of_transformer_layers = 6
     number_of_attention_heads = 8
-    experiment = "exp-self-attn-swaps-layers_0_5-8-heads-6l"
+    experiment = "exp-enc_self_attn-attn-swaps-heads_0_1_2_with_5_6_7-8heads-6l"
     mask_layer_combinations = ['enc-enc', 'enc-dec', 'dec-dec']
     # mask_layer_combinations = ['enc-dec']
     results_dict = {i: np.zeros((number_of_transformer_layers, number_of_attention_heads)) for i in
