@@ -355,7 +355,7 @@ class MultiheadAttention(nn.Module):
 
         for j in range(self.num_heads):
             sum = 0
-            for i in bsz:
+            for i in range(bsz):
                 temp = attn_weights.view(self.num_heads,bsz,tgt_len, src_len)[i,j,:,:].flatten().max()
                 sum += temp
             conf = sum/bsz
