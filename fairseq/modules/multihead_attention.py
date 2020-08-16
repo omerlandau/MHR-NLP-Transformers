@@ -37,8 +37,7 @@ class MultiheadAttention(nn.Module):
             mask_layer=None,
             mask_head=None,
             mask_layer_type=None,
-            guy_test=None,
-            guy_test_layer_index=None,
+
     ):
         super().__init__()
         self.mask_layer = mask_layer
