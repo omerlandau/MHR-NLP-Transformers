@@ -361,6 +361,9 @@ class MultiheadAttention(nn.Module):
 
             print("conf of head num {0} = {1}".format(j,conf))
 
+            # worth adding layer number (from trasformer_layer)
+            # and  print during training the advancment of head confidence over each bsz.
+
         exit()
 
         attn_probs = F.dropout(
