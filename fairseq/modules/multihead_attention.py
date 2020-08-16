@@ -352,9 +352,14 @@ class MultiheadAttention(nn.Module):
         attn_weights = attn_weights_float.type_as(attn_weights)
 
 
-        z_i = attn_weights.view(self.num_heads,bsz,tgt_len, src_len)[0,0,:,:].flatten().max()
+        for j in num_heads:
+            sum = 0
+            for i in bsz:
+                temp = attn_weights.view(self.num_heads,bsz,tgt_len, src_len)[i,j,:,:].flatten().max()
+                sum += temp
+            avg = sum/bsz
 
-        print(z_i)
+            print (avg)
 
         exit()
 
