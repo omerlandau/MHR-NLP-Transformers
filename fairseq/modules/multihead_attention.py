@@ -351,7 +351,7 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
 
-        ## computing confidence of all heads
+        ## computing confidence of all heads over bsz sentences
 
         for j in range(self.num_heads):
             sum = 0
@@ -360,7 +360,7 @@ class MultiheadAttention(nn.Module):
                 sum += temp
             conf = sum/bsz
 
-            print (conf)
+            print("conf of head num {0} = {1}".format(j,conf))
 
         exit()
 
