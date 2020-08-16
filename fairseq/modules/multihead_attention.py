@@ -351,15 +351,16 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
 
+        ## computing confidence of all heads
 
         for j in num_heads:
             sum = 0
             for i in bsz:
                 temp = attn_weights.view(self.num_heads,bsz,tgt_len, src_len)[i,j,:,:].flatten().max()
                 sum += temp
-            avg = sum/bsz
+            conf = sum/bsz
 
-            print (avg)
+            print (conf)
 
         exit()
 
