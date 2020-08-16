@@ -352,7 +352,7 @@ class MultiheadAttention(nn.Module):
         attn_weights = attn_weights_float.type_as(attn_weights)
 
 
-        z_i = attn_weights.view(self.num_heads,bsz,tgt_len, src_len)[0,0,:,:]
+        z_i = np.max(attn_weights.view(self.num_heads,bsz,tgt_len, src_len)[0,0,:,:])
 
         print(z_i)
 
