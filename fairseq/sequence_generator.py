@@ -216,6 +216,7 @@ class SequenceGenerator(nn.Module):
             .fill_(self.pad)
         )  # +2 for eos and pad
         tokens[:, 0] = self.eos if bos_token is None else bos_token
+        print("Guy comment - > tokens : {}".format(tokens))
         attn: Optional[Tensor] = None
 
         # A list that indicates candidates that should be ignored.
@@ -269,6 +270,8 @@ class SequenceGenerator(nn.Module):
                 incremental_states,
                 self.temperature,
             )
+            print("Guy comment -> after calling decoder forward from the generator : {}".format(avg_attn_scores))
+
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
             lprobs[:, self.pad] = -math.inf  # never select pad
