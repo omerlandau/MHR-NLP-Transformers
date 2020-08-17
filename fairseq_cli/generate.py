@@ -150,7 +150,7 @@ def _main(args, output_file):
 
         gen_timer.start()
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
-        for i, h in enumerate(hypos): # Guy test - to delete
+        for i, h in enumerate(hypos[:10]): # Guy test - to delete
             print("Guy comment - > hypo {} is : {}".format(i, h))
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
