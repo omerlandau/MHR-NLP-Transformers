@@ -93,7 +93,6 @@ def _main(args, output_file):
     align_dict = utils.load_align_dict(args.replace_unk)
 
     # Load dataset (possibly sharded)
-    print("Guy comment - > Before task.get_batch_iterator")
     itr = task.get_batch_iterator(
         dataset=task.dataset(args.gen_subset),
         max_tokens=args.max_tokens,
@@ -108,19 +107,18 @@ def _main(args, output_file):
         shard_id=args.shard_id,
         num_workers=args.num_workers,
     ).next_epoch_itr(shuffle=False)
-    print("Guy comment - > After task.get_batch_iterator")
-    print("Guy comment - > Before progress_bar")
     progress = progress_bar.progress_bar(
         itr,
         log_format=args.log_format,
         log_interval=args.log_interval,
         default_log_format=('tqdm' if not args.no_progress_bar else 'none'),
     )
-    print("Guy comment - > After progress_bar")
     # Initialize generator
     gen_timer = StopwatchMeter()
-    generator = task.build_generator(models, args)
+    print("Guy comment - > Before build_generator")
 
+    generator = task.build_generator(models, args)
+    print("Guy comment - > After build_generator")
     # Handle tokenization and BPE
     tokenizer = encoders.build_tokenizer(args)
     bpe = encoders.build_bpe(args)
@@ -141,6 +139,7 @@ def _main(args, output_file):
     has_target = True
     wps_meter = TimeMeter()
     for sample in progress:
+        print("Guy comment - > Sample : {}".format(sample))
         sample = utils.move_to_cuda(sample) if use_cuda else sample
         if 'net_input' not in sample:
             continue
@@ -151,8 +150,8 @@ def _main(args, output_file):
 
         gen_timer.start()
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
-        print("Guy comment - > hypos size : {}".format(len(hypos)))
-        print("Guy comment - > hypos[0]  : {}".format(hypos[0]))
+        for i, h in enumerate(hypos): # Guy test - to delete
+            print("Guy comment - > hypo {} is : {}".format(i, h))
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
