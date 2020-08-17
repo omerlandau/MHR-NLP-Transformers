@@ -409,6 +409,7 @@ class TransformerDecoderLayer(nn.Module):
             else:
                 self_attn_state = [saved_state["prev_key"], saved_state["prev_value"]]
             return x, attn, self_attn_state
+        print("Guy comment -> inside decoderlayer forward")
         return x, attn, None
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):
