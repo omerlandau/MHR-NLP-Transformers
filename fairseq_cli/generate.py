@@ -204,12 +204,13 @@ def _main(args, output_file):
                         generator.eos,
                     }
                 )
-                print("Guy comment - > hypo_tokens : {}".format(hypo_tokens))
-                print("Guy comment - > hypo_str : {}".format(hypo_str))
-                print("Guy comment - > alignment : {}".format(alignment))
-                if len(alignment) != 0:
-                    print("Guy comment - > alignment is not none")
-                    exit()
+                # print("Guy comment - > hypo_tokens : {}".format(hypo_tokens))
+                # print("Guy comment - > hypo_str : {}".format(hypo_str))
+                # print("Guy comment - > alignment : {}".format(alignment))
+                print("Guy comment - > maybe the matrix I want".format(
+                    sample_id,
+                    ' '.join(['{}-{}'.format(src_idx, tgt_idx) for src_idx, tgt_idx in alignment])
+                ), file=output_file)
                 detok_hypo_str = decode_fn(hypo_str)
                 if not args.quiet:
                     score = hypo['score'] / math.log(2)  # convert to base 2
@@ -268,9 +269,11 @@ def _main(args, output_file):
     if has_target:
         if args.bpe and not args.sacrebleu:
             if args.remove_bpe:
-                logger.warning("BLEU score is being computed by splitting detokenized string on spaces, this is probably not what you want. Use --sacrebleu for standard 13a BLEU tokenization")
+                logger.warning(
+                    "BLEU score is being computed by splitting detokenized string on spaces, this is probably not what you want. Use --sacrebleu for standard 13a BLEU tokenization")
             else:
-                logger.warning("If you are using BPE on the target side, the BLEU score is computed on BPE tokens, not on proper words.  Use --sacrebleu for standard 13a BLEU tokenization")
+                logger.warning(
+                    "If you are using BPE on the target side, the BLEU score is computed on BPE tokens, not on proper words.  Use --sacrebleu for standard 13a BLEU tokenization")
         logger.info('Generate {} with beam={}: {}'.format(args.gen_subset, args.beam, scorer.result_string()))
 
     return scorer
