@@ -115,10 +115,8 @@ def _main(args, output_file):
     )
     # Initialize generator
     gen_timer = StopwatchMeter()
-    print("Guy comment - > Before build_generator")
 
     generator = task.build_generator(models, args)
-    print("Guy comment - > After build_generator")
     # Handle tokenization and BPE
     tokenizer = encoders.build_tokenizer(args)
     bpe = encoders.build_bpe(args)
@@ -139,7 +137,6 @@ def _main(args, output_file):
     has_target = True
     wps_meter = TimeMeter()
     for sample in progress:
-        print("Guy comment - > Sample : {}".format(sample))
         sample = utils.move_to_cuda(sample) if use_cuda else sample
         if 'net_input' not in sample:
             continue
@@ -151,8 +148,6 @@ def _main(args, output_file):
         gen_timer.start()
         print("Guy comment - > Before task.inference_step")
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
-        for i, h in enumerate(hypos[:10]): # Guy test - to delete
-            print("Guy comment - > hypo {} is : {}".format(i, h))
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)

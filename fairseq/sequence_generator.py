@@ -156,7 +156,7 @@ class SequenceGenerator(nn.Module):
             bos_token (int, optional): beginning of sentence token
                 (default: self.eos)
         """
-        print("Guy comment -> inside sequence_generator.generate")
+        #print("Guy comment -> inside sequence_generator.generate")
         return self._generate(sample, **kwargs)
 
     def _generate(
@@ -263,15 +263,14 @@ class SequenceGenerator(nn.Module):
                 encoder_outs = self.model.reorder_encoder_out(
                     encoder_outs, reorder_state
                 )
-            print("Guy comment -> calling decoder forward from the generator with tokens : {}".format(
-                tokens[:, : step + 1]))
+            #print("Guy comment -> calling decoder forward from the generator with tokens : {}".format(
+                #tokens[:, : step + 1]))
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
                 incremental_states,
                 self.temperature,
             )
-            print("Guy comment -> after calling decoder forward from the generator : {}".format(avg_attn_scores))
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
