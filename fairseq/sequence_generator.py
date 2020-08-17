@@ -156,6 +156,7 @@ class SequenceGenerator(nn.Module):
             bos_token (int, optional): beginning of sentence token
                 (default: self.eos)
         """
+        print("Guy comment -> inside sequence_generator.generate")
         return self._generate(sample, **kwargs)
 
     def _generate(
