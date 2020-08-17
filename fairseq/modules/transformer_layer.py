@@ -305,7 +305,6 @@ class TransformerDecoderLayer(nn.Module):
         need_head_weights = True
         if need_head_weights:
             need_attn = True
-        print("Guy comment -> Inside forward of TrnasformerDecoderLayer")
         residual = x
         if self.normalize_before:
             x = self.self_attn_layer_norm(x)
@@ -410,11 +409,9 @@ class TransformerDecoderLayer(nn.Module):
             else:
                 self_attn_state = [saved_state["prev_key"], saved_state["prev_value"]]
             return x, attn, self_attn_state
-        print("Guy comment -> Bewfore retutn attn")
         return x, attn, None
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):
-        print("Guy comment -> Inside make_generation_fast_ of TrnasformerDecoderLayer")
         self.need_attn = need_attn
 
 
