@@ -21,6 +21,7 @@ class SequenceScorer(object):
 
     @torch.no_grad()
     def generate(self, models, sample, **kwargs):
+        print("Guy comment -> inside sequence_scorer.generate")
         """Score a batch of translations."""
         net_input = sample['net_input']
 
