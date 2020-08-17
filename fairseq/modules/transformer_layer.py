@@ -412,6 +412,7 @@ class TransformerDecoderLayer(nn.Module):
         return x, attn, None
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):
+        print("Guy comment -> Inside make_generation_fast_ of TrnasformerDecoderLayer")
         self.need_attn = need_attn
 
 

@@ -81,6 +81,7 @@ def _main(args, output_file):
     )
     # Optimize ensemble for generation
     for model in models:
+        print("Guy comment - > before model.prepare_for_inference")
         model.prepare_for_inference_(args)
         if args.fp16:
             model.half()
@@ -210,7 +211,7 @@ def _main(args, output_file):
                 print("Guy comment - > maybe the matrix I want - {}".format(
                     sample_id,
                     ' '.join(['{}-{}'.format(src_idx, tgt_idx) for src_idx, tgt_idx in alignment])
-                ), file=output_file)
+                ))
                 detok_hypo_str = decode_fn(hypo_str)
                 if not args.quiet:
                     score = hypo['score'] / math.log(2)  # convert to base 2

@@ -129,6 +129,7 @@ class BaseFairseqModel(nn.Module):
 
     def prepare_for_inference_(self, args):
         """Prepare model for inference."""
+        print("Guy comment - > Inside prepare_for_inference_")
         kwargs = {}
         kwargs['beamable_mm_beam_size'] = (
             None if getattr(args, 'no_beamable_mm', False)
@@ -147,6 +148,7 @@ class BaseFairseqModel(nn.Module):
         Legacy entry point to optimize model for faster generation.
         Prefer prepare_for_inference_.
         """
+        print("Guy comment - > Inside make_generation_fast_")
         if self._is_generation_fast:
             return  # only apply once
         self._is_generation_fast = True
