@@ -87,7 +87,7 @@ def _main(args, output_file):
             model.half()
         if use_cuda:
             model.cuda()
-
+    print("Guy comment - > After model.prepare_for_inference")
     # Load alignment dictionary for unknown word replacement
     # (None if no unknown word replacement, empty if no path to align dictionary)
     align_dict = utils.load_align_dict(args.replace_unk)

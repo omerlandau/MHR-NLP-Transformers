@@ -302,6 +302,7 @@ class TransformerDecoderLayer(nn.Module):
         Returns:
             encoded output of shape `(seq_len, batch, embed_dim)`
         """
+        need_head_weights = True
         if need_head_weights:
             need_attn = True
         print("Guy comment -> Inside forward of TrnasformerDecoderLayer")
