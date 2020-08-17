@@ -149,6 +149,7 @@ def _main(args, output_file):
             prefix_tokens = sample['target'][:, :args.prefix_size]
 
         gen_timer.start()
+        print("Guy comment - > Before task.inference_step")
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
         for i, h in enumerate(hypos[:10]): # Guy test - to delete
             print("Guy comment - > hypo {} is : {}".format(i, h))
