@@ -148,7 +148,7 @@ def _main(args, output_file):
         gen_timer.start()
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
         print("Guy comment - > hypos size : {}".format(len(hypos)))
-        print("Guy comment - > hypos[0]['attention'] size : {}".format(len(hypos[0]['attention'])))
+        print("Guy comment - > hypos[0]  : {}".format(hypos[0]))
         print("Guy comment - > hypos[0]['attention'] : {}".format(str(hypos[0]['attention'])))
         exit()
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
