@@ -37,8 +37,7 @@ class MultiheadAttention(nn.Module):
             mask_layer=None,
             mask_head=None,
             mask_layer_type=None,
-            guy_test=None,
-            guy_test_layer_index=None,
+
     ):
         super().__init__()
         self.mask_layer = mask_layer
@@ -351,6 +350,22 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
 
+        ## computing confidence of all heads over bsz sentences
+
+        for j in range(self.num_heads):
+            sum = 0
+            for i in range(bsz):
+                temp = attn_weights.view(self.num_heads,bsz,tgt_len, src_len)[j,i,:,:].flatten().max()
+                sum += temp
+            conf = sum/bsz
+
+            print("conf of head num {0} = {1}".format(j,conf))
+
+            # worth adding layer number (from trasformer_layer)
+            # and  print during training the advancment of head confidence over each bsz.
+
+        exit()
+
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
             p=self.dropout,
@@ -360,6 +375,8 @@ class MultiheadAttention(nn.Module):
         assert v is not None
 
         attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
+
+
 
         assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
         if self.onnx_trace and attn.size(1) == 1:
