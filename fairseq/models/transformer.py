@@ -823,6 +823,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         if self.project_out_dim is not None:
             x = self.project_out_dim(x)
+        print("Guy comment -> inside transformer forward")
         return x, {"attn": [attn], "inner_states": inner_states}
 
     def output_layer(self, features):
