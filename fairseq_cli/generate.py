@@ -149,8 +149,7 @@ def _main(args, output_file):
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
         print("Guy comment - > hypos size : {}".format(len(hypos)))
         print("Guy comment - > hypos[0]  : {}".format(hypos[0]))
-        print("Guy comment - > hypos[0]['attention'] : {}".format(hypos[0]['attention']))
-        exit()
+
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
 
@@ -205,6 +204,10 @@ def _main(args, output_file):
                         generator.eos,
                     }
                 )
+                print("Guy comment - > hypo_tokens : {}".format(hypo_tokens))
+                print("Guy comment - > hypo_str : {}".format(hypo_str))
+                print("Guy comment - > alignment : {}".format(alignment))
+                exit()
                 detok_hypo_str = decode_fn(hypo_str)
                 if not args.quiet:
                     score = hypo['score'] / math.log(2)  # convert to base 2
