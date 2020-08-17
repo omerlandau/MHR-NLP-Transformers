@@ -207,7 +207,7 @@ def _main(args, output_file):
                 # print("Guy comment - > hypo_tokens : {}".format(hypo_tokens))
                 # print("Guy comment - > hypo_str : {}".format(hypo_str))
                 # print("Guy comment - > alignment : {}".format(alignment))
-                print("Guy comment - > maybe the matrix I want".format(
+                print("Guy comment - > maybe the matrix I want - {}".format(
                     sample_id,
                     ' '.join(['{}-{}'.format(src_idx, tgt_idx) for src_idx, tgt_idx in alignment])
                 ), file=output_file)
