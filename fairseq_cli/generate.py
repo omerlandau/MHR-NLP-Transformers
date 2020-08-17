@@ -207,7 +207,9 @@ def _main(args, output_file):
                 print("Guy comment - > hypo_tokens : {}".format(hypo_tokens))
                 print("Guy comment - > hypo_str : {}".format(hypo_str))
                 print("Guy comment - > alignment : {}".format(alignment))
-                exit()
+                if len(alignment) != 0:
+                    print("Guy comment - > alignment is not none")
+                    exit()
                 detok_hypo_str = decode_fn(hypo_str)
                 if not args.quiet:
                     score = hypo['score'] / math.log(2)  # convert to base 2
