@@ -113,7 +113,7 @@ def main(args):
         args.max_sentences,
     ))
     print('| Optimizer {}'.format(trainer.optimizer.__class__.__name__))
-
+'''
     # Initialize dataloader
     epoch_itr = task.get_batch_iterator(
         dataset=task.dataset(args.train_subset),
@@ -126,6 +126,7 @@ def main(args):
         num_shards=args.distributed_world_size,
         shard_id=args.distributed_rank,
     )
+    '''
     # Load the latest checkpoint if one is available
     extra_state, epoch_itr = checkpoint_utils.load_checkpoint(args, trainer)
 
