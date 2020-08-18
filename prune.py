@@ -1,7 +1,7 @@
 import sys
 import collections
 import torch
-
+from fairseq.model_parallel.megatron_trainer import MegatronTrainer
 from fairseq import options, progress_bar, tasks, utils
 from fairseq.trainer import Trainer
 from fairseq.meters import AverageMeter, StopwatchMeter
@@ -10,7 +10,7 @@ from fairseq_cli.train import (
     load_checkpoint,
 )
 from itertools import islice
-
+from fairseq import checkpoint_utils
 from fairseq.sequence_generator import SequenceGenerator
 from fairseq_cli.interactive import translate_corpus, parse_head_pruning_descriptors, mask_heads
 from math import ceil
@@ -97,11 +97,16 @@ def main(args):
         task.max_positions(),
         model.max_positions(),
     )
+    '''
     dummy_batch = task.dataset('train').get_dummy_batch(
         args.max_tokens, max_positions)
-
+'''
+    quantizer = None
     # Build trainer
-    trainer = Trainer(args, task, model, criterion, dummy_batch)
+    if args.model_parallel_size == 1:
+        trainer = Trainer(args, task, model, criterion, quantizer)
+    else:
+        trainer = MegatronTrainer(args, task, model, criterion)
     print('| training on {} GPUs'.format(args.distributed_world_size))
     print('| max tokens per GPU = {} and max sentences per GPU = {}'.format(
         args.max_tokens,
@@ -122,8 +127,7 @@ def main(args):
         shard_id=args.distributed_rank,
     )
     # Load the latest checkpoint if one is available
-    if not load_checkpoint(args, trainer, epoch_itr):
-        trainer.dummy_train_step([dummy_batch])
+    extra_state, epoch_itr = checkpoint_utils.load_checkpoint(args, trainer)
 
     # Train until the learning rate gets too small
     prune_meter = StopwatchMeter()
