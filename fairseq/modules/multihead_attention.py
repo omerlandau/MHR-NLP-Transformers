@@ -352,11 +352,23 @@ class MultiheadAttention(nn.Module):
 
         ## computing confidence of all heads over bsz sentences
 
+        # Voita's confidence
         for j in range(self.num_heads):
             conf_temp = 0
             for batch in range(bsz):
-                conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
-            conf = conf_temp/bsz
+                conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1] \
+                    .flatten().max()
+            conf = conf_temp / bsz
+            print("conf of head num {0} = {1}".format(j, conf))
+        # Take max for each source word, than average all
+        for j in range(self.num_heads):
+            conf_temp = 0
+            for batch in range(bsz):
+                word_attn_sum = 0
+                for tgt in range(tgt_len - 1):
+                    word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt, :-1].max()
+                conf_temp += word_attn_sum / tgt_len - 1
+            conf = conf_temp / bsz
             print("conf of head num {0} = {1}".format(j, conf))
 
         # worth adding layer number (from trasformer_layer)
