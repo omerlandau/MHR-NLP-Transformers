@@ -354,7 +354,7 @@ class MultiheadAttention(nn.Module):
 
         for j in range(self.num_heads):
             conf_temp = 0
-            for batch in bsz:
+            for batch in range(bsz):
                 conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
             conf = conf_temp/bsz
             print("conf of head num {0} = {1}".format(j, conf))
