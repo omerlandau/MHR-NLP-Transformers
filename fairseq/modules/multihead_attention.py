@@ -353,7 +353,7 @@ class MultiheadAttention(nn.Module):
         ## computing confidence of all heads over bsz sentences
 
         for j in range(self.num_heads):
-            conf = attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, :, :-1, :-1].max(dim=0).mean(dim=1)
+            conf = attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, :, :-1, :-1].max(dim=2).mean(dim=1)
 
             print("conf of head num {0} = {1}".format(j, conf))
 
