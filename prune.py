@@ -113,7 +113,7 @@ def main(args):
         args.max_sentences,
     ))
     print('| Optimizer {}'.format(trainer.optimizer.__class__.__name__))
-'''
+    '''
     # Initialize dataloader
     epoch_itr = task.get_batch_iterator(
         dataset=task.dataset(args.train_subset),
