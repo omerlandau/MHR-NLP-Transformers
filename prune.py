@@ -5,7 +5,7 @@ import torch
 from fairseq import options, progress_bar, tasks, utils
 from fairseq.trainer import Trainer
 from fairseq.meters import AverageMeter, StopwatchMeter
-from train import (
+from fairseq_cli.train import (
     load_dataset_splits,
     load_checkpoint,
 )
