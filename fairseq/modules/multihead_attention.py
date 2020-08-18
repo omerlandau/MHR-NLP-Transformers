@@ -122,7 +122,7 @@ class MultiheadAttention(nn.Module):
             attn_mask: Optional[Tensor] = None,
             before_softmax: bool = False,
             need_head_weights: bool = False,
-    ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor]]:
+    ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor], Optional[Tensor]]:
         """Input shape: Time x Batch x Channel
 
         Args:
@@ -374,7 +374,7 @@ class MultiheadAttention(nn.Module):
                             .max()
                     conf_temp += word_attn_sum / (tgt_len - 1)
                 conf.append(conf_temp / bsz)
-                #print("conf of head num {0} = {1}".format(j, conf[j]))
+                print("conf of head num {0} = {1}".format(j, conf[j]))
 
             # worth adding layer number (from trasformer_layer)
             # and  print during training the
