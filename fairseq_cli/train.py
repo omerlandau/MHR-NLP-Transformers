@@ -7,6 +7,7 @@
 Train a new model on one or across multiple GPUs.
 """
 
+import collections
 import itertools
 import argparse
 import logging
@@ -580,6 +581,77 @@ def mhr(model, swaps, head_dim, num_heads, num_epoch):
     end = time.time()
     print("The experiment swapping took {} minuets".format(str((end - start) / 60)))
 
+
+def save_checkpoint(args, trainer, epoch_itr, val_loss):
+    if args.no_save or not distributed_utils.is_master(args):
+        return
+    epoch = epoch_itr.epoch
+    end_of_epoch = epoch_itr.end_of_epoch()
+    updates = trainer.get_num_updates()
+
+    checkpoint_conds = collections.OrderedDict()
+    checkpoint_conds['checkpoint{}.pt'.format(epoch)] = (
+        end_of_epoch and not args.no_epoch_checkpoints and
+        epoch % args.save_interval == 0
+    )
+    checkpoint_conds['checkpoint_{}_{}.pt'.format(epoch, updates)] = (
+        not end_of_epoch and args.save_interval_updates > 0 and
+        updates % args.save_interval_updates == 0
+    )
+    checkpoint_conds['checkpoint_best.pt'] = (
+        val_loss is not None and
+        (not hasattr(save_checkpoint, 'best') or val_loss < save_checkpoint.best)
+    )
+    # keep this last so that it's a symlink
+    checkpoint_conds['checkpoint_last.pt'] = True
+
+    prev_best = getattr(save_checkpoint, 'best', val_loss)
+    if val_loss is not None:
+        save_checkpoint.best = min(val_loss, prev_best)
+    extra_state = {
+        'train_iterator': epoch_itr.state_dict(),
+        'val_loss': val_loss,
+    }
+    if hasattr(save_checkpoint, 'best'):
+        extra_state.update({'best': save_checkpoint.best})
+
+    checkpoints = [os.path.join(args.save_dir, fn)
+                   for fn, cond in checkpoint_conds.items() if cond]
+    if len(checkpoints) > 0:
+        for cp in checkpoints:
+            trainer.save_checkpoint(cp, extra_state)
+
+    if not end_of_epoch and args.keep_interval_updates > 0:
+        # remove old checkpoints; checkpoints are sorted in descending order
+        checkpoints = utils.checkpoint_paths(
+            args.save_dir, pattern=r'checkpoint(\d+)\.pt')
+        for old_chk in checkpoints[args.keep_interval_updates:]:
+            os.remove(old_chk)
+
+def load_checkpoint(args, trainer, epoch_itr):
+    """Load a checkpoint and replay dataloader to match."""
+    os.makedirs(args.save_dir, exist_ok=True)
+    pure_restore_file = os.path.abspath(args.restore_file)
+    if os.path.isfile(pure_restore_file):
+        checkpoint_path = pure_restore_file
+    else:
+        checkpoint_path = os.path.join(args.save_dir, args.restore_file)
+    if os.path.isfile(checkpoint_path):
+        extra_state = trainer.load_checkpoint(checkpoint_path, args.reset_optimizer, args.reset_lr_scheduler,
+                                              eval(args.optimizer_overrides))
+        if extra_state is not None and not args.reset_optimizer:
+            # replay train iterator to match checkpoint
+            epoch_itr.load_state_dict(extra_state['train_iterator'])
+
+            print('| loaded checkpoint {} (epoch {} @ {} updates)'.format(
+                checkpoint_path, epoch_itr.epoch, trainer.get_num_updates()))
+
+            trainer.lr_step(epoch_itr.epoch)
+            trainer.lr_step_update(trainer.get_num_updates())
+            if 'best' in extra_state:
+                save_checkpoint.best = extra_state['best']
+        return True
+    return False
 
 def load_dataset_splits(task, splits):
     for split in splits:
