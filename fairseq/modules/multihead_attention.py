@@ -354,44 +354,42 @@ class MultiheadAttention(nn.Module):
 
         for j in range(self.num_heads):
             conf = attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, :, :-1, :-1].max(dim=2).mean(dim=1)
-
             print("conf of head num {0} = {1}".format(j, conf))
 
         # worth adding layer number (from trasformer_layer)
         # and  print during training the
         # advancment of head confidence over each bsz.
+        exit()
 
-    exit()
+        attn_probs = F.dropout(
+            attn_weights_float.type_as(attn_weights),
+            p=self.dropout,
+            training=self.training,
+        )
 
-    attn_probs = F.dropout(
-        attn_weights_float.type_as(attn_weights),
-        p=self.dropout,
-        training=self.training,
-    )
+        assert v is not None
 
-    assert v is not None
+        ctx = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
+        save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
+        ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
-    ctx = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
-    save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
-    ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
-
-    assert list(ctx.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
-    if self.onnx_trace and ctx.size(1) == 1:
-        # when ONNX tracing a single decoder step (sequence length == 1)
-        # the transpose is a no-op copy before view, thus unnecessary
-        ctx = ctx.contiguous().view(tgt_len, bsz, embed_dim)
-    else:
-        ctx = ctx.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
-    attn = self.out_proj(ctx)
-    attn_weights: Optional[Tensor] = None
-    if need_weights:
-        attn_weights = attn_weights_float.view(
-            bsz, self.num_heads, tgt_len, src_len
-        ).transpose(1, 0)
-        if not need_head_weights:
-            # average attention weights over heads
-            attn_weights = attn_weights.mean(dim=0)
-    return attn, attn_weights, save_ctx
+        assert list(ctx.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
+        if self.onnx_trace and ctx.size(1) == 1:
+            # when ONNX tracing a single decoder step (sequence length == 1)
+            # the transpose is a no-op copy before view, thus unnecessary
+            ctx = ctx.contiguous().view(tgt_len, bsz, embed_dim)
+        else:
+            ctx = ctx.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
+        attn = self.out_proj(ctx)
+        attn_weights: Optional[Tensor] = None
+        if need_weights:
+            attn_weights = attn_weights_float.view(
+                bsz, self.num_heads, tgt_len, src_len
+            ).transpose(1, 0)
+            if not need_head_weights:
+                # average attention weights over heads
+                attn_weights = attn_weights.mean(dim=0)
+        return attn, attn_weights, save_ctx
 
 
 @staticmethod
