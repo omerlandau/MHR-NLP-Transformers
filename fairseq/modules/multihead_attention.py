@@ -366,6 +366,7 @@ class MultiheadAttention(nn.Module):
             for batch in range(bsz):
                 word_attn_sum = 0
                 for tgt in range(tgt_len - 1):
+                    print(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt, :-1])
                     word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt, :-1].max()
                 conf_temp += word_attn_sum / tgt_len - 1
             conf = conf_temp / bsz
