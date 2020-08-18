@@ -81,13 +81,11 @@ def _main(args, output_file):
     )
     # Optimize ensemble for generation
     for model in models:
-        print("Guy comment - > before model.prepare_for_inference")
         model.prepare_for_inference_(args)
         if args.fp16:
             model.half()
         if use_cuda:
             model.cuda()
-    print("Guy comment - > After model.prepare_for_inference")
     # Load alignment dictionary for unknown word replacement
     # (None if no unknown word replacement, empty if no path to align dictionary)
     align_dict = utils.load_align_dict(args.replace_unk)
@@ -146,7 +144,6 @@ def _main(args, output_file):
             prefix_tokens = sample['target'][:, :args.prefix_size]
 
         gen_timer.start()
-        print("Guy comment - > Before task.inference_step")
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
