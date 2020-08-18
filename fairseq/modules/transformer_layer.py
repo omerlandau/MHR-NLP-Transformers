@@ -229,8 +229,8 @@ class TransformerDecoderLayer(nn.Module):
         self.self_attn_variables = {}
         self.encoder_attn_variables = {}
 
-        self.self_attn_conf = None
-        self.encoder_attn_conf = None
+        self.self_attn_confidence = None
+        self.encoder_attn_confidence = None
         self.onnx_trace = False
 
     def build_fc1(self, input_dim, output_dim, q_noise, qn_block_size):
@@ -368,7 +368,7 @@ class TransformerDecoderLayer(nn.Module):
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
         self.self_attn_variables["in_mask"] = self_attn_padding_mask
         self.self_attn_variables["out_mask"] = self_attn_padding_mask
-        self.self_attn_conf = conf
+        self.self_attn_confidence = conf
 
         x = self.dropout_module(x)
         x = residual + x
@@ -405,7 +405,7 @@ class TransformerDecoderLayer(nn.Module):
             self.encoder_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.encoder_attn.num_heads, -1)
             self.encoder_attn_variables["in_mask"] = encoder_padding_mask
             self.encoder_attn_variables["out_mask"] = self_attn_padding_mask
-            self.encoder_attn_conf = conf
+            self.encoder_attn_confidence = conf
             x = self.dropout_module(x)
             x = residual + x
             if not self.normalize_before:
