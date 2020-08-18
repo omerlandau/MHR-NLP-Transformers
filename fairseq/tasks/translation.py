@@ -28,21 +28,19 @@ from fairseq.tasks import FairseqTask, register_task
 
 EVAL_BLEU_ORDER = 4
 
-
 logger = logging.getLogger(__name__)
 
 
 def load_langpair_dataset(
-    data_path, split,
-    src, src_dict,
-    tgt, tgt_dict,
-    combine, dataset_impl, upsample_primary,
-    left_pad_source, left_pad_target, max_source_positions,
-    max_target_positions, prepend_bos=False, load_alignments=False,
-    truncate_source=False, append_source_id=False,
-    num_buckets=0,
+        data_path, split,
+        src, src_dict,
+        tgt, tgt_dict,
+        combine, dataset_impl, upsample_primary,
+        left_pad_source, left_pad_target, max_source_positions,
+        max_target_positions, prepend_bos=False, load_alignments=False,
+        truncate_source=False, append_source_id=False,
+        num_buckets=0,
 ):
-
     def split_exists(split, src, tgt, lang, data_path):
         filename = os.path.join(data_path, '{}.{}-{}.{}'.format(split, src, tgt, lang))
         return indexed_dataset.dataset_exists(filename, impl=dataset_impl)
@@ -344,6 +342,21 @@ class TranslationTask(FairseqTask):
     def max_positions(self):
         """Return the max sentence length allowed by the task."""
         return (self.args.max_source_positions, self.args.max_target_positions)
+
+    def prune_step(self, sample, model, criterion):
+        """Like train_step but we retain_grad for some variables"""
+        model.eval()
+        # Forward pass
+        loss, sample_size, logging_output = criterion(model, sample)
+        # Retain grads wrt. attn context (for computing the importance score)
+        for layer in model.encoder.layers:
+            layer.self_attn_variables["context"].retain_grad()
+        for layer in model.decoder.layers:
+            layer.self_attn_variables["context"].retain_grad()
+            layer.encoder_attn_variables["context"].retain_grad()
+        # Get those gradients
+        loss.backward()
+        return sample_size, logging_output
 
     @property
     def source_dictionary(self):
