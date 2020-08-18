@@ -7,6 +7,7 @@
 Train a new model on one or across multiple GPUs.
 """
 
+import itertools
 import argparse
 import logging
 import math
@@ -479,18 +480,15 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
     for s_key, d_key in zip(src_parameters.keys(), dst_parameters.keys()):
         with torch.no_grad():
             # one source parameter(holds all heads)
-            #print("######## before #########")
-            #print(d_key)
-            #print(model.state_dict()[d_key][0:3,0:4])
-            #print(model.state_dict()[d_key][0:3, 128:132])
-            #print(model.state_dict()[d_key].size())
-            #print(s_key)
-            #print(model.state_dict()[s_key][0:3,0:4])
-            #print(model.state_dict()[s_key][0:3, 128:132])
-            #print(model.state_dict()[s_key].size())
-
-
-
+            # print("######## before #########")
+            # print(d_key)
+            # print(model.state_dict()[d_key][0:3,0:4])
+            # print(model.state_dict()[d_key][0:3, 128:132])
+            # print(model.state_dict()[d_key].size())
+            # print(s_key)
+            # print(model.state_dict()[s_key][0:3,0:4])
+            # print(model.state_dict()[s_key][0:3, 128:132])
+            # print(model.state_dict()[s_key].size())
 
             ms = model.state_dict()
 
@@ -517,8 +515,8 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
 
                 # Get specific head parameters
 
-                src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim , : ].clone()
-                dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim , : ].clone()
+                src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :].clone()
+                dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :].clone()
                 dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :] = src_head_parameter
                 src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :] = dst_head_parameter
 
@@ -526,19 +524,21 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
                 del dst_parameter
                 torch.cuda.empty_cache()
 
-                #print("######## after ########")
-                #print(d_key)
-                #print(model.state_dict()[d_key][0:3, 0:4])
-                #print(model.state_dict()[d_key][0:3, 128:132])
-                #print(model.state_dict()[d_key].size())
-                #print(s_key)
-                #print(model.state_dict()[s_key][0:3, 0:4])
-                #print(model.state_dict()[s_key][0:3, 128:132])
-                #print(model.state_dict()[s_key].size())
+                # print("######## after ########")
+                # print(d_key)
+                # print(model.state_dict()[d_key][0:3, 0:4])
+                # print(model.state_dict()[d_key][0:3, 128:132])
+                # print(model.state_dict()[d_key].size())
+                # print(s_key)
+                # print(model.state_dict()[s_key][0:3, 0:4])
+                # print(model.state_dict()[s_key][0:3, 128:132])
+                # print(model.state_dict()[s_key].size())
 
     print(
-        "Done swapping parameters for creation of head {} in layer {} and head {} in layer {}".format(src_head, src_layer, dst_head,
-                                                                                         dst_layer))
+        "Done swapping parameters for creation of head {} in layer {} and head {} in layer {}".format(src_head,
+                                                                                                      src_layer,
+                                                                                                      dst_head,
+                                                                                                      dst_layer))
 
 
 def mhr(model, swaps, head_dim, num_heads, num_epoch):
@@ -579,6 +579,21 @@ def mhr(model, swaps, head_dim, num_heads, num_epoch):
                         dst_layer)
     end = time.time()
     print("The experiment swapping took {} minuets".format(str((end - start) / 60)))
+
+
+def load_dataset_splits(task, splits):
+    for split in splits:
+        if split == 'train':
+            task.load_dataset(split, combine=True)
+        else:
+            for k in itertools.count():
+                split_k = split + (str(k) if k > 0 else '')
+                try:
+                    task.load_dataset(split_k, combine=False)
+                except FileNotFoundError as e:
+                    if k > 0:
+                        break
+                    raise e
 
 
 if __name__ == "__main__":
