@@ -361,7 +361,6 @@ class MultiheadAttention(nn.Module):
                     conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1] \
                         .flatten().max()
                 conf.append(conf_temp / bsz)
-                #print("conf of head num {0} = {1}".format(j, conf[j]))
 
         if confidence_arch == "tgt_word_max_avg":
         # Take max for each source word, than average all
@@ -374,11 +373,7 @@ class MultiheadAttention(nn.Module):
                             .max()
                     conf_temp += word_attn_sum / (tgt_len - 1)
                 conf.append(conf_temp / bsz)
-                #print("conf of head num {0} = {1}".format(j, conf[j]))
 
-            # worth adding layer number (from trasformer_layer)
-            # and  print during training the
-            # advancment of head confidence over each bsz.
 
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
