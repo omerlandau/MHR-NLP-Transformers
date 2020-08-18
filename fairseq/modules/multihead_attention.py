@@ -351,7 +351,7 @@ class MultiheadAttention(nn.Module):
         attn_weights = attn_weights_float.type_as(attn_weights)
 
         ## computing confidence of all heads over bsz sentences
-
+        '''
         # Voita's confidence
         for j in range(self.num_heads):
             conf_temp = 0
@@ -376,7 +376,7 @@ class MultiheadAttention(nn.Module):
         # and  print during training the
         # advancment of head confidence over each bsz.
         exit()
-
+        '''
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
             p=self.dropout,
