@@ -142,9 +142,10 @@ def main(
     experiment_path = args.mhr_experiment  # path for experiment configuration
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
-        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
         encoder_layers = trainer.args.encoder_layers
         print("Guy comment - > enc layers are : {}".format(encoder_layers))
+        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
+
         if should_stop:
             break
 
