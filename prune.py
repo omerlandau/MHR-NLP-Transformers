@@ -139,8 +139,8 @@ def main(args):
     prune_meter.stop()
     print('| done estimating head importance in {:.1f} seconds'.format(
         prune_meter.sum))
-    torch.save(
-        head_stats, f"{os.path.dirname(args.restore_file)}/heads_stats.bin")
+    #torch.save(
+    #    head_stats, f"{os.path.dirname(args.restore_file)}/heads_stats.bin")
     # Print
     print("Head importances")
     print("Encoder self attention")
