@@ -214,6 +214,57 @@ class Trainer(object):
         self._lr_scheduler = lr_scheduler.build_lr_scheduler(self.args, self.optimizer)
         self._lr_scheduler.step_update(0)
 
+    def prune_step(self, sample, raise_oom=False):
+        """Do forward and backward pass in evaluation mode."""
+        self.model.eval()
+        self.zero_grad()
+
+        sample = self._prepare_sample(sample)
+        if sample is None:
+            sample = self._prepare_sample(self._dummy_batch)
+            ignore_results = True
+        else:
+            ignore_results = False
+
+        try:
+            sample_size, logging_output = self.task.prune_step(
+                sample, self.model, self.criterion,
+            )
+        except RuntimeError as e:
+            if 'out of memory' in str(e) and not raise_oom:
+                print('| WARNING: ran out of memory, retrying batch')
+                for p in self.model.parameters():
+                    if p.grad is not None:
+                        del p.grad  # free some memory
+                torch.cuda.empty_cache()
+                return self.prune_step(sample, raise_oom=True)
+            else:
+                raise e
+
+        if ignore_results:
+            logging_output, sample_size = {}, 0
+
+        # gather logging outputs from all replicas
+        if self.args.distributed_world_size > 1:
+            logging_output, sample_size = zip(*distributed_utils.all_gather_list(
+                [logging_output, sample_size],
+            ))
+            logging_output = list(logging_output)
+            sample_size = list(sample_size)
+        else:
+            logging_output = [logging_output]
+            sample_size = [sample_size]
+
+        # aggregate logging outputs and sample sizes
+        logging_output = self.task.aggregate_logging_outputs(
+            logging_output, self.criterion
+        )
+        sample_size = self.task.grad_denom(
+            sample_size, self.criterion
+        )
+
+        return logging_output
+
     def save_checkpoint(self, filename, extra_state):
         """Save all training state in a checkpoint file."""
         if self.is_data_parallel_master:  # only save one checkpoint
