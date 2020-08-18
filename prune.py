@@ -428,8 +428,8 @@ def estimate_head_importance(args, trainer, task, epoch_itr):
             head_importance["encoder_self"][layer] += importance
             denoms["encoder_self"][layer] += denom
             # Stats
-            aggregate_stats(head_stats["encoder_self"][layer],
-                            batch_head_stats(self_attn_variables)[0])
+            #aggregate_stats(head_stats["encoder_self"][layer],
+            #                batch_head_stats(self_attn_variables)[0])
         # Retrieve importance scores for the decoder
         for layer in range(decoder_layers):
             # Self attention
@@ -438,16 +438,16 @@ def estimate_head_importance(args, trainer, task, epoch_itr):
                 self_attn_variables, one_minus=args.one_minus)
             head_importance["decoder_self"][layer] += importance
             denoms["decoder_self"][layer] += denom
-            aggregate_stats(head_stats["decoder_self"][layer],
-                            batch_head_stats(self_attn_variables, triu_masking=True)[0])
+            #aggregate_stats(head_stats["decoder_self"][layer],
+            #                batch_head_stats(self_attn_variables, triu_masking=True)[0])
             # Encoder attention
             encoder_attn_variables = trainer.model.decoder.layers[layer].encoder_attn_variables
             importance, denom = batch_head_importance(
                 encoder_attn_variables, one_minus=args.one_minus)
             head_importance["encoder_decoder"][layer] += importance
             denoms["encoder_decoder"][layer] += denom
-            aggregate_stats(head_stats["encoder_decoder"][layer],
-                            batch_head_stats(encoder_attn_variables)[0])
+            #aggregate_stats(head_stats["encoder_decoder"][layer],
+            #                batch_head_stats(encoder_attn_variables)[0])
         # log mid-epoch stats
         stats = get_pruning_stats(trainer)
         for k, v in log_output.items():
