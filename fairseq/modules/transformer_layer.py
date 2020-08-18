@@ -135,6 +135,8 @@ class TransformerEncoderLayer(nn.Module):
         self.self_attn_variables["weights"] = layer_attn
         self.self_attn_variables["context"] = context
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
+        self.self_attn_variables["in_mask"] = encoder_padding_mask
+        self.self_attn_variables["out_mask"] = encoder_padding_mask
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -359,6 +361,8 @@ class TransformerDecoderLayer(nn.Module):
         self.self_attn_variables["weights"] = attn
         self.self_attn_variables["context"] = context
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
+        self.self_attn_variables["in_mask"] = self_attn_padding_mask
+        self.self_attn_variables["out_mask"] = self_attn_padding_mask
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -392,6 +396,8 @@ class TransformerDecoderLayer(nn.Module):
             self.encoder_attn_variables["weights"] = attn
             self.encoder_attn_variables["context"] = context
             self.encoder_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.encoder_attn.num_heads, -1)
+            self.encoder_attn_variables["in_mask"] = encoder_padding_mask
+            self.encoder_attn_variables["out_mask"] = self_attn_padding_mask
             x = self.dropout_module(x)
             x = residual + x
             if not self.normalize_before:
