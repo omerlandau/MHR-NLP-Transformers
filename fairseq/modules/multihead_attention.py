@@ -122,7 +122,7 @@ class MultiheadAttention(nn.Module):
             attn_mask: Optional[Tensor] = None,
             before_softmax: bool = False,
             need_head_weights: bool = False,
-    ) -> Tuple[Tensor, Optional[Tensor]]:
+    ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor]]:
         """Input shape: Time x Batch x Channel
 
         Args:
@@ -375,18 +375,18 @@ class MultiheadAttention(nn.Module):
 
         assert v is not None
 
-        attn = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
+        ctx = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
+        save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
+        ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
-
-
-        assert list(attn.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
-        if self.onnx_trace and attn.size(1) == 1:
+        assert list(ctx.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
+        if self.onnx_trace and ctx.size(1) == 1:
             # when ONNX tracing a single decoder step (sequence length == 1)
             # the transpose is a no-op copy before view, thus unnecessary
-            attn = attn.contiguous().view(tgt_len, bsz, embed_dim)
+            ctx = ctx.contiguous().view(tgt_len, bsz, embed_dim)
         else:
-            attn = attn.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
-        attn = self.out_proj(attn)
+            ctx = ctx.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
+        attn = self.out_proj(ctx)
         attn_weights: Optional[Tensor] = None
         if need_weights:
             attn_weights = attn_weights_float.view(
@@ -395,7 +395,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights
+        return attn, attn_weights, save_ctx
 
     @staticmethod
     def _append_prev_key_padding_mask(

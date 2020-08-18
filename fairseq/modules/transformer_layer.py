@@ -125,7 +125,7 @@ class TransformerEncoderLayer(nn.Module):
         residual = x
         if self.normalize_before:
             x = self.self_attn_layer_norm(x)
-        x, layer_attn = self.self_attn(
+        x, layer_attn, context = self.self_attn(
             query=x,
             key=x,
             value=x,
@@ -133,6 +133,7 @@ class TransformerEncoderLayer(nn.Module):
             attn_mask=attn_mask,
         )
         self.self_attn_variables["weights"] = layer_attn
+        self.self_attn_variables["context"] = context
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
         x = self.dropout_module(x)
         x = residual + x
@@ -346,7 +347,7 @@ class TransformerDecoderLayer(nn.Module):
             y = torch.cat((encoder_out, x), dim=0)
         else:
             y = x
-        x, attn = self.self_attn(
+        x, attn, context = self.self_attn(
             query=x,
             key=y,
             value=y,
@@ -356,6 +357,7 @@ class TransformerDecoderLayer(nn.Module):
             attn_mask=self_attn_mask,
         )
         self.self_attn_variables["weights"] = attn
+        self.self_attn_variables["context"] = context
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
         x = self.dropout_module(x)
         x = residual + x
@@ -377,7 +379,7 @@ class TransformerDecoderLayer(nn.Module):
                 assert incremental_state is not None
                 self.encoder_attn._set_input_buffer(incremental_state, saved_state)
 
-            x, attn = self.encoder_attn(
+            x, attn, context = self.encoder_attn(
                 query=x,
                 key=encoder_out,
                 value=encoder_out,
@@ -388,6 +390,7 @@ class TransformerDecoderLayer(nn.Module):
                 need_head_weights=need_head_weights,
             )
             self.encoder_attn_variables["weights"] = attn
+            self.encoder_attn_variables["context"] = context
             self.encoder_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.encoder_attn.num_heads, -1)
             x = self.dropout_module(x)
             x = residual + x
