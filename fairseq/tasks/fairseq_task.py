@@ -47,7 +47,7 @@ class FairseqTask(object):
 
     @classmethod
     def build_dictionary(
-        cls, filenames, workers=1, threshold=-1, nwords=-1, padding_factor=8
+            cls, filenames, workers=1, threshold=-1, nwords=-1, padding_factor=8
     ):
         """Build the dictionary
 
@@ -105,18 +105,18 @@ class FairseqTask(object):
         return self.datasets[split]
 
     def get_batch_iterator(
-        self,
-        dataset,
-        max_tokens=None,
-        max_sentences=None,
-        max_positions=None,
-        ignore_invalid_inputs=False,
-        required_batch_size_multiple=1,
-        seed=1,
-        num_shards=1,
-        shard_id=0,
-        num_workers=0,
-        epoch=1
+            self,
+            dataset,
+            max_tokens=None,
+            max_sentences=None,
+            max_positions=None,
+            ignore_invalid_inputs=False,
+            required_batch_size_multiple=1,
+            seed=1,
+            num_shards=1,
+            shard_id=0,
+            num_workers=0,
+            epoch=1
     ):
         """
         Get an iterator that yields batches of data from the given dataset.
@@ -251,16 +251,16 @@ class FairseqTask(object):
         match_source_len = getattr(args, "match_source_len", False)
         diversity_rate = getattr(args, "diversity_rate", -1)
         if (
-            sum(
-                int(cond)
-                for cond in [
-                    sampling,
-                    diverse_beam_groups > 0,
-                    match_source_len,
-                    diversity_rate > 0,
-                ]
-            )
-            > 1
+                sum(
+                    int(cond)
+                    for cond in [
+                        sampling,
+                        diverse_beam_groups > 0,
+                        match_source_len,
+                        diversity_rate > 0,
+                    ]
+                )
+                > 1
         ):
             raise ValueError("Provided Search parameters are mutually exclusive.")
         assert sampling_topk < 0 or sampling, "--sampling-topk requires --sampling"
@@ -314,7 +314,7 @@ class FairseqTask(object):
         )
 
     def train_step(
-        self, sample, model, criterion, optimizer, update_num, ignore_grad=False
+            self, sample, model, criterion, optimizer, update_num, ignore_grad=False
     ):
         """
         Do forward and backward, and return the loss as computed by *criterion*
@@ -351,6 +351,9 @@ class FairseqTask(object):
         with torch.no_grad():
             loss, sample_size, logging_output = criterion(model, sample)
         return loss, sample_size, logging_output
+
+    def grad_denom(self, sample_sizes, criterion):
+        return criterion.__class__.grad_denom(sample_sizes)
 
     def inference_step(self, generator, models, sample, prefix_tokens=None):
         with torch.no_grad():
