@@ -142,8 +142,6 @@ def main(
     experiment_path = args.mhr_experiment  # path for experiment configuration
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
-        test = trainer.model.encoder.layers[0].self_attn_confidence
-        print("Guy comment - > enc layer 0 self_attn_conf is : {}".format(test))
         valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
         for layer in trainer.args.encoder_layers:
             test = trainer.model.encoder.layers[layer].self_attn_confidence

@@ -374,7 +374,7 @@ class MultiheadAttention(nn.Module):
                             .max()
                     conf_temp += word_attn_sum / (tgt_len - 1)
                 conf.append(conf_temp / bsz)
-                print("conf of head num {0} = {1}".format(j, conf[j]))
+                #print("conf of head num {0} = {1}".format(j, conf[j]))
 
             # worth adding layer number (from trasformer_layer)
             # and  print during training the
