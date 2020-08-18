@@ -351,7 +351,7 @@ class MultiheadAttention(nn.Module):
         attn_weights = attn_weights_float.type_as(attn_weights)
 
         ## computing confidence of all heads over bsz sentences
-        confidence_arch = "base" # for testing
+        confidence_arch = "tgt_word_max_avg" # for testing
         conf = []
         # Voita's confidence
         if confidence_arch == "base":
