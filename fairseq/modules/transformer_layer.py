@@ -58,6 +58,7 @@ class TransformerEncoderLayer(nn.Module):
 
         self.final_layer_norm = LayerNorm(self.embed_dim)
         self.self_attn_variables = {}
+        self.self_attn_confidence = None
 
     def build_fc1(self, input_dim, output_dim, q_noise, qn_block_size):
         return quant_noise(nn.Linear(input_dim, output_dim), p=q_noise, block_size=qn_block_size)
@@ -125,7 +126,7 @@ class TransformerEncoderLayer(nn.Module):
         residual = x
         if self.normalize_before:
             x = self.self_attn_layer_norm(x)
-        x, layer_attn, context = self.self_attn(
+        x, layer_attn, context, conf = self.self_attn(
             query=x,
             key=x,
             value=x,
@@ -137,6 +138,7 @@ class TransformerEncoderLayer(nn.Module):
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
         self.self_attn_variables["in_mask"] = encoder_padding_mask
         self.self_attn_variables["out_mask"] = encoder_padding_mask
+        self.self_attn_confidence = conf
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -226,6 +228,9 @@ class TransformerDecoderLayer(nn.Module):
         self.need_attn = True
         self.self_attn_variables = {}
         self.encoder_attn_variables = {}
+
+        self.self_attn_conf = None
+        self.encoder_attn_conf = None
         self.onnx_trace = False
 
     def build_fc1(self, input_dim, output_dim, q_noise, qn_block_size):
@@ -349,7 +354,7 @@ class TransformerDecoderLayer(nn.Module):
             y = torch.cat((encoder_out, x), dim=0)
         else:
             y = x
-        x, attn, context = self.self_attn(
+        x, attn, context, conf = self.self_attn(
             query=x,
             key=y,
             value=y,
@@ -363,6 +368,8 @@ class TransformerDecoderLayer(nn.Module):
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
         self.self_attn_variables["in_mask"] = self_attn_padding_mask
         self.self_attn_variables["out_mask"] = self_attn_padding_mask
+        self.self_attn_conf = conf
+
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -383,7 +390,7 @@ class TransformerDecoderLayer(nn.Module):
                 assert incremental_state is not None
                 self.encoder_attn._set_input_buffer(incremental_state, saved_state)
 
-            x, attn, context = self.encoder_attn(
+            x, attn, context, conf = self.encoder_attn(
                 query=x,
                 key=encoder_out,
                 value=encoder_out,
@@ -398,6 +405,7 @@ class TransformerDecoderLayer(nn.Module):
             self.encoder_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.encoder_attn.num_heads, -1)
             self.encoder_attn_variables["in_mask"] = encoder_padding_mask
             self.encoder_attn_variables["out_mask"] = self_attn_padding_mask
+            self.encoder_attn_conf = conf
             x = self.dropout_module(x)
             x = residual + x
             if not self.normalize_before:

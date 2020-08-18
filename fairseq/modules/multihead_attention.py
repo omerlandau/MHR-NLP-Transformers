@@ -409,7 +409,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights, save_ctx
+        return attn, attn_weights, save_ctx, conf
 
 
     @staticmethod
