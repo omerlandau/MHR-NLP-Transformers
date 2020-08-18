@@ -179,8 +179,7 @@ def main(args):
     print(" ".join(p for p, _ in sorted_profiles))
     print("Sorted head importance scores:")
     print(" ".join(f"{v.data:.5f}" for _, v in sorted_profiles))
-    print("Guy comment -> exit")
-    exit()
+
     if args.only_importance:
         return
 
