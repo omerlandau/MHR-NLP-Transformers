@@ -229,6 +229,8 @@ def main(args):
             reverse_descriptors=False
         )
         print(f"Evaluating following profile: \t{' '.join(to_prune_profile)}")
+        print("Guy comment -> exit")
+        exit()
         # Apply pruning
         mask_heads(model, to_prune, args.transformer_mask_rescale)
         bleu = eval_bleu_score(
