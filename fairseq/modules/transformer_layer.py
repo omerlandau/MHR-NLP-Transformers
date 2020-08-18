@@ -57,6 +57,7 @@ class TransformerEncoderLayer(nn.Module):
         )
 
         self.final_layer_norm = LayerNorm(self.embed_dim)
+        self.self_attn_variables = {}
 
     def build_fc1(self, input_dim, output_dim, q_noise, qn_block_size):
         return quant_noise(nn.Linear(input_dim, output_dim), p=q_noise, block_size=qn_block_size)
@@ -131,6 +132,8 @@ class TransformerEncoderLayer(nn.Module):
             key_padding_mask=encoder_padding_mask,
             attn_mask=attn_mask,
         )
+        self.self_attn_variables["weights"] = layer_attn
+        self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -218,7 +221,8 @@ class TransformerDecoderLayer(nn.Module):
 
         self.final_layer_norm = LayerNorm(self.embed_dim, export=export)
         self.need_attn = True
-
+        self.self_attn_variables = {}
+        self.encoder_attn_variables = {}
         self.onnx_trace = False
 
     def build_fc1(self, input_dim, output_dim, q_noise, qn_block_size):
@@ -351,6 +355,8 @@ class TransformerDecoderLayer(nn.Module):
             need_weights=False,
             attn_mask=self_attn_mask,
         )
+        self.self_attn_variables["weights"] = attn
+        self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -381,6 +387,8 @@ class TransformerDecoderLayer(nn.Module):
                 need_weights=need_attn or (not self.training and self.need_attn),
                 need_head_weights=need_head_weights,
             )
+            self.encoder_attn_variables["weights"] = attn
+            self.encoder_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.encoder_attn.num_heads, -1)
             x = self.dropout_module(x)
             x = residual + x
             if not self.normalize_before:
@@ -409,7 +417,7 @@ class TransformerDecoderLayer(nn.Module):
             else:
                 self_attn_state = [saved_state["prev_key"], saved_state["prev_value"]]
             return x, attn, self_attn_state
-        #print("Guy comment -> inside decoderlayer forward")
+        # print("Guy comment -> inside decoderlayer forward")
         return x, attn, None
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):
