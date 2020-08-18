@@ -351,7 +351,7 @@ class MultiheadAttention(nn.Module):
         attn_weights = attn_weights_float.type_as(attn_weights)
 
         ## computing confidence of all heads over bsz sentences
-        confidence_arch = "tgt_word_max_avg" # for testing
+        confidence_arch = "base" # for testing
         conf = []
         # Voita's confidence
         if confidence_arch == "base":
@@ -361,6 +361,7 @@ class MultiheadAttention(nn.Module):
                     conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1] \
                         .flatten().max()
                 conf.append(conf_temp / bsz)
+                print("Guy comment - > head {} ".format(j))
 
         if confidence_arch == "tgt_word_max_avg":
         # Take max for each source word, than average all
@@ -373,6 +374,7 @@ class MultiheadAttention(nn.Module):
                             .max()
                     conf_temp += word_attn_sum / (tgt_len - 1)
                 conf.append(conf_temp / bsz)
+
 
 
         attn_probs = F.dropout(
