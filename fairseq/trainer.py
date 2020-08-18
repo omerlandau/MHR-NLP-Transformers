@@ -259,9 +259,7 @@ class Trainer(object):
         logging_output = self.task.aggregate_logging_outputs(
             logging_output, self.criterion
         )
-        sample_size = self.task.grad_denom(
-            sample_size, self.criterion
-        )
+
 
         return logging_output
 

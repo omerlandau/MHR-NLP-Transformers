@@ -352,9 +352,6 @@ class FairseqTask(object):
             loss, sample_size, logging_output = criterion(model, sample)
         return loss, sample_size, logging_output
 
-    def grad_denom(self, sample_sizes, criterion):
-        return criterion.__class__.grad_denom(sample_sizes)
-
     def inference_step(self, generator, models, sample, prefix_tokens=None):
         with torch.no_grad():
             return generator.generate(models, sample, prefix_tokens=prefix_tokens)
