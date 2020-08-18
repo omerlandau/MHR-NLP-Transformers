@@ -12,7 +12,7 @@ from fairseq_cli.train import (
 from itertools import islice
 
 from fairseq.sequence_generator import SequenceGenerator
-from interactive import translate_corpus, parse_head_pruning_descriptors, mask_heads
+from fairseq_cli.interactive import translate_corpus, parse_head_pruning_descriptors, mask_heads
 from math import ceil
 import sacrebleu
 import os

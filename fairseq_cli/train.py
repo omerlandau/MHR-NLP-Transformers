@@ -591,16 +591,16 @@ def save_checkpoint(args, trainer, epoch_itr, val_loss):
 
     checkpoint_conds = collections.OrderedDict()
     checkpoint_conds['checkpoint{}.pt'.format(epoch)] = (
-        end_of_epoch and not args.no_epoch_checkpoints and
-        epoch % args.save_interval == 0
+            end_of_epoch and not args.no_epoch_checkpoints and
+            epoch % args.save_interval == 0
     )
     checkpoint_conds['checkpoint_{}_{}.pt'.format(epoch, updates)] = (
-        not end_of_epoch and args.save_interval_updates > 0 and
-        updates % args.save_interval_updates == 0
+            not end_of_epoch and args.save_interval_updates > 0 and
+            updates % args.save_interval_updates == 0
     )
     checkpoint_conds['checkpoint_best.pt'] = (
-        val_loss is not None and
-        (not hasattr(save_checkpoint, 'best') or val_loss < save_checkpoint.best)
+            val_loss is not None and
+            (not hasattr(save_checkpoint, 'best') or val_loss < save_checkpoint.best)
     )
     # keep this last so that it's a symlink
     checkpoint_conds['checkpoint_last.pt'] = True
@@ -628,6 +628,7 @@ def save_checkpoint(args, trainer, epoch_itr, val_loss):
         for old_chk in checkpoints[args.keep_interval_updates:]:
             os.remove(old_chk)
 
+
 def load_checkpoint(args, trainer, epoch_itr):
     """Load a checkpoint and replay dataloader to match."""
     os.makedirs(args.save_dir, exist_ok=True)
@@ -652,6 +653,7 @@ def load_checkpoint(args, trainer, epoch_itr):
                 save_checkpoint.best = extra_state['best']
         return True
     return False
+
 
 def load_dataset_splits(task, splits):
     for split in splits:
