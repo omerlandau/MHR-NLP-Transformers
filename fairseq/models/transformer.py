@@ -185,7 +185,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
         # fmt: on
 
     @classmethod
-    def build_model(cls, args, task, head_confidence):
+    def build_model(cls, args, task):
         """Build a new model instance."""
 
         # make sure all arguments are present in older models
@@ -229,8 +229,8 @@ class TransformerModel(FairseqEncoderDecoderModel):
                 args, tgt_dict, args.decoder_embed_dim, args.decoder_embed_path
             )
 
-        encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens, head_confidence=head_confidence)
-        decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens, head_confidence=head_confidence)
+        encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens)
+        decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens)
         return cls(args, encoder, decoder)
 
     @classmethod
