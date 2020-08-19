@@ -246,11 +246,11 @@ class TransformerModel(FairseqEncoderDecoderModel):
         return emb
 
     @classmethod
-    def build_encoder(cls, args, src_dict, embed_tokens, head_confidence):
+    def build_encoder(cls, args, src_dict, embed_tokens):
         return TransformerEncoder(args, src_dict, embed_tokens)
 
     @classmethod
-    def build_decoder(cls, args, tgt_dict, embed_tokens, head_confidence):
+    def build_decoder(cls, args, tgt_dict, embed_tokens):
         return TransformerDecoder(
             args,
             tgt_dict,
