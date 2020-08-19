@@ -59,7 +59,7 @@ class TransformerEncoderLayer(nn.Module):
         self.final_layer_norm = LayerNorm(self.embed_dim)
         self.self_attn_variables = {}
         self.self_attn_confidence = None
-
+        self.head_confidence_method = args.head_confidence_method
     def build_fc1(self, input_dim, output_dim, q_noise, qn_block_size):
         return quant_noise(nn.Linear(input_dim, output_dim), p=q_noise, block_size=qn_block_size)
 
@@ -140,8 +140,9 @@ class TransformerEncoderLayer(nn.Module):
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
         self.self_attn_variables["in_mask"] = encoder_padding_mask
         self.self_attn_variables["out_mask"] = encoder_padding_mask
-        self.self_attn_confidence = conf
-        print("Guy comment - > layer {} , encoder conf is : {}".format(self.layer_index, self.self_attn_confidence))
+        if self.head_confidence_method is not None:
+            self.self_attn_confidence = conf
+            print("Guy comment - > layer {} , encoder conf is : {}".format(self.layer_index, self.self_attn_confidence))
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -187,7 +188,7 @@ class TransformerDecoderLayer(nn.Module):
         self.dropout_module = FairseqDropout(args.dropout, module_name=self.__class__.__name__)
         self.quant_noise = getattr(args, "quant_noise_pq", 0)
         self.quant_noise_block_size = getattr(args, "quant_noise_pq_block_size", 8)
-
+        self.head_confidence_method = args.head_confidence_method
         self.cross_self_attention = getattr(args, "cross_self_attention", False)
 
         self.self_attn = self.build_self_attention(
@@ -375,8 +376,9 @@ class TransformerDecoderLayer(nn.Module):
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
         self.self_attn_variables["in_mask"] = self_attn_padding_mask
         self.self_attn_variables["out_mask"] = self_attn_padding_mask
-        self.self_attn_confidence = conf
-        print("Guy comment - > layer {}, decoder self conf is : {}".format(self.layer_index, self.self_attn_confidence))
+        if self.head_confidence_method is not None:
+            self.self_attn_confidence = conf
+            print("Guy comment - > layer {}, decoder self conf is : {}".format(self.layer_index, self.self_attn_confidence))
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -412,8 +414,10 @@ class TransformerDecoderLayer(nn.Module):
             self.encoder_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.encoder_attn.num_heads, -1)
             self.encoder_attn_variables["in_mask"] = encoder_padding_mask
             self.encoder_attn_variables["out_mask"] = self_attn_padding_mask
-            self.encoder_attn_confidence = conf
-            print("Guy comment - > layer {} , decoder encoder conf is : {}".format(self.layer_index, self.encoder_attn_confidence))
+            if self.head_confidence_method is not None:
+                self.encoder_attn_confidence = conf
+                print("Guy comment - > layer {} , decoder encoder conf is : {}".format(self.layer_index,
+                                                                                       self.encoder_attn_confidence))
             x = self.dropout_module(x)
             x = residual + x
             if not self.normalize_before:
