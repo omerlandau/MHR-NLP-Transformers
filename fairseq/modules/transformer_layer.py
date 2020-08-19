@@ -364,6 +364,7 @@ class TransformerDecoderLayer(nn.Module):
             need_weights=False,
             attn_mask=self_attn_mask,
         )
+        enc_conf = None
         self.self_attn_variables["weights"] = attn
         self.self_attn_variables["context"] = context
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
@@ -373,11 +374,10 @@ class TransformerDecoderLayer(nn.Module):
         x = residual + x
         if not self.normalize_before:
             x = self.self_attn_layer_norm(x)
-        enc_conf = None
         if self.encoder_attn is not None:
             residual = x
-            if self.normalize_before:  # guy test - remove the commenting
-                x = self.encoder_attn_layer_norm(x)  # guy test - remove the commenting
+            if self.normalize_before:
+                x = self.encoder_attn_layer_norm(x)
             if prev_attn_state is not None:
                 prev_key, prev_value = prev_attn_state[:2]
                 saved_state: Dict[str, Optional[Tensor]] = {
@@ -433,7 +433,6 @@ class TransformerDecoderLayer(nn.Module):
             else:
                 self_attn_state = [saved_state["prev_key"], saved_state["prev_value"]]
             return x, attn, self_attn_state
-        # print("Guy comment -> inside decoderlayer forward")
         return x, attn, conf, enc_conf
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):
