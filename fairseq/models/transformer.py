@@ -546,7 +546,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             (default: False).
     """
 
-    def __init__(self, args, dictionary, embed_tokens, no_encoder_attn=False, head_confidence):
+    def __init__(self, args, dictionary, embed_tokens, no_encoder_attn=False, head_confidence=None):
         self.args = args
         super().__init__(dictionary)
 
