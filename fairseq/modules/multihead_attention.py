@@ -361,8 +361,8 @@ class MultiheadAttention(nn.Module):
             # if confidence_arch == "base":
             #print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
             #print("Guy comment - > attn_weights: {}".format(attn_weights))
-            voita_conf = {"heads":[]}
-            word_max = {"heads":[]}
+            voita_conf = {"heads":[], "batch_size":bsz}
+            word_max = {"heads":[], "batch_size":bsz}
             with torch.no_grad():
                 if attn_weights is not None:
                     for j in range(self.num_heads):
@@ -385,7 +385,6 @@ class MultiheadAttention(nn.Module):
             conf = {"voita": voita_conf, "word_max": word_max}
             t = time.time() - t0
             print(t)
-        conf =None
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
             p=self.dropout,

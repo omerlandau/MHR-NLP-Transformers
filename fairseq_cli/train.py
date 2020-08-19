@@ -32,6 +32,7 @@ from fairseq.logging import meters, metrics, progress_bar
 from fairseq.model_parallel.megatron_trainer import MegatronTrainer
 from fairseq.trainer import Trainer
 import json
+import pickle
 
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
@@ -140,17 +141,16 @@ def main(
     train_meter = meters.StopwatchMeter()
     train_meter.start()
     experiment_path = args.mhr_experiment  # path for experiment configuration
+    batches_conf = {}
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
-        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
+        valid_losses, should_stop, batches_conf[epoch_itr.epoch] = train(args, trainer, task, epoch_itr, model, experiment_path)
         if should_stop:
             break
 
         # only use first validation loss to update the learning rate
         lr = trainer.lr_step(epoch_itr.epoch, valid_losses[0])
 
-
-        print(len(e_conf))
 
         epoch_itr = trainer.get_train_iterator(
             epoch_itr.next_epoch_idx,
@@ -159,6 +159,12 @@ def main(
         )
     train_meter.stop()
     logger.info("done training in {:.1f} seconds".format(train_meter.sum))
+
+    ####### for try ########
+
+    with open("/a/home/cc/students/cs/omerlandau1/foromerlandau/data/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l",'wb') as fd:
+        pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
+
 
 
 def should_stop_early(args, valid_loss):
@@ -242,10 +248,13 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     valid_subsets = args.valid_subset.split(",")
     should_stop = False
+    batches_conf = []
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output, e_conf = trainer.train_step(samples)
-            print(e_conf)
+
+            batches_conf.append(e_conf)
+
             if log_output is None:  # OOM, overflow, ...
                 continue
 
@@ -273,7 +282,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     # reset epoch-level meters
     metrics.reset_meters("train")
-    return valid_losses, should_stop
+    return valid_losses, should_stop, batches_conf
 
 
 def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoch):
