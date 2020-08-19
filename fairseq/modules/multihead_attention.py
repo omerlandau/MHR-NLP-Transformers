@@ -384,7 +384,7 @@ class MultiheadAttention(nn.Module):
                         word_max["heads"].append(conf_temp)
             conf = {"voita": voita_conf, "word_max": word_max}
             t = time.time() - t0
-            print(t)
+
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
             p=self.dropout,
