@@ -73,7 +73,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         loss, nll_loss = label_smoothed_nll_loss(
             lprobs, target, self.eps, ignore_index=self.padding_idx, reduce=reduce,
         )
-        return loss, nll_loss, conf, d_conf
+        return loss, nll_loss
 
     @staticmethod
     def reduce_metrics(logging_outputs) -> None:
