@@ -289,6 +289,8 @@ class TransformerModel(FairseqEncoderDecoderModel):
             return_all_hiddens=return_all_hiddens,
         )
 
+
+
         return decoder_out, conf, d_conf
 
     # Since get_normalized_probs is in the Fairseq Model which is not scriptable,
