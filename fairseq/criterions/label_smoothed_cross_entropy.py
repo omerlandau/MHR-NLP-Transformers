@@ -54,9 +54,10 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         3) logging outputs to display while training
         """
         net_output, conf, d_conf = model(**sample['net_input'])
-        print(net_output)
-        exit()
+
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
+        print(nll_loss)
+        exit()
         sample_size = sample['target'].size(0) if self.sentence_avg else sample['ntokens']
         logging_output = {
             'loss': loss.data,
@@ -65,7 +66,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             'nsentences': sample['target'].size(0),
             'sample_size': sample_size,
         }
-        return loss, sample_size, logging_output
+        return loss, sample_size, logging_output, conf, d_conf
 
     def compute_loss(self, model, net_output, sample, reduce=True):
         lprobs = model.get_normalized_probs(net_output, log_probs=True)
