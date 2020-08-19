@@ -12,6 +12,7 @@ from torch import Tensor, nn
 from torch.nn import Parameter
 from fairseq.incremental_decoding_utils import with_incremental_state
 import numpy as np
+import time
 
 
 @with_incremental_state
@@ -352,6 +353,7 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
         conf = None
+        t0 = time.time()
         if self.head_confidence_method is not None:
             ## computing confidence of all heads over bsz sentences
             # confidence_arch = "base" # for testing
@@ -381,6 +383,9 @@ class MultiheadAttention(nn.Module):
                             conf_temp += word_attn_sum / (tgt_len - 1)
                         word_max["heads"].append(conf_temp)
             conf = {"voita": voita_conf, "word_max": word_max}
+            t = time.time() - t0
+            print(t)
+            exit()
 
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
