@@ -359,25 +359,26 @@ class MultiheadAttention(nn.Module):
             # Voita's confidence
             # if confidence_arch == "base":
             print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
-            for j in range(self.num_heads):
-                conf_temp = 0
-                for batch in range(bsz):
-                    conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
-                self.heads_confidence.append(conf_temp / bsz)
-            '''
-            if confidence_arch == "tgt_word_max_avg":
-            # Take max for each source word, than average all
+            if attn_weights is not None:
                 for j in range(self.num_heads):
                     conf_temp = 0
                     for batch in range(bsz):
-                        word_attn_sum = 0
-                        for tgt in range(tgt_len - 1):
-                            word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt, :-1]\
-                                .max()
-                        conf_temp += word_attn_sum / (tgt_len - 1)
-                    conf.append(conf_temp / bsz)
-    
-            '''
+                        conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
+                    self.heads_confidence.append(conf_temp / bsz)
+                '''
+                if confidence_arch == "tgt_word_max_avg":
+                # Take max for each source word, than average all
+                    for j in range(self.num_heads):
+                        conf_temp = 0
+                        for batch in range(bsz):
+                            word_attn_sum = 0
+                            for tgt in range(tgt_len - 1):
+                                word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt, :-1]\
+                                    .max()
+                            conf_temp += word_attn_sum / (tgt_len - 1)
+                        conf.append(conf_temp / bsz)
+        
+                '''
 
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
