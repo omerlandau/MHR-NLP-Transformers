@@ -279,7 +279,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
         encoder_out, conf = self.encoder(
             src_tokens, src_lengths=src_lengths, return_all_hiddens=return_all_hiddens
         )
-        (decoder_out, extras), d_conf = self.decoder(
+        decoder_out, d_conf = self.decoder(
             prev_output_tokens,
             encoder_out=encoder_out,
             features_only=features_only,
