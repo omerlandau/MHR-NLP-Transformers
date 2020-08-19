@@ -37,7 +37,6 @@ class MultiheadAttention(nn.Module):
             mask_layer=None,
             mask_head=None,
             mask_layer_type=None,
-            head_confidence=None,
             head_confidence_method=None,
 
     ):
@@ -46,7 +45,6 @@ class MultiheadAttention(nn.Module):
         self.mask_head = mask_head
         self.mask_layer_type = mask_layer_type
         self.head_confidence_method = head_confidence_method
-        self.heads_confidence = head_confidence
         self.embed_dim = embed_dim
         self.kdim = kdim if kdim is not None else embed_dim
         self.vdim = vdim if vdim is not None else embed_dim
@@ -414,7 +412,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights, save_ctx, self.heads_confidence
+        return attn, attn_weights, save_ctx, self.head_confidence_method
 
 
     @staticmethod

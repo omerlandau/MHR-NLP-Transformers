@@ -29,9 +29,8 @@ class TransformerEncoderLayer(nn.Module):
         args (argparse.Namespace): parsed command-line arguments
     """
 
-    def __init__(self, args, layer_index, head_confidence):
+    def __init__(self, args, layer_index):
         super().__init__()
-        self.head_confidence = head_confidence
         self.layer_index = layer_index
         self.embed_dim = args.encoder_embed_dim
         self.quant_noise = getattr(args, "quant_noise_pq", 0)
@@ -78,7 +77,6 @@ class TransformerEncoderLayer(nn.Module):
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
                 head_confidence_method=args.head_confidence_method,
-                head_confidence=self.head_confidence
             )
         else:
             return MultiheadAttention(
@@ -87,7 +85,6 @@ class TransformerEncoderLayer(nn.Module):
                 dropout=args.attention_dropout,
                 self_attention=True,
                 head_confidence_method=args.head_confidence_method,
-                head_confidence=self.head_confidence
             )
 
     def upgrade_state_dict_named(self, state_dict, name):
@@ -180,9 +177,8 @@ class TransformerDecoderLayer(nn.Module):
             (default: False).
     """
 
-    def __init__(self, args, layer_index, no_encoder_attn=False, add_bias_kv=False, add_zero_attn=False, head_confidence=None):
+    def __init__(self, args, layer_index, no_encoder_attn=False, add_bias_kv=False, add_zero_attn=False):
         super().__init__()
-        self.head_confidence = head_confidence
         self.layer_index = layer_index
         self.embed_dim = args.decoder_embed_dim
         self.dropout_module = FairseqDropout(args.dropout, module_name=self.__class__.__name__)
@@ -256,7 +252,6 @@ class TransformerDecoderLayer(nn.Module):
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
                 head_confidence_method=args.head_confidence_method,
-                head_confidence= self.head_confidence
             )
         else:
             return MultiheadAttention(
@@ -267,7 +262,6 @@ class TransformerDecoderLayer(nn.Module):
                 add_zero_attn=add_zero_attn,
                 self_attention=not getattr(args, "cross_self_attention", False),
                 head_confidence_method=args.head_confidence_method,
-                head_confidence=self.head_confidence
             )
 
     def build_encoder_attention(self, embed_dim, args):
@@ -283,7 +277,6 @@ class TransformerDecoderLayer(nn.Module):
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
                 head_confidence_method=args.head_confidence_method,
-                head_confidence=self.head_confidence
             )
         else:
             return MultiheadAttention(
@@ -294,7 +287,6 @@ class TransformerDecoderLayer(nn.Module):
                 dropout=args.attention_dropout,
                 encoder_decoder_attention=True,
                 head_confidence_method=args.head_confidence_method,
-                head_confidence=self.head_confidence
             )
 
     def prepare_for_onnx_export_(self):
