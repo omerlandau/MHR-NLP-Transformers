@@ -255,9 +255,7 @@ def _main(args, output_file):
         progress.log({'wps': round(wps_meter.avg)})
         num_sentences += sample['nsentences']
 
-    for layer in range(len(generator.model.single_model.encoder.layers)):
-        test = generator.model.single_model.encoder.layers[layer].self_attn_confidence
-        print("Guy comment - > enc layer {} self_attn_conf is : {}".format(layer, test))
+
     logger.info('NOTE: hypothesis and token scores are output in base 2')
     logger.info('Translated {} sentences ({} tokens) in {:.1f}s ({:.2f} sentences/s, {:.2f} tokens/s)'.format(
         num_sentences, gen_timer.n, gen_timer.sum, num_sentences / gen_timer.sum, 1. / gen_timer.avg))

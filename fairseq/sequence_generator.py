@@ -265,7 +265,9 @@ class SequenceGenerator(nn.Module):
                 )
             #print("Guy comment -> calling decoder forward from the generator with tokens : {}".format(
                 #tokens[:, : step + 1]))
-            print("Guy comment - > Inside seq_gen , model is {}".format(self.model))
+            for layer in range(len(self.model.single_model.encoder.layers)):
+                test = self.model.single_model.encoder.layers[layer].self_attn_confidence
+                print("Guy comment - > enc layer {} self_attn_conf is : {}".format(layer, test))
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
