@@ -114,6 +114,7 @@ class MultiheadAttention(nn.Module):
 
     def forward(
             self,
+            debug,
             query,
             key: Optional[Tensor],
             value: Optional[Tensor],
