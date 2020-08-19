@@ -358,6 +358,7 @@ class MultiheadAttention(nn.Module):
             # confidence_arch = "base" # for testing
             # Voita's confidence
             # if confidence_arch == "base":
+            print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
             for j in range(self.num_heads):
                 conf_temp = 0
                 for batch in range(bsz):
