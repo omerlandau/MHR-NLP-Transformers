@@ -315,9 +315,8 @@ class TransformerEncoder(FairseqEncoder):
         embed_tokens (torch.nn.Embedding): input embedding
     """
 
-    def __init__(self, args, dictionary, embed_tokens, head_confidence):
+    def __init__(self, args, dictionary, embed_tokens):
         super().__init__(dictionary)
-        self.head_confidence = head_confidence
         self.register_buffer("version", torch.Tensor([3]))
 
         self.dropout = args.dropout
@@ -359,7 +358,7 @@ class TransformerEncoder(FairseqEncoder):
             self.layernorm_embedding = None
 
     def build_encoder_layer(self, args, layer_index):
-        return TransformerEncoderLayer(args, layer_index, head_confidence=self.head_confidence)
+        return TransformerEncoderLayer(args, layer_index)
 
     def forward_embedding(self, src_tokens):
         # embed tokens and positions
@@ -545,11 +544,9 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             (default: False).
     """
 
-    def __init__(self, args, dictionary, embed_tokens, no_encoder_attn=False, head_confidence=None):
+    def __init__(self, args, dictionary, embed_tokens, no_encoder_attn=False):
         self.args = args
         super().__init__(dictionary)
-
-        self.head_confidence = head_confidence
         self.register_buffer("version", torch.Tensor([3]))
         self._future_mask = torch.empty(0)
 
@@ -655,7 +652,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             )
 
     def build_decoder_layer(self, args, layer_index, no_encoder_attn=False):
-        return TransformerDecoderLayer(args, layer_index, no_encoder_attn, head_confidence=self.head_confidence)
+        return TransformerDecoderLayer(args, layer_index, no_encoder_attn)
 
     def forward(
             self,
