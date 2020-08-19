@@ -367,7 +367,7 @@ class MultiheadAttention(nn.Module):
                     for batch in range(bsz):
                         #print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
                         conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
-                    voida_conf["heads"].append(conf_temp)
+                    voita_conf["heads"].append(conf_temp)
 
 
                 # Take max for each source word, than average all
