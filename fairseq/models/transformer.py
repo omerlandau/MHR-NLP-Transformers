@@ -262,6 +262,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
     # Current workaround is to add union of all arguments in child classes.
     def forward(
             self,
+            dddd,
             src_tokens,
             src_lengths,
             prev_output_tokens,
@@ -290,7 +291,6 @@ class TransformerModel(FairseqEncoderDecoderModel):
             return_all_hiddens=return_all_hiddens,
         )
 
-        print(decoder_out.log_softmax())
         return decoder_out, conf
 
     # Since get_normalized_probs is in the Fairseq Model which is not scriptable,
