@@ -351,7 +351,7 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz, self.num_heads, tgt_len, src_len) * head_masking_vector
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
-
+        conf = None
         if self.head_confidence_method is not None:
             ## computing confidence of all heads over bsz sentences
             # confidence_arch = "base" # for testing
@@ -359,27 +359,27 @@ class MultiheadAttention(nn.Module):
             # if confidence_arch == "base":
             #print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
             #print("Guy comment - > attn_weights: {}".format(attn_weights))
+            voita_conf = {"heads":[]}
+            word_max = {}
             if attn_weights is not None:
                 for j in range(self.num_heads):
                     conf_temp = 0
                     for batch in range(bsz):
                         #print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
                         conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
-                    #print(conf_temp)
-            '''
-                if confidence_arch == "tgt_word_max_avg":
+                    voida_conf["heads"].append(conf_temp)
+
+
                 # Take max for each source word, than average all
-                    for j in range(self.num_heads):
-                        conf_temp = 0
-                        for batch in range(bsz):
-                            word_attn_sum = 0
-                            for tgt in range(tgt_len - 1):
-                                word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt, :-1]\
-                                    .max()
-                            conf_temp += word_attn_sum / (tgt_len - 1)
-                        conf.append(conf_temp / bsz)
-        
-            '''
+                for j in range(self.num_heads):
+                    conf_temp = 0
+                    for batch in range(bsz):
+                        word_attn_sum = 0
+                        for tgt in range(tgt_len - 1):
+                            word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt, :-1].max()
+                        conf_temp += word_attn_sum / (tgt_len - 1)
+                    word_max["heads"].append(conf_temp)
+            conf = {"voita": voita_conf, "word_max": word_max}
 
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
@@ -409,7 +409,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights, save_ctx, self.head_confidence_method
+        return attn, attn_weights, save_ctx, conf
 
 
     @staticmethod
