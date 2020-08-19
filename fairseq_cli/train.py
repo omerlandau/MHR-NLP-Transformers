@@ -143,9 +143,6 @@ def main(
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
         valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
-        for layer in trainer.args.encoder_layers:
-            test = trainer.model.encoder.layers[layer].self_attn_confidence
-            print("Guy comment - > enc layer {} self_attn_conf is : {}".format(layer, test))
         if should_stop:
             break
 
