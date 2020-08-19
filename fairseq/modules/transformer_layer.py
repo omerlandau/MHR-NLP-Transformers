@@ -128,13 +128,15 @@ class TransformerEncoderLayer(nn.Module):
         residual = x
         if self.normalize_before:
             x = self.self_attn_layer_norm(x)
-        x, layer_attn, context, conf = self.self_attn(
+        x, layer_attn, context, conf, debug = self.self_attn(
             query=x,
             key=x,
             value=x,
             key_padding_mask=encoder_padding_mask,
             attn_mask=attn_mask,
         )
+        print(debug)
+        exit()
         self.self_attn_variables["weights"] = layer_attn
         self.self_attn_variables["context"] = context
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
