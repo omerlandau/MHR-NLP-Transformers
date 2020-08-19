@@ -196,6 +196,7 @@ class SequenceGenerator(nn.Module):
                 self.min_len <= max_len
         ), "min_len cannot be larger than max_len, please adjust these!"
         # compute the encoder output for each beam
+        print("Guy comment -> calling encoder forward")
         encoder_outs = self.model.forward_encoder(net_input)
 
         # placeholder of indices for bsz * beam_size to hold tokens and accumulative scores
@@ -263,7 +264,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs = self.model.reorder_encoder_out(
                     encoder_outs, reorder_state
                 )
-            #print("Guy comment -> calling decoder forward from the generator with tokens : {}".format(
+            print("Guy comment -> calling decoder forward from sequence generator")
                 #tokens[:, : step + 1]))
 
             lprobs, avg_attn_scores = self.model.forward_decoder(
