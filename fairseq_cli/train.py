@@ -247,6 +247,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
             log_output, e_conf = trainer.train_step(samples)
             print(e_conf)
             print(trainer.model.TransformerEncoder)
+            exit()
             if log_output is None:  # OOM, overflow, ...
                 continue
 
