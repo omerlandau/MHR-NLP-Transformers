@@ -5,7 +5,6 @@
 
 import math
 from typing import Dict, Optional, Tuple
-import sys
 import torch
 import torch.nn.functional as F
 from fairseq import utils
@@ -143,7 +142,6 @@ class MultiheadAttention(nn.Module):
                 return the average attention weights over all heads.
         """
 
-        print(sys._getframe().f_back.f_code.co_name)
         if need_head_weights:
             need_weights = True
 
@@ -359,7 +357,7 @@ class MultiheadAttention(nn.Module):
             # confidence_arch = "base" # for testing
             # Voita's confidence
             # if confidence_arch == "base":
-            print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
+            #print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
             #print("Guy comment - > attn_weights: {}".format(attn_weights))
             if attn_weights is not None:
                 for j in range(self.num_heads):
