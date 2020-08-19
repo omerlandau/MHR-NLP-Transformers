@@ -265,16 +265,16 @@ class SequenceGenerator(nn.Module):
                 )
             #print("Guy comment -> calling decoder forward from the generator with tokens : {}".format(
                 #tokens[:, : step + 1]))
-            for layer in range(len(self.model.single_model.decoder.layers)):
-                test = self.model.single_model.decoder.layers[layer].self_attn_confidence
-                print("Guy comment - > decoder layer {} self_attn_conf is : {}".format(layer, test))
+
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
                 incremental_states,
                 self.temperature,
             )
-
+            for layer in range(len(self.model.single_model.decoder.layers)):
+                test = self.model.single_model.decoder.layers[layer].self_attn_confidence
+                print("Guy comment - > decoder layer {} self_attn_conf is : {}".format(layer, test))
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
             lprobs[:, self.pad] = -math.inf  # never select pad
