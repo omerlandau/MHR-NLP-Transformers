@@ -115,7 +115,7 @@ def _main(args, output_file):
     gen_timer = StopwatchMeter()
 
     generator = task.build_generator(models, args)
-    for layer in generator.args.encoder_layers:
+    for layer in args.encoder_layers:
         test = generator.model.encoder.layers[layer].self_attn_confidence
         print("Guy comment - > enc layer {} self_attn_conf is : {}".format(layer, test))
     # Handle tokenization and BPE
