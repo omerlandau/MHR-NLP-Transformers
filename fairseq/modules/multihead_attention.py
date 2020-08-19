@@ -364,9 +364,10 @@ class MultiheadAttention(nn.Module):
                 for j in range(self.num_heads):
                     conf_temp = 0
                     for batch in range(bsz):
-                        print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
+                        #print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
                         conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
                     print(conf_temp)
+            exit()
                 '''
                 if confidence_arch == "tgt_word_max_avg":
                 # Take max for each source word, than average all
