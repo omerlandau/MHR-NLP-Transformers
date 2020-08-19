@@ -279,7 +279,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
         encoder_out, conf = self.encoder(
             src_tokens, src_lengths=src_lengths, return_all_hiddens=return_all_hiddens
         )
-        decoder_out = self.decoder(
+        decoder_out, d_conf, enc_conf = self.decoder(
             prev_output_tokens,
             encoder_out=encoder_out,
             features_only=features_only,
@@ -289,7 +289,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
             return_all_hiddens=return_all_hiddens,
         )
 
-        return decoder_out, conf
+        return decoder_out, conf, d_conf, enc_conf
 
     # Since get_normalized_probs is in the Fairseq Model which is not scriptable,
     # I rewrite the get_normalized_probs from Base Class to call the
