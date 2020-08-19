@@ -339,18 +339,18 @@ class FairseqTask(object):
         model.train()
         model.set_num_updates(update_num)
         with torch.autograd.profiler.record_function("forward"):
-            loss, sample_size, logging_output = criterion(model, sample)
+            loss, sample_size, logging_output, conf = criterion(model, sample)
         if ignore_grad:
             loss *= 0
         with torch.autograd.profiler.record_function("backward"):
             optimizer.backward(loss)
-        return loss, sample_size, logging_output
+        return loss, sample_size, logging_output, conf
 
     def valid_step(self, sample, model, criterion):
         model.eval()
         with torch.no_grad():
-            loss, sample_size, logging_output = criterion(model, sample)
-        return loss, sample_size, logging_output
+            loss, sample_size, logging_output, conf = criterion(model, sample)
+        return loss, sample_size, logging_output, conf
 
     def inference_step(self, generator, models, sample, prefix_tokens=None):
         with torch.no_grad():
