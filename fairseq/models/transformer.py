@@ -695,7 +695,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         )
         if not features_only:
             x = self.output_layer(x)
-        return x, extra, l_conf
+        return (x, extra), l_conf
 
     def extract_features(
             self,
