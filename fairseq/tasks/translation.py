@@ -270,8 +270,8 @@ class TranslationTask(FairseqTask):
     def build_dataset_for_inference(self, src_tokens, src_lengths):
         return LanguagePairDataset(src_tokens, src_lengths, self.source_dictionary)
 
-    def build_model(self, args, head_confidence):
-        model = super().build_model(args, head_confidence=head_confidence)
+    def build_model(self, args):
+        model = super().build_model(args)
         if getattr(args, 'eval_bleu', False):
             assert getattr(args, 'eval_bleu_detok', None) is not None, (
                 '--eval-bleu-detok is required if using --eval-bleu; '
