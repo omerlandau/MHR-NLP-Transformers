@@ -145,8 +145,9 @@ def main(
         batches_conf =[]
         # train for one epoch
         valid_losses, should_stop, batches_conf = train(args, trainer, task, epoch_itr, model, experiment_path)
-        with open("/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
-            pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
+        ####### for try ########
+        #with open("/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
+        #    pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
         if should_stop:
             break
 
@@ -162,7 +163,6 @@ def main(
     train_meter.stop()
     logger.info("done training in {:.1f} seconds".format(train_meter.sum))
 
-    ####### for try ########
 
 
 
