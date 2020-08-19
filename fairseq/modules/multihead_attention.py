@@ -5,7 +5,7 @@
 
 import math
 from typing import Dict, Optional, Tuple
-
+import sys
 import torch
 import torch.nn.functional as F
 from fairseq import utils
@@ -37,6 +37,7 @@ class MultiheadAttention(nn.Module):
             mask_layer=None,
             mask_head=None,
             mask_layer_type=None,
+            head_confidence=None,
             head_confidence_method=None,
 
     ):
@@ -45,7 +46,7 @@ class MultiheadAttention(nn.Module):
         self.mask_head = mask_head
         self.mask_layer_type = mask_layer_type
         self.head_confidence_method = head_confidence_method
-        self.heads_confidence = []
+        self.heads_confidence = head_confidence
         self.embed_dim = embed_dim
         self.kdim = kdim if kdim is not None else embed_dim
         self.vdim = vdim if vdim is not None else embed_dim
@@ -143,6 +144,8 @@ class MultiheadAttention(nn.Module):
                 weights for each head. Implies *need_weights*. Default:
                 return the average attention weights over all heads.
         """
+
+        print(sys._getframe().f_back.f_code.co_name)
         if need_head_weights:
             need_weights = True
 
@@ -381,7 +384,7 @@ class MultiheadAttention(nn.Module):
                             conf_temp += word_attn_sum / (tgt_len - 1)
                         conf.append(conf_temp / bsz)
         
-                '''
+            '''
 
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),

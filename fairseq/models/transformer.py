@@ -96,8 +96,9 @@ class TransformerModel(FairseqEncoderDecoderModel):
         }
         # fmt: on
 
-    def __init__(self, args, encoder, decoder):
+    def __init__(self, args, encoder, decoder, head_confidence):
         super().__init__(encoder, decoder)
+        self.head_confidence = head_confidence
         self.args = args
         self.supports_align_args = True
 
@@ -229,8 +230,8 @@ class TransformerModel(FairseqEncoderDecoderModel):
                 args, tgt_dict, args.decoder_embed_dim, args.decoder_embed_path
             )
 
-        encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens)
-        decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens)
+        encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens, head_confidence=cls.head_confidence)
+        decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens, head_confidence=cls.head_confidence)
         return cls(args, encoder, decoder)
 
     @classmethod
@@ -246,16 +247,16 @@ class TransformerModel(FairseqEncoderDecoderModel):
         return emb
 
     @classmethod
-    def build_encoder(cls, args, src_dict, embed_tokens):
-        return TransformerEncoder(args, src_dict, embed_tokens)
+    def build_encoder(cls, args, src_dict, embed_tokens, head_confidence):
+        return TransformerEncoder(args, src_dict, embed_tokens, head_confidence=head_confidence)
 
     @classmethod
-    def build_decoder(cls, args, tgt_dict, embed_tokens):
+    def build_decoder(cls, args, tgt_dict, embed_tokens, head_confidence):
         return TransformerDecoder(
             args,
             tgt_dict,
             embed_tokens,
-            no_encoder_attn=getattr(args, "no_cross_attention", False),
+            no_encoder_attn=getattr(args, "no_cross_attention", False), head_confidence=head_confidence
         )
 
     # TorchScript doesn't support optional arguments with variable length (**kwargs).
@@ -315,8 +316,9 @@ class TransformerEncoder(FairseqEncoder):
         embed_tokens (torch.nn.Embedding): input embedding
     """
 
-    def __init__(self, args, dictionary, embed_tokens):
+    def __init__(self, args, dictionary, embed_tokens, head_confidence):
         super().__init__(dictionary)
+        self.head_confidence = head_confidence
         self.register_buffer("version", torch.Tensor([3]))
 
         self.dropout = args.dropout
@@ -358,7 +360,7 @@ class TransformerEncoder(FairseqEncoder):
             self.layernorm_embedding = None
 
     def build_encoder_layer(self, args, layer_index):
-        return TransformerEncoderLayer(args, layer_index)
+        return TransformerEncoderLayer(args, layer_index, head_confidence=self.head_confidence)
 
     def forward_embedding(self, src_tokens):
         # embed tokens and positions
@@ -544,9 +546,11 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             (default: False).
     """
 
-    def __init__(self, args, dictionary, embed_tokens, no_encoder_attn=False):
+    def __init__(self, args, dictionary, embed_tokens, no_encoder_attn=False, head_confidence):
         self.args = args
         super().__init__(dictionary)
+
+        self.head_confidence = head_confidence
         self.register_buffer("version", torch.Tensor([3]))
         self._future_mask = torch.empty(0)
 
@@ -652,7 +656,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             )
 
     def build_decoder_layer(self, args, layer_index, no_encoder_attn=False):
-        return TransformerDecoderLayer(args, layer_index, no_encoder_attn)
+        return TransformerDecoderLayer(args, layer_index, no_encoder_attn, head_confidence=self.head_confidence)
 
     def forward(
             self,
@@ -966,11 +970,11 @@ def base_architecture(args):
 def transformer_iwslt_de_en(args):
     args.encoder_embed_dim = getattr(args, "encoder_embed_dim", 512)
     args.encoder_ffn_embed_dim = getattr(args, "encoder_ffn_embed_dim", 1024)
-    args.encoder_attention_heads = getattr(args, "encoder_attention_heads", 4)
+    args.encoder_attention_heads = getattr(args, "encoder_attention_heads", 8)
     args.encoder_layers = getattr(args, "encoder_layers", 6)
     args.decoder_embed_dim = getattr(args, "decoder_embed_dim", 512)
     args.decoder_ffn_embed_dim = getattr(args, "decoder_ffn_embed_dim", 1024)
-    args.decoder_attention_heads = getattr(args, "decoder_attention_heads", 4)
+    args.decoder_attention_heads = getattr(args, "decoder_attention_heads", 8)
     args.decoder_layers = getattr(args, "decoder_layers", 6)
     base_architecture(args)
 
