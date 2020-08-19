@@ -96,9 +96,8 @@ class TransformerModel(FairseqEncoderDecoderModel):
         }
         # fmt: on
 
-    def __init__(self, args, encoder, decoder, head_confidence):
+    def __init__(self, args, encoder, decoder):
         super().__init__(encoder, decoder)
-        self.head_confidence = head_confidence
         self.args = args
         self.supports_align_args = True
 
@@ -186,7 +185,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
         # fmt: on
 
     @classmethod
-    def build_model(cls, args, task):
+    def build_model(cls, args, task, head_confidence):
         """Build a new model instance."""
 
         # make sure all arguments are present in older models
@@ -230,8 +229,8 @@ class TransformerModel(FairseqEncoderDecoderModel):
                 args, tgt_dict, args.decoder_embed_dim, args.decoder_embed_path
             )
 
-        encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens, head_confidence=cls.head_confidence)
-        decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens, head_confidence=cls.head_confidence)
+        encoder = cls.build_encoder(args, src_dict, encoder_embed_tokens, head_confidence=head_confidence)
+        decoder = cls.build_decoder(args, tgt_dict, decoder_embed_tokens, head_confidence=head_confidence)
         return cls(args, encoder, decoder)
 
     @classmethod
