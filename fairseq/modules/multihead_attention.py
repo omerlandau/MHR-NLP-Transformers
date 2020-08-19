@@ -360,7 +360,7 @@ class MultiheadAttention(nn.Module):
             #print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
             #print("Guy comment - > attn_weights: {}".format(attn_weights))
             voita_conf = {"heads":[]}
-            word_max = {}
+            word_max = {"heads":[]}
             if attn_weights is not None:
                 for j in range(self.num_heads):
                     conf_temp = 0
