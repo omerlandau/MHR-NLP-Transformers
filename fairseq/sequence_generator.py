@@ -263,7 +263,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs = self.model.reorder_encoder_out(
                     encoder_outs, reorder_state
                 )
-            #print("Guy comment -> calling decoder forward from the generator with tokens : {}".format(
+            print("Guy comment -> calling decoder forward from sequence generator")
                 #tokens[:, : step + 1]))
 
             lprobs, avg_attn_scores = self.model.forward_decoder(
