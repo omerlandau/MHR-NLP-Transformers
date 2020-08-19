@@ -247,7 +247,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
 
     @classmethod
     def build_encoder(cls, args, src_dict, embed_tokens, head_confidence):
-        return TransformerEncoder(args, src_dict, embed_tokens, head_confidence=head_confidence)
+        return TransformerEncoder(args, src_dict, embed_tokens)
 
     @classmethod
     def build_decoder(cls, args, tgt_dict, embed_tokens, head_confidence):
@@ -255,7 +255,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
             args,
             tgt_dict,
             embed_tokens,
-            no_encoder_attn=getattr(args, "no_cross_attention", False), head_confidence=head_confidence
+            no_encoder_attn=getattr(args, "no_cross_attention", False)
         )
 
     # TorchScript doesn't support optional arguments with variable length (**kwargs).
