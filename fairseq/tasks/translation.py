@@ -204,6 +204,7 @@ class TranslationTask(FairseqTask):
         parser.add_argument('--mhr-experiment', type=str, default=None, help="some mhr supported experiment. e.g. "
                                                                              "'enc-dec last layer swapping'")
 
+        parser.add_argument('--head-confidence-method', type=str, default=None, help="overall_max or mean_word_max")
         # fmt: on
 
     def __init__(self, args, src_dict, tgt_dict):

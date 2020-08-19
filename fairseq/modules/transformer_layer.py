@@ -76,6 +76,7 @@ class TransformerEncoderLayer(nn.Module):
                 mask_layer=args.mask_layer,
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
+                head_confidence_method=args.head_confidence_method,
             )
         else:
             return MultiheadAttention(
@@ -83,6 +84,7 @@ class TransformerEncoderLayer(nn.Module):
                 args.encoder_attention_heads,
                 dropout=args.attention_dropout,
                 self_attention=True,
+                head_confidence_method=args.head_confidence_method,
             )
 
     def upgrade_state_dict_named(self, state_dict, name):
@@ -252,6 +254,7 @@ class TransformerDecoderLayer(nn.Module):
                 mask_layer=args.mask_layer,
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
+                head_confidence_method=args.head_confidence_method,
             )
         else:
             return MultiheadAttention(
@@ -261,6 +264,7 @@ class TransformerDecoderLayer(nn.Module):
                 add_bias_kv=add_bias_kv,
                 add_zero_attn=add_zero_attn,
                 self_attention=not getattr(args, "cross_self_attention", False),
+                head_confidence_method=args.head_confidence_method,
             )
 
     def build_encoder_attention(self, embed_dim, args):
@@ -275,6 +279,7 @@ class TransformerDecoderLayer(nn.Module):
                 mask_layer=args.mask_layer,
                 mask_head=args.mask_head,
                 mask_layer_type=args.mask_layer_type,
+                head_confidence_method=args.head_confidence_method,
             )
         else:
             return MultiheadAttention(
@@ -284,6 +289,7 @@ class TransformerDecoderLayer(nn.Module):
                 vdim=getattr(args, "encoder_embed_dim", None),
                 dropout=args.attention_dropout,
                 encoder_decoder_attention=True,
+                head_confidence_method=args.head_confidence_method,
             )
 
     def prepare_for_onnx_export_(self):
