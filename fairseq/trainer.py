@@ -463,7 +463,7 @@ class Trainer(object):
             try:
                 with maybe_no_sync():
                     # forward and backward
-                    loss, sample_size_i, logging_output, conf, d_conf = self.task.train_step(
+                    loss, sample_size_i, logging_output = self.task.train_step(
                         sample=sample,
                         model=self.model,
                         criterion=self.criterion,
@@ -474,7 +474,7 @@ class Trainer(object):
                     del loss
 
                 logging_outputs.append(logging_output)
-                h_conf.append(conf)
+                #h_conf.append(conf)
                 sample_size += sample_size_i
 
                 # emptying the CUDA cache after the first step can
@@ -625,7 +625,7 @@ class Trainer(object):
 
         metrics.log_stop_time("train_wall")
 
-        return logging_output, h_conf
+        return logging_output
 
     @metrics.aggregate("valid")
     def valid_step(self, sample, raise_oom=False):
