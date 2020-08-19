@@ -349,7 +349,7 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz, self.num_heads, tgt_len, src_len) * head_masking_vector
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
-        '''
+
         ## computing confidence of all heads over bsz sentences
         #confidence_arch = "base" # for testing
         conf = []
@@ -359,11 +359,10 @@ class MultiheadAttention(nn.Module):
         for j in range(self.num_heads):
             conf_temp = 0
             for batch in range(bsz):
-                conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1] \
-                    .flatten().max()
+                conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
             conf.append(conf_temp / bsz)
-            print("Guy comment - > head {} ".format(j))
-        
+            #print("Guy comment - > head {} ".format(j))
+        '''
         if confidence_arch == "tgt_word_max_avg":
         # Take max for each source word, than average all
             for j in range(self.num_heads):
@@ -406,7 +405,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights, save_ctx, None
+        return attn, attn_weights, save_ctx, conf
 
 
     @staticmethod

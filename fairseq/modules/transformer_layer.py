@@ -139,6 +139,7 @@ class TransformerEncoderLayer(nn.Module):
         self.self_attn_variables["in_mask"] = encoder_padding_mask
         self.self_attn_variables["out_mask"] = encoder_padding_mask
         self.self_attn_confidence = conf
+        print("Guy comment - > encoder conf is : {}".format(self.self_attn_confidence))
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -369,7 +370,7 @@ class TransformerDecoderLayer(nn.Module):
         self.self_attn_variables["in_mask"] = self_attn_padding_mask
         self.self_attn_variables["out_mask"] = self_attn_padding_mask
         self.self_attn_confidence = conf
-
+        print("Guy comment - > decoder self conf is : {}".format(self.self_attn_confidence))
         x = self.dropout_module(x)
         x = residual + x
         if not self.normalize_before:
@@ -406,6 +407,7 @@ class TransformerDecoderLayer(nn.Module):
             self.encoder_attn_variables["in_mask"] = encoder_padding_mask
             self.encoder_attn_variables["out_mask"] = self_attn_padding_mask
             self.encoder_attn_confidence = conf
+            print("Guy comment - > decoder encoder conf is : {}".format(self.encoder_attn_confidence))
             x = self.dropout_module(x)
             x = residual + x
             if not self.normalize_before:
