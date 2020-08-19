@@ -262,7 +262,6 @@ class TransformerModel(FairseqEncoderDecoderModel):
     # Current workaround is to add union of all arguments in child classes.
     def forward(
             self,
-            dddd,
             src_tokens,
             src_lengths,
             prev_output_tokens,
