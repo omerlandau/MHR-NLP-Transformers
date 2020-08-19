@@ -474,7 +474,7 @@ class Trainer(object):
                     del loss
 
                 logging_outputs.append(logging_output)
-                e_conf.append(conf)
+                e_conf.append({"encoder":conf, "decoder":d_conf})
                 sample_size += sample_size_i
 
                 # emptying the CUDA cache after the first step can
