@@ -141,10 +141,14 @@ def main(
     train_meter = meters.StopwatchMeter()
     train_meter.start()
     experiment_path = args.mhr_experiment  # path for experiment configuration
-    batches_conf = {}
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
+        batches_conf =[]
         # train for one epoch
-        valid_losses, should_stop, batches_conf[epoch_itr.epoch] = train(args, trainer, task, epoch_itr, model, experiment_path)
+        valid_losses, should_stop, batches_conf = train(args, trainer, task, epoch_itr, model, experiment_path)
+        with open(
+                "/a/home/cc/students/cs/omerlandau1/foromerlandau/data/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-epoch:{0}".format(epoch_itr.epoch),
+                'wb') as fd:
+            pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
         if should_stop:
             break
 
@@ -162,8 +166,6 @@ def main(
 
     ####### for try ########
 
-    with open("/a/home/cc/students/cs/omerlandau1/foromerlandau/data/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l",'wb') as fd:
-        pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 
