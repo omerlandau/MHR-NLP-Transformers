@@ -115,7 +115,8 @@ def _main(args, output_file):
     gen_timer = StopwatchMeter()
 
     generator = task.build_generator(models, args)
-    print("Guy comment -> num of layers : {}".format(len(generator.model.layers)))
+    print("Guy comment -> model : {}".format(generator.model))
+    print("Guy comment -> model[0] : {}".format(generator.model[0]))
     print("Guy comment -> args : {}".format(args))
     for layer in range(len(generator.model.layers)):
         test = generator.model.encoder.layers[layer].self_attn_confidence
