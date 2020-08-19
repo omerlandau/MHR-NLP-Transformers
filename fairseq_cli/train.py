@@ -246,7 +246,6 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output, e_conf = trainer.train_step(samples)
             print(e_conf)
-            exit()
             if log_output is None:  # OOM, overflow, ...
                 continue
 
