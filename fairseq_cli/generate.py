@@ -115,9 +115,6 @@ def _main(args, output_file):
     gen_timer = StopwatchMeter()
 
     generator = task.build_generator(models, args)
-    for layer in range(len(generator.model.single_model.encoder.layers)):
-        test = generator.model.single_model.encoder.layers[layer].self_attn_confidence
-        print("Guy comment - > enc layer {} self_attn_conf is : {}".format(layer, test))
     # Handle tokenization and BPE
     tokenizer = encoders.build_tokenizer(args)
     bpe = encoders.build_bpe(args)
@@ -206,10 +203,6 @@ def _main(args, output_file):
                 # print("Guy comment - > hypo_tokens : {}".format(hypo_tokens))
                 # print("Guy comment - > hypo_str : {}".format(hypo_str))
                 # print("Guy comment - > alignment : {}".format(alignment))
-                print("Guy comment - > maybe the matrix I want - {}".format(
-                    sample_id,
-                    ' '.join(['{}-{}'.format(src_idx, tgt_idx) for src_idx, tgt_idx in alignment])
-                ))
                 detok_hypo_str = decode_fn(hypo_str)
                 if not args.quiet:
                     score = hypo['score'] / math.log(2)  # convert to base 2
@@ -262,6 +255,9 @@ def _main(args, output_file):
         progress.log({'wps': round(wps_meter.avg)})
         num_sentences += sample['nsentences']
 
+    for layer in range(len(generator.model.single_model.encoder.layers)):
+        test = generator.model.single_model.encoder.layers[layer].self_attn_confidence
+        print("Guy comment - > enc layer {} self_attn_conf is : {}".format(layer, test))
     logger.info('NOTE: hypothesis and token scores are output in base 2')
     logger.info('Translated {} sentences ({} tokens) in {:.1f}s ({:.2f} sentences/s, {:.2f} tokens/s)'.format(
         num_sentences, gen_timer.n, gen_timer.sum, num_sentences / gen_timer.sum, 1. / gen_timer.avg))
