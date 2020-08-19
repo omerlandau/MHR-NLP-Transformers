@@ -360,14 +360,14 @@ class MultiheadAttention(nn.Module):
             # Voita's confidence
             # if confidence_arch == "base":
             print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
-            print("Guy comment - > attn_weights: {}".format(attn_weights))
+            #print("Guy comment - > attn_weights: {}".format(attn_weights))
             if attn_weights is not None:
                 for j in range(self.num_heads):
                     conf_temp = 0
                     for batch in range(bsz):
                         #print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
                         conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
-                    print(conf_temp)
+                    #print(conf_temp)
             '''
                 if confidence_arch == "tgt_word_max_avg":
                 # Take max for each source word, than average all
