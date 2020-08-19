@@ -142,6 +142,7 @@ class TransformerEncoderLayer(nn.Module):
         self.self_attn_variables["out_mask"] = encoder_padding_mask
         if self.head_confidence_method is not None:
             self.self_attn_confidence = conf
+            print("Guy comment - > conf method : {}".format(self.head_confidence_method))
             print("Guy comment - > layer {} , encoder conf is : {}".format(self.layer_index, self.self_attn_confidence))
         x = self.dropout_module(x)
         x = residual + x
