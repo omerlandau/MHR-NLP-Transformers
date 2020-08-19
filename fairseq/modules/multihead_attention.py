@@ -45,6 +45,7 @@ class MultiheadAttention(nn.Module):
         self.mask_head = mask_head
         self.mask_layer_type = mask_layer_type
         self.head_confidence_method = head_confidence_method
+        self.heads_confidence = []
         self.embed_dim = embed_dim
         self.kdim = kdim if kdim is not None else embed_dim
         self.vdim = vdim if vdim is not None else embed_dim
@@ -355,14 +356,13 @@ class MultiheadAttention(nn.Module):
         if self.head_confidence_method is not None:
             ## computing confidence of all heads over bsz sentences
             # confidence_arch = "base" # for testing
-            conf = []
             # Voita's confidence
             # if confidence_arch == "base":
             for j in range(self.num_heads):
                 conf_temp = 0
                 for batch in range(bsz):
                     conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
-                conf.append(conf_temp / bsz)
+                self.heads_confidence.append(conf_temp / bsz)
             '''
             if confidence_arch == "tgt_word_max_avg":
             # Take max for each source word, than average all
@@ -406,7 +406,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights, save_ctx, conf
+        return attn, attn_weights, save_ctx, self.heads_confidence
 
 
     @staticmethod
