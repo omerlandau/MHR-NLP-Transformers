@@ -414,7 +414,7 @@ class TransformerEncoder(FairseqEncoder):
             # add LayerDrop (see https://arxiv.org/abs/1909.11556 for description)
             dropout_probability = torch.empty(1).uniform_()
             if not self.training or (dropout_probability > self.encoder_layerdrop):
-                x, layer_attn = layer(x, encoder_padding_mask)
+                x, layer_attn, conf = layer(x, encoder_padding_mask)
                 if return_all_hiddens:
                     assert encoder_states is not None
                     encoder_states.append(x)
@@ -431,7 +431,7 @@ class TransformerEncoder(FairseqEncoder):
             encoder_states=encoder_states,  # List[T x B x C]
             src_tokens=None,
             src_lengths=None,
-        )
+        ) , conf
 
     @torch.jit.export
     def reorder_encoder_out(self, encoder_out: EncoderOut, new_order):
