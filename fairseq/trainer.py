@@ -463,7 +463,7 @@ class Trainer(object):
             try:
                 with maybe_no_sync():
                     # forward and backward
-                    loss, sample_size_i, logging_output, conf = self.task.train_step(
+                    loss, sample_size_i, logging_output, conf, d_conf = self.task.train_step(
                         sample=sample,
                         model=self.model,
                         criterion=self.criterion,
