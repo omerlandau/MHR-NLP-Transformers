@@ -265,6 +265,7 @@ class SequenceGenerator(nn.Module):
                 )
             #print("Guy comment -> calling decoder forward from the generator with tokens : {}".format(
                 #tokens[:, : step + 1]))
+            print("Guy comment - > Inside seq_gen , model is {}".format(self.model))
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
