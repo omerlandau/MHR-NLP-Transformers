@@ -399,8 +399,7 @@ class TransformerDecoderLayer(nn.Module):
                 need_weights=need_attn or (not self.training and self.need_attn),
                 need_head_weights=need_head_weights,
             )
-            #print("Guy comment - > Inside decoder layer attn_weights size {}".format(attn.size()))
-            #print("Guy comment - > Inside decoder layer decoder x size {}".format(x.size()))
+
             self.encoder_attn_variables["weights"] = attn
             self.encoder_attn_variables["context"] = context
             self.encoder_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.encoder_attn.num_heads, -1)

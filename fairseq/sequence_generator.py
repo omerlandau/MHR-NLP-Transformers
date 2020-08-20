@@ -725,7 +725,6 @@ class EnsembleModel(nn.Module):
                 )
             else:
                 decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out)
-            print("Guy comment - > decoder out is {}".format(decoder_out))
 
             attn: Optional[Tensor] = None
             decoder_len = len(decoder_out)
@@ -734,7 +733,6 @@ class EnsembleModel(nn.Module):
                     attn = decoder_out[1]
                 else:
                     attn_holder = decoder_out[1]["attn"]
-                    print("Guy comment - > attn is {}".format(attn))
                     if isinstance(attn_holder, Tensor):
                         attn = attn_holder
                     elif attn_holder is not None:
