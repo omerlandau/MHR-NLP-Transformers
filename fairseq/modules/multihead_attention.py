@@ -367,8 +367,8 @@ class MultiheadAttention(nn.Module):
             if attn_weights is not None:
                 a = attn_weights.view(self.num_heads, bsz, tgt_len, src_len)
                 heads = a[:, :, :, :].max(dim=3)
-                heads = heads.max(dim=2)
-                heads = heads.sum(dim=1)
+                heads = heads[0].max(dim=2)
+                heads = heads[0].sum(dim=1)
                 voita_conf["heads"].append(heads)
 
                 # Take max for each source word, than average all
