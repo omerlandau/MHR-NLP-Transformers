@@ -409,6 +409,7 @@ class MultiheadAttention(nn.Module):
             ctx = ctx.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
         attn = self.out_proj(ctx)
         attn_weights: Optional[Tensor] = None
+        print("Guy comment - > need_weights is {}".format(need_weights))
         if need_weights:
             attn_weights = attn_weights_float.view(
                 bsz, self.num_heads, tgt_len, src_len
