@@ -738,6 +738,7 @@ class EnsembleModel(nn.Module):
                     elif attn_holder is not None:
                         attn = attn_holder[0]
                 if attn is not None:
+                    print("Guy comment - > attn is {}".format(attn))
                     attn = attn[:, -1, :]
 
             decoder_out_tuple = (
