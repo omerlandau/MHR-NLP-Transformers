@@ -166,6 +166,8 @@ class LanguagePairDataset(FairseqDataset):
         align_dataset=None,
         append_bos=False, eos=None,
         num_buckets=0,
+        max_source_positions=1024,
+        max_target_positions=1024,
     ):
         if tgt_dict is not None:
             assert src_dict.pad() == tgt_dict.pad()
@@ -181,6 +183,8 @@ class LanguagePairDataset(FairseqDataset):
         self.tgt_dict = tgt_dict
         self.left_pad_source = left_pad_source
         self.left_pad_target = left_pad_target
+        self.max_source_positions = max_source_positions
+        self.max_target_positions = max_target_positions
         self.shuffle = shuffle
         self.input_feeding = input_feeding
         self.remove_eos_from_source = remove_eos_from_source
