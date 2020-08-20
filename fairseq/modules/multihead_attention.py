@@ -363,13 +363,13 @@ class MultiheadAttention(nn.Module):
             # print("Guy comment - > attn_weights: {}".format(attn_weights))
             voita_conf = {"heads": [], "batch_size": bsz}
             word_max = {"heads": [], "batch_size": bsz}
-            if attn_weights is not None:
-                a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
-                heads = a[:, :, :, :].max(dim=3)
-                heads = heads[0].max(dim=2)
-                heads = heads[0].sum(dim=1)
-                print(heads)
-                voita_conf["heads"].append(heads)
+            with torch.no_grad():
+                if attn_weights is not None:
+                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
+                    heads = a[:, :, :, :].max(dim=3)
+                    heads = heads[0].max(dim=2)
+                    heads = heads[0].sum(dim=1)
+                    voita_conf["heads"].append(heads)
 
                 # Take max for each source word, than average all
                 #for j in range(self.num_heads):
