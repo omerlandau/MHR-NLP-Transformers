@@ -289,7 +289,7 @@ class TranslationTask(FairseqTask):
         return model
 
     def valid_step(self, sample, model, criterion):
-        loss, sample_size, logging_output = super().valid_step(sample, model, criterion)
+        loss, sample_size, logging_output, conf, d_conf = super().valid_step(sample, model, criterion)
         if self.args.eval_bleu:
             bleu = self._inference_with_bleu(self.sequence_generator, sample, model)
             logging_output['_bleu_sys_len'] = bleu.sys_len
@@ -300,7 +300,7 @@ class TranslationTask(FairseqTask):
             for i in range(EVAL_BLEU_ORDER):
                 logging_output['_bleu_counts_' + str(i)] = bleu.counts[i]
                 logging_output['_bleu_totals_' + str(i)] = bleu.totals[i]
-        return loss, sample_size, logging_output
+        return loss, sample_size, logging_output, conf, d_conf
 
     def reduce_metrics(self, logging_outputs, criterion):
         super().reduce_metrics(logging_outputs, criterion)

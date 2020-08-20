@@ -349,8 +349,8 @@ class FairseqTask(object):
     def valid_step(self, sample, model, criterion):
         model.eval()
         with torch.no_grad():
-            loss, sample_size, logging_output = criterion(model, sample)
-        return loss, sample_size, logging_output
+            loss, sample_size, logging_output, conf, d_conf = criterion(model, sample)
+        return loss, sample_size, logging_output, conf, d_conf
 
     def inference_step(self, generator, models, sample, prefix_tokens=None):
         with torch.no_grad():
