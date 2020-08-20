@@ -385,7 +385,7 @@ class MultiheadAttention(nn.Module):
                     word_max["heads"].append(conf_temp)
             conf = {"voita": voita_conf, "word_max": word_max}
 
-            self.head_conf.append(conf)
+        self.head_conf.append(conf)
 
         t = time.time() - t0
 
