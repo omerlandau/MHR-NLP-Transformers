@@ -316,7 +316,7 @@ class TransformerDecoderLayer(nn.Module):
         Returns:
             encoded output of shape `(seq_len, batch, embed_dim)`
         """
-        need_head_weights = True
+
         if need_head_weights:
             need_attn = True
         residual = x
@@ -397,7 +397,6 @@ class TransformerDecoderLayer(nn.Module):
                 incremental_state=incremental_state,
                 static_kv=True,
                 need_weights=True,  # (not self.training and self.need_attn)
-                need_head_weights=need_head_weights,
             )
             self.encoder_attn_variables["weights"] = attn
             self.encoder_attn_variables["context"] = context
