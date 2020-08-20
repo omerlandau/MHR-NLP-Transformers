@@ -291,7 +291,7 @@ class TranslationTask(FairseqTask):
     def valid_step(self, sample, model, criterion):
         loss, sample_size, logging_output, conf, d_conf = super().valid_step(sample, model, criterion)
         if self.args.eval_bleu:
-            bleu = self._inference_with_bleu(self.sequence_generator, sample, model)
+            bleu, conf, d_conf = self._inference_with_bleu(self.sequence_generator, sample, model)
             logging_output['_bleu_sys_len'] = bleu.sys_len
             logging_output['_bleu_ref_len'] = bleu.ref_len
             # we split counts into separate entries so that they can be
@@ -401,6 +401,6 @@ class TranslationTask(FairseqTask):
             logger.info('example hypothesis: ' + hyps[0])
             logger.info('example reference: ' + refs[0])
         if self.args.eval_tokenized_bleu:
-            return sacrebleu.corpus_bleu(hyps, [refs], tokenize='none')
+            return sacrebleu.corpus_bleu(hyps, [refs], tokenize='none'), conf, d_conf
         else:
-            return sacrebleu.corpus_bleu(hyps, [refs])
+            return sacrebleu.corpus_bleu(hyps, [refs]), conf, d_conf
