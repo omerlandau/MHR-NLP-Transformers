@@ -276,7 +276,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
             break
 
     with open(args.save_dir.replace("checkpoints","confs") + "-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
-        pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
     progress.print(stats, tag="train", step=num_updates)
