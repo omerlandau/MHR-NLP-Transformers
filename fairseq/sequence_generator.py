@@ -734,12 +734,12 @@ class EnsembleModel(nn.Module):
                     attn = decoder_out[1]
                 else:
                     attn_holder = decoder_out[1]["attn"]
-                    print("Guy comment - > attn is {}".format(attn))
                     if isinstance(attn_holder, Tensor):
                         attn = attn_holder
                     elif attn_holder is not None:
                         attn = attn_holder[0]
                 if attn is not None:
+                    print("Guy comment - > attn is {}".format(attn))
                     attn = attn[:, -1, :]
 
             decoder_out_tuple = (
