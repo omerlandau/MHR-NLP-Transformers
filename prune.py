@@ -46,7 +46,8 @@ def eval_bleu_score(
     results = translate_corpus(
         translator,
         task,
-        input_feed=eval_data.src,
+        input_feed=[eval_data.src.get_original_text(
+            i) for i in range(len(eval_data.src))],
         buffer_size=buffer_size,
         replace_unk=replace_unk,
         use_cuda=use_cuda,
