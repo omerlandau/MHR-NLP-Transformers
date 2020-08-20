@@ -51,6 +51,8 @@ class MultiheadAttention(nn.Module):
         self.qkv_same_dim = self.kdim == embed_dim and self.vdim == embed_dim
         self.num_heads = num_heads
         self.dropout = dropout
+
+        self.head_conf = []
         self.head_dim = embed_dim // num_heads
         assert (
                 self.head_dim * num_heads == self.embed_dim
