@@ -263,6 +263,11 @@ class Trainer(object):
 
         return logging_output
 
+    def dummy_train_step(self, dummy_batch):
+        """Dummy training step for warming caching allocator."""
+        self.train_step(dummy_batch, dummy_batch=True)
+        self.zero_grad()
+
     def save_checkpoint(self, filename, extra_state):
         """Save all training state in a checkpoint file."""
         if self.is_data_parallel_master:  # only save one checkpoint
