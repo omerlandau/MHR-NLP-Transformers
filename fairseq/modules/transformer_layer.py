@@ -59,6 +59,7 @@ class TransformerEncoderLayer(nn.Module):
         self.final_layer_norm = LayerNorm(self.embed_dim)
         self.self_attn_variables = {}
         self.head_confidence_method = args.head_confidence_method
+
     def build_fc1(self, input_dim, output_dim, q_noise, qn_block_size):
         return quant_noise(nn.Linear(input_dim, output_dim), p=q_noise, block_size=qn_block_size)
 

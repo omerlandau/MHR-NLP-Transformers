@@ -286,6 +286,8 @@ def batch_head_stats(attn_variables, triu_masking=False):
     in_mask = attn_variables["in_mask"]
     out_mask = attn_variables["out_mask"]
     p = attn_variables["weights"].detach()
+    print("Guy comment - > p size {}".format(p.size))
+
     logp = torch.log(p)
     device = p.device
     # Results
