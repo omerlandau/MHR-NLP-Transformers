@@ -245,6 +245,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     trainer.begin_epoch(epoch_itr.epoch)
 
+    print(model.state_dict().keys)
+
 
     valid_subsets = args.valid_subset.split(",")
     should_stop = False
