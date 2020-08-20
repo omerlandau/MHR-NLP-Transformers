@@ -51,6 +51,8 @@ class MultiheadAttention(nn.Module):
         self.qkv_same_dim = self.kdim == embed_dim and self.vdim == embed_dim
         self.num_heads = num_heads
         self.dropout = dropout
+
+        self.head_conf = ["monkey"]
         self.head_dim = embed_dim // num_heads
         assert (
                 self.head_dim * num_heads == self.embed_dim
@@ -382,6 +384,9 @@ class MultiheadAttention(nn.Module):
                         conf_temp += word_attn_sum / (tgt_len - 1)
                     word_max["heads"].append(conf_temp)
             conf = {"voita": voita_conf, "word_max": word_max}
+
+        self.head_conf.append(conf)
+
         t = time.time() - t0
 
         attn_probs = F.dropout(
