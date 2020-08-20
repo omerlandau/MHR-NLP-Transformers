@@ -7,7 +7,7 @@ import logging
 
 import numpy as np
 import torch
-
+from fairseq import utils
 from fairseq.data import data_utils, FairseqDataset
 
 
