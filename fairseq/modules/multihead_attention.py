@@ -363,28 +363,27 @@ class MultiheadAttention(nn.Module):
             # print("Guy comment - > attn_weights: {}".format(attn_weights))
             voita_conf = {"heads": [], "batch_size": bsz}
             word_max = {"heads": [], "batch_size": bsz}
-            with torch.no_grad():
-                if attn_weights is not None:
-                    for j in range(self.num_heads):
-                        conf_temp = 0
-                        for batch in range(bsz):
-                            # print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
-                            conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1,
-                                         :-1].flatten().max()
-                        voita_conf["heads"].append(conf_temp)
+            if attn_weights is not None:
+                for j in range(self.num_heads):
+                    conf_temp = 0
+                    for batch in range(bsz):
+                        # print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
+                        conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1,
+                                     :-1].flatten().max()
+                    voita_conf["heads"].append(conf_temp)
 
-                    # Take max for each source word, than average all
-                    for j in range(self.num_heads):
-                        conf_temp = 0
-                        for batch in range(bsz):
-                            word_attn_sum = 0
-                            for tgt in range(tgt_len - 1):
-                                word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt,
-                                                 :-1].max()
-                            conf_temp += word_attn_sum / (tgt_len - 1)
-                        word_max["heads"].append(conf_temp)
+                # Take max for each source word, than average all
+                for j in range(self.num_heads):
+                    conf_temp = 0
+                    for batch in range(bsz):
+                        word_attn_sum = 0
+                        for tgt in range(tgt_len - 1):
+                            word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt,
+                                             :-1].max()
+                        conf_temp += word_attn_sum / (tgt_len - 1)
+                    word_max["heads"].append(conf_temp)
             conf = {"voita": voita_conf, "word_max": word_max}
-            t = time.time() - t0
+        t = time.time() - t0
 
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
