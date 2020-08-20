@@ -407,8 +407,7 @@ class MultiheadAttention(nn.Module):
             ctx = ctx.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
         attn = self.out_proj(ctx)
         attn_weights: Optional[Tensor] = None
-        #print("Guy comment - > need_weights is {}".format(need_weights))
-        print("Guy comment -> before need_weights")
+        '''
         if need_weights:
             print("Guy comment -> inside need_weights")
             attn_weights = attn_weights_float.view(
@@ -417,8 +416,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        #print("Guy comment - > Inside MHA attn_weights size {}".format(attn_weights.size()))
-        #print("Guy comment - > Inside MHA attn size {}".format(attn.size()))
+        '''
         return attn, attn_weights, save_ctx
 
     @staticmethod
