@@ -249,16 +249,13 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples)
 
-            for i,j in zip(range(args.encoder_layers),range(args.decoder_layers)):
-
-                conf["decoder"].append({"layer": j, "self_attn": model.decoder.layers[j].self_attn.head_conf,
-                                        "encoder_attn": model.decoder.layers[i].encoder_attn.head_conf})
-                conf["encoder"].append({"layer": i, "self_attn": model.encoder.layers[i].self_attn.head_conf})
-
-
             if log_output is None:  # OOM, overflow, ...
                 continue
 
+        for i, j in zip(range(args.encoder_layers), range(args.decoder_layers)):
+            conf["decoder"].append({"layer": j, "self_attn": model.decoder.layers[j].self_attn.head_conf,
+                                    "encoder_attn": model.decoder.layers[i].encoder_attn.head_conf})
+            conf["encoder"].append({"layer": i, "self_attn": model.encoder.layers[i].self_attn.head_conf})
 
         # log mid-epoch stats
         num_updates = trainer.get_num_updates()
@@ -277,6 +274,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
         if should_stop:
             break
+
     print(conf)
     exit()
     # log end-of-epoch stats
