@@ -368,6 +368,7 @@ class MultiheadAttention(nn.Module):
                 heads = a[:, :, :, :].max(dim=3)
                 heads = heads[0].max(dim=2)
                 heads = heads[0].sum(dim=1)
+                print(heads)
                 voita_conf["heads"].append(heads)
 
                 # Take max for each source word, than average all
