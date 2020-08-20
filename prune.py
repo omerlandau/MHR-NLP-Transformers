@@ -46,8 +46,7 @@ def eval_bleu_score(
     results = translate_corpus(
         translator,
         task,
-        input_feed=[eval_data.src.get_original_text(
-            i) for i in range(len(eval_data.src))],
+        input_feed=eval_data.src,
         buffer_size=buffer_size,
         replace_unk=replace_unk,
         use_cuda=use_cuda,
@@ -129,9 +128,7 @@ def main(args):
     '''
     # Load the latest checkpoint if one is available
     extra_state, epoch_itr = checkpoint_utils.load_checkpoint(args, trainer)
-    print("Guy comment - > task.dataset {} ".format(task.dataset))
-    test = task.dataset(args.valid_subset)
-    print("Guy comment - > task.dataset(args.valid_subset) {} ".format(test.src))
+
     # Train until the learning rate gets too small
     prune_meter = StopwatchMeter()
     prune_meter.start()
@@ -233,7 +230,7 @@ def main(args):
 
         # Apply pruning
         mask_heads(model, to_prune, args.transformer_mask_rescale)
-
+        print("Guy comment - > before eval_bleu_score")
         bleu = eval_bleu_score(
             model,
             task,

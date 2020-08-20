@@ -359,19 +359,19 @@ class MultiheadAttention(nn.Module):
             # confidence_arch = "base" # for testing
             # Voita's confidence
             # if confidence_arch == "base":
-            #print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
-            #print("Guy comment - > attn_weights: {}".format(attn_weights))
-            voita_conf = {"heads":[], "batch_size":bsz}
-            word_max = {"heads":[], "batch_size":bsz}
+            # print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
+            # print("Guy comment - > attn_weights: {}".format(attn_weights))
+            voita_conf = {"heads": [], "batch_size": bsz}
+            word_max = {"heads": [], "batch_size": bsz}
             with torch.no_grad():
                 if attn_weights is not None:
                     for j in range(self.num_heads):
                         conf_temp = 0
                         for batch in range(bsz):
-                            #print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
-                            conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten().max()
+                            # print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
+                            conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1,
+                                         :-1].flatten().max()
                         voita_conf["heads"].append(conf_temp)
-
 
                     # Take max for each source word, than average all
                     for j in range(self.num_heads):
@@ -379,7 +379,8 @@ class MultiheadAttention(nn.Module):
                         for batch in range(bsz):
                             word_attn_sum = 0
                             for tgt in range(tgt_len - 1):
-                                word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt, :-1].max()
+                                word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt,
+                                                 :-1].max()
                             conf_temp += word_attn_sum / (tgt_len - 1)
                         word_max["heads"].append(conf_temp)
             conf = {"voita": voita_conf, "word_max": word_max}
@@ -414,7 +415,6 @@ class MultiheadAttention(nn.Module):
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
         return attn, attn_weights, save_ctx, conf
-
 
     @staticmethod
     def _append_prev_key_padding_mask(
@@ -454,7 +454,6 @@ class MultiheadAttention(nn.Module):
             new_key_padding_mask = prev_key_padding_mask
         return new_key_padding_mask
 
-
     @torch.jit.export
     def reorder_incremental_state(
             self, incremental_state: Dict[str, Dict[str, Optional[Tensor]]], new_order: Tensor
@@ -471,7 +470,6 @@ class MultiheadAttention(nn.Module):
             incremental_state = self._set_input_buffer(incremental_state, input_buffer)
         return incremental_state
 
-
     def _get_input_buffer(
             self, incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]]
     ) -> Dict[str, Optional[Tensor]]:
@@ -482,7 +480,6 @@ class MultiheadAttention(nn.Module):
             empty_result: Dict[str, Optional[Tensor]] = {}
             return empty_result
 
-
     def _set_input_buffer(
             self,
             incremental_state: Dict[str, Dict[str, Optional[Tensor]]],
@@ -490,10 +487,8 @@ class MultiheadAttention(nn.Module):
     ):
         return self.set_incremental_state(incremental_state, "attn_state", buffer)
 
-
     def apply_sparse_mask(attn_weights, tgt_len: int, src_len: int, bsz: int):
         return attn_weights
-
 
     def upgrade_state_dict_named(self, state_dict, name):
         prefix = name + "." if name != "" else ""
