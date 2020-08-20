@@ -362,7 +362,7 @@ class TransformerDecoderLayer(nn.Module):
             value=y,
             key_padding_mask=self_attn_padding_mask,
             incremental_state=incremental_state,
-            need_weights=True,
+            need_weights=False,
             attn_mask=self_attn_mask,
         )
         self.self_attn_variables["weights"] = attn
@@ -396,7 +396,8 @@ class TransformerDecoderLayer(nn.Module):
                 key_padding_mask=encoder_padding_mask,
                 incremental_state=incremental_state,
                 static_kv=True,
-                need_weights=True # or (not self.training and self.need_attn)
+                need_weights=need_attn or (not self.training and self.need_attn),
+                need_head_weights=need_head_weights,
             )
             #print("Guy comment - > Inside decoder layer attn_weights size {}".format(attn.size()))
             #print("Guy comment - > Inside decoder layer decoder x size {}".format(x.size()))
