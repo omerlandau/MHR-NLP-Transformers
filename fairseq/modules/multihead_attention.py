@@ -412,6 +412,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
+        print("Guy comment - > attn_weights size {}".format(attn_weights.size()))
         return attn, attn_weights, save_ctx, conf
 
     @staticmethod
