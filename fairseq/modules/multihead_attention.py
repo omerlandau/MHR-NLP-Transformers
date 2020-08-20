@@ -406,18 +406,14 @@ class MultiheadAttention(nn.Module):
         else:
             ctx = ctx.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
         attn = self.out_proj(ctx)
-        '''
         attn_weights: Optional[Tensor] = None
-        
         if need_weights:
-            print("Guy comment -> inside need_weights")
             attn_weights = attn_weights_float.view(
                 bsz, self.num_heads, tgt_len, src_len
             ).transpose(1, 0)
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        '''
         return attn, attn_weights, save_ctx
 
     @staticmethod
