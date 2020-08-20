@@ -654,7 +654,7 @@ class Trainer(object):
                 is_dummy_batch = False
 
             try:
-                _loss, sample_size, logging_output = self.task.valid_step(
+                _loss, sample_size, logging_output, conf, d_conf = self.task.valid_step(
                     sample, self.model, self.criterion
                 )
             except RuntimeError as e:
