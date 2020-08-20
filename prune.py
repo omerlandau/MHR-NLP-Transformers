@@ -129,8 +129,8 @@ def main(args):
     '''
     # Load the latest checkpoint if one is available
     extra_state, epoch_itr = checkpoint_utils.load_checkpoint(args, trainer)
-    print("Guy comment - > args.valid_subset {} ".format(args.valid_subset))
-    print("Guy comment - > task.dataset(args.valid_subset) {} ".format(task.dataset(args.valid_subset)))
+    test = task.dataset(args.valid_subset)
+    print("Guy comment - > task.dataset(args.valid_subset) {} ".format(test.src))
     # Train until the learning rate gets too small
     prune_meter = StopwatchMeter()
     prune_meter.start()
