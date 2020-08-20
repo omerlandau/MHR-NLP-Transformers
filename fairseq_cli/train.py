@@ -243,7 +243,11 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     mhr(model, swaps, head_dim, num_heads, epoch_itr.epoch)
 
+    print(model.state_dict().keys)
+
     trainer.begin_epoch(epoch_itr.epoch)
+
+
 
 
     valid_subsets = args.valid_subset.split(",")
