@@ -365,13 +365,9 @@ class MultiheadAttention(nn.Module):
             voita_conf = {"heads": [], "batch_size": bsz}
             word_max = {"heads": [], "batch_size": bsz}
             if attn_weights is not None:
-                for j in range(self.num_heads):
-                    conf_temp = 0
-                    for batch in range(bsz):
-                        # print("Guy comment -> attn_weights.view : {}".format(attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1, :-1].flatten()))
-                        conf_temp += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, :-1,
-                                     :-1].flatten().max()
-                    voita_conf["heads"].append(conf_temp)
+                a = attn_weights.view(self.num_heads, bsz, tgt_len, src_len)
+                heads = a[:, :, :, :].max(axis=(3, 2)).sum(axis=1)
+                voita_conf["heads"].append(heads)
 
                 # Take max for each source word, than average all
                 #for j in range(self.num_heads):
