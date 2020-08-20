@@ -354,7 +354,7 @@ class MultiheadAttention(nn.Module):
         attn_weights = attn_weights_float.type_as(attn_weights)
         conf = None
         t0 = time.time()
-        if self.head_confidence_method is not None:
+        if self.head_confidence_method == "base":
             ## computing confidence of all heads over bsz sentences
             # confidence_arch = "base" # for testing
             # Voita's confidence
@@ -413,7 +413,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights, save_ctx, None
+        return attn, attn_weights, save_ctx, conf
 
     @staticmethod
     def _append_prev_key_padding_mask(
