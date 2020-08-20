@@ -243,7 +243,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     mhr(model, swaps, head_dim, num_heads, epoch_itr.epoch)
 
-    print(model.decoder.layers[0].self_attn.heads_)
+    print(model.decoder.layers[0].self_attn.head_conf)
+
 
     trainer.begin_epoch(epoch_itr.epoch)
 
