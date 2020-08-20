@@ -35,7 +35,7 @@ class Trainer(object):
     communication of the gradients across workers.
     """
 
-    def __init__(self, args, task, model, criterion, quantizer=None):
+    def __init__(self, args, task, model, criterion, dummy_batch, quantizer=None):
         self.args = args
         self.task = task
 
@@ -75,8 +75,9 @@ class Trainer(object):
                 )
                 _set_module_by_path(self._model, path, ref)
 
-        self._dummy_batch = "DUMMY"  # indicates we don't have a dummy batch at first
+        #self._dummy_batch = "DUMMY"  # indicates we don't have a dummy batch at first
         self._lr_scheduler = None
+        self._dummy_batch = dummy_batch
         self._num_updates = 0
         self._num_xla_compiles = 0  # for TPUs
         self._optim_history = None
@@ -424,10 +425,10 @@ class Trainer(object):
         self.task.begin_epoch(epoch, self.get_model())
 
     @metrics.aggregate("train")
-    def train_step(self, samples, raise_oom=False):
+    def train_step(self, samples, dummy_batch=False, raise_oom=False):
         """Do forward, backward and parameter update."""
-        if self._dummy_batch == "DUMMY":
-            self._dummy_batch = samples[0]
+        #if self._dummy_batch == "DUMMY":
+        #    self._dummy_batch = samples[0]
 
         self._set_seed()
         self.model.train()
@@ -502,6 +503,8 @@ class Trainer(object):
                         return None
                 else:
                     raise e
+
+
 
             if self.tpu and i < len(samples) - 1:
                 # tpu-comment: every XLA operation before marking step is
