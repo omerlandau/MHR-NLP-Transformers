@@ -51,7 +51,6 @@ class MultiheadAttention(nn.Module):
         self.qkv_same_dim = self.kdim == embed_dim and self.vdim == embed_dim
         self.num_heads = num_heads
         self.dropout = dropout
-
         self.head_conf = ["monkey"]
         self.head_dim = embed_dim // num_heads
         assert (
@@ -365,7 +364,7 @@ class MultiheadAttention(nn.Module):
             voita_conf = {"heads": [], "batch_size": bsz}
             word_max = {"heads": [], "batch_size": bsz}
             if attn_weights is not None:
-                a = attn_weights.view(self.num_heads, bsz, tgt_len, src_len)
+                a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
                 heads = a[:, :, :, :].max(dim=3)
                 heads = heads[0].max(dim=2)
                 heads = heads[0].sum(dim=1)
