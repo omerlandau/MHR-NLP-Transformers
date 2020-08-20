@@ -285,6 +285,7 @@ def batch_head_stats(attn_variables, triu_masking=False):
     ctx = attn_variables["context"].detach()
     in_mask = attn_variables["in_mask"]
     out_mask = attn_variables["out_mask"]
+    print("Guy comment - > attn_variables {}".format(attn_variables))
     p = attn_variables["weights"].detach()
     logp = torch.log(p)
     device = p.device
@@ -418,7 +419,6 @@ def estimate_head_importance(args, trainer, task, epoch_itr):
         # Retrieve importance scores for the encoder
         for layer in range(encoder_layers):
             self_attn_variables = trainer.model.encoder.layers[layer].self_attn_variables
-            print("Guy comment - > layer {}, self_attn_variables - {}".format(layer,self_attn_variables))
             importance, denom = batch_head_importance(
                 self_attn_variables, one_minus=args.one_minus)
             head_importance["encoder_self"][layer] += importance
