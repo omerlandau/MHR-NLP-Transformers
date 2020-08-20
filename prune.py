@@ -129,6 +129,7 @@ def main(args):
     '''
     # Load the latest checkpoint if one is available
     extra_state, epoch_itr = checkpoint_utils.load_checkpoint(args, trainer)
+    print("Guy comment - > task.dataset {} ".format(task.dataset))
     test = task.dataset(args.valid_subset)
     print("Guy comment - > task.dataset(args.valid_subset) {} ".format(test.src))
     # Train until the learning rate gets too small
