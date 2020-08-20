@@ -412,13 +412,14 @@ class TransformerEncoder(FairseqEncoder):
         encoder_states = [] if return_all_hiddens else None
 
         l_conf = []
-
+        self.self_attns = []
         # encoder layers
         for i, layer in enumerate(self.layers):
             # add LayerDrop (see https://arxiv.org/abs/1909.11556 for description)
             dropout_probability = torch.empty(1).uniform_()
             if not self.training or (dropout_probability > self.encoder_layerdrop):
                 x, layer_attn, conf = layer(x, encoder_padding_mask)
+                self.self_attns.append(layer.self_attn_variables["weights"])
                 l_conf.append(conf)
                 if return_all_hiddens:
                     assert encoder_states is not None
@@ -785,7 +786,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         # B x T x C -> T x B x C
         x = x.transpose(0, 1)
-
+        self.attns = []
+        self.self_attns = []
         self_attn_padding_mask: Optional[Tensor] = None
         if self.cross_self_attention or prev_output_tokens.eq(self.padding_idx).any():
             self_attn_padding_mask = prev_output_tokens.eq(self.padding_idx)
@@ -811,6 +813,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             )
             l_conf.append({"self_attn":conf,"enc_attn":enc_conf})
             inner_states.append(x)
+            self.attns.append(attn)
+            self.self_attns.append(layer.self_attn_variables["weights"])
             if layer_attn is not None and idx == alignment_layer:
                 attn = layer_attn.float().to(x)
 
