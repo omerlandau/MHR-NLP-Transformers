@@ -385,9 +385,8 @@ class MultiheadAttention(nn.Module):
                     word_max["heads"].append(conf_temp)
             conf = {"voita": voita_conf, "word_max": word_max}
 
-        self.head_conf.append(conf)
+        self.head_conf = conf
 
-        t = time.time() - t0
 
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
@@ -417,7 +416,7 @@ class MultiheadAttention(nn.Module):
             if not need_head_weights:
                 # average attention weights over heads
                 attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights, save_ctx, conf
+        return attn, attn_weights, save_ctx
 
     @staticmethod
     def _append_prev_key_padding_mask(

@@ -128,7 +128,7 @@ class TransformerEncoderLayer(nn.Module):
         residual = x
         if self.normalize_before:
             x = self.self_attn_layer_norm(x)
-        x, layer_attn, context, conf = self.self_attn(
+        x, layer_attn, context = self.self_attn(
             query=x,
             key=x,
             value=x,
@@ -157,7 +157,7 @@ class TransformerEncoderLayer(nn.Module):
         x = residual + x
         if not self.normalize_before:
             x = self.final_layer_norm(x)
-        return x, layer_attn, conf
+        return x, layer_attn
 
 
 class TransformerDecoderLayer(nn.Module):
@@ -356,7 +356,7 @@ class TransformerDecoderLayer(nn.Module):
             y = torch.cat((encoder_out, x), dim=0)
         else:
             y = x
-        x, attn, context, conf = self.self_attn(
+        x, attn, context = self.self_attn(
             query=x,
             key=y,
             value=y,
@@ -365,7 +365,6 @@ class TransformerDecoderLayer(nn.Module):
             need_weights=False,
             attn_mask=self_attn_mask,
         )
-        enc_conf = None
         self.self_attn_variables["weights"] = attn
         self.self_attn_variables["context"] = context
         self.self_attn_variables["attn"] = x.view(x.size(0), x.size(1), self.self_attn.num_heads, -1)
@@ -390,7 +389,7 @@ class TransformerDecoderLayer(nn.Module):
                 assert incremental_state is not None
                 self.encoder_attn._set_input_buffer(incremental_state, saved_state)
 
-            x, attn, context, enc_conf = self.encoder_attn(
+            x, attn, context = self.encoder_attn(
                 query=x,
                 key=encoder_out,
                 value=encoder_out,
@@ -434,7 +433,7 @@ class TransformerDecoderLayer(nn.Module):
             else:
                 self_attn_state = [saved_state["prev_key"], saved_state["prev_value"]]
             return x, attn, self_attn_state
-        return x, attn, conf, enc_conf
+        return x, attn
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):
         self.need_attn = need_attn

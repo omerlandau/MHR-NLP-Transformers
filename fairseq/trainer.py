@@ -435,8 +435,6 @@ class Trainer(object):
         self.criterion.train()
         self.zero_grad()
 
-        e_conf = []
-
         metrics.log_start_time("train_wall", priority=800, round=0)
 
         # forward and backward pass
@@ -469,7 +467,7 @@ class Trainer(object):
             try:
                 with maybe_no_sync():
                     # forward and backward
-                    loss, sample_size_i, logging_output, conf, d_conf = self.task.train_step(
+                    loss, sample_size_i, logging_output = self.task.train_step(
                         sample=sample,
                         model=self.model,
                         criterion=self.criterion,
@@ -480,7 +478,6 @@ class Trainer(object):
                     del loss
 
                 logging_outputs.append(logging_output)
-                e_conf.append({"encoder":conf, "decoder":d_conf})
                 sample_size += sample_size_i
 
                 # emptying the CUDA cache after the first step can
@@ -633,7 +630,7 @@ class Trainer(object):
 
         metrics.log_stop_time("train_wall")
 
-        return logging_output, e_conf
+        return logging_output
 
     @metrics.aggregate("valid")
     def valid_step(self, sample, raise_oom=False):
@@ -657,7 +654,7 @@ class Trainer(object):
                 is_dummy_batch = False
 
             try:
-                _loss, sample_size, logging_output, conf, d_conf = self.task.valid_step(
+                _loss, sample_size, logging_output = self.task.valid_step(
                     sample, self.model, self.criterion
                 )
             except RuntimeError as e:

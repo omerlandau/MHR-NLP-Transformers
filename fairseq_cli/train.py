@@ -142,9 +142,8 @@ def main(
     train_meter.start()
     experiment_path = args.mhr_experiment  # path for experiment configuration
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
-        batches_conf =[]
         # train for one epoch
-        valid_losses, should_stop, batches_conf = train(args, trainer, task, epoch_itr, model, experiment_path)
+        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
         ####### for try ########
         #with open("/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-2-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
         #    pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
@@ -252,14 +251,13 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     valid_subsets = args.valid_subset.split(",")
     should_stop = False
-    batches_conf = []
+
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
-            log_output, e_conf = trainer.train_step(samples)
+            log_output = trainer.train_step(samples)
 
             print(model.decoder.layers[0].self_attn.head_conf)
 
-            batches_conf.append(e_conf)
 
             if log_output is None:  # OOM, overflow, ...
                 continue
@@ -288,7 +286,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     # reset epoch-level meters
     metrics.reset_meters("train")
-    return valid_losses, should_stop, batches_conf
+    return valid_losses, should_stop
 
 
 def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoch):

@@ -276,10 +276,10 @@ class TransformerModel(FairseqEncoderDecoderModel):
         Copied from the base class, but without ``**kwargs``,
         which are not supported by TorchScript.
         """
-        encoder_out, conf = self.encoder(
+        encoder_out = self.encoder(
             src_tokens, src_lengths=src_lengths, return_all_hiddens=return_all_hiddens
         )
-        decoder_out, d_conf = self.decoder(
+        decoder_out = self.decoder(
             prev_output_tokens,
             encoder_out=encoder_out,
             features_only=features_only,
@@ -290,7 +290,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
         )
 
 
-        return decoder_out, conf, d_conf
+        return decoder_out
 
     # Since get_normalized_probs is in the Fairseq Model which is not scriptable,
     # I rewrite the get_normalized_probs from Base Class to call the
@@ -411,16 +411,14 @@ class TransformerEncoder(FairseqEncoder):
 
         encoder_states = [] if return_all_hiddens else None
 
-        l_conf = []
         self.self_attns = []
         # encoder layers
         for i, layer in enumerate(self.layers):
             # add LayerDrop (see https://arxiv.org/abs/1909.11556 for description)
             dropout_probability = torch.empty(1).uniform_()
             if not self.training or (dropout_probability > self.encoder_layerdrop):
-                x, layer_attn, conf = layer(x, encoder_padding_mask)
+                x, layer_attn = layer(x, encoder_padding_mask)
                 self.self_attns.append(layer.self_attn_variables["weights"])
-                l_conf.append(conf)
                 if return_all_hiddens:
                     assert encoder_states is not None
                     encoder_states.append(x)
@@ -437,7 +435,7 @@ class TransformerEncoder(FairseqEncoder):
             encoder_states=encoder_states,  # List[T x B x C]
             src_tokens=None,
             src_lengths=None,
-        ), l_conf
+        )
 
     @torch.jit.export
     def reorder_encoder_out(self, encoder_out: EncoderOut, new_order):
@@ -687,7 +685,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 - the decoder's output of shape `(batch, tgt_len, vocab)`
                 - a dictionary with any model-specific outputs
         """
-        x, extra, l_conf = self.extract_features(
+        x, extra = self.extract_features(
             prev_output_tokens,
             encoder_out=encoder_out,
             incremental_state=incremental_state,
@@ -696,7 +694,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         )
         if not features_only:
             x = self.output_layer(x)
-        return (x, extra), l_conf
+        return x, extra
 
     def extract_features(
             self,
@@ -791,7 +789,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         self_attn_padding_mask: Optional[Tensor] = None
         if self.cross_self_attention or prev_output_tokens.eq(self.padding_idx).any():
             self_attn_padding_mask = prev_output_tokens.eq(self.padding_idx)
-        l_conf = []
         # decoder layers
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
@@ -801,7 +798,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             else:
                 self_attn_mask = None
 
-            x, layer_attn, conf, enc_conf = layer(
+            x, layer_attn = layer(
                 x,
                 encoder_out.encoder_out if encoder_out is not None else None,
                 encoder_out.encoder_padding_mask if encoder_out is not None else None,
@@ -811,7 +808,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 need_attn=bool((idx == alignment_layer)),
                 need_head_weights=bool((idx == alignment_layer)),
             )
-            l_conf.append({"self_attn":conf,"enc_attn":enc_conf})
             inner_states.append(x)
             self.attns.append(attn)
             self.self_attns.append(layer.self_attn_variables["weights"])
@@ -833,7 +829,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         if self.project_out_dim is not None:
             x = self.project_out_dim(x)
-        return x, {"attn": [attn], "inner_states": inner_states}, l_conf
+        return x, {"attn": [attn], "inner_states": inner_states}
 
     def output_layer(self, features):
         """Project features to the vocabulary size."""

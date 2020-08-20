@@ -289,9 +289,9 @@ class TranslationTask(FairseqTask):
         return model
 
     def valid_step(self, sample, model, criterion):
-        loss, sample_size, logging_output, conf, d_conf = super().valid_step(sample, model, criterion)
+        loss, sample_size, logging_output = super().valid_step(sample, model, criterion)
         if self.args.eval_bleu:
-            bleu, conf, d_conf = self._inference_with_bleu(self.sequence_generator, sample, model)
+            bleu = self._inference_with_bleu(self.sequence_generator, sample, model)
             logging_output['_bleu_sys_len'] = bleu.sys_len
             logging_output['_bleu_ref_len'] = bleu.ref_len
             # we split counts into separate entries so that they can be
@@ -300,7 +300,7 @@ class TranslationTask(FairseqTask):
             for i in range(EVAL_BLEU_ORDER):
                 logging_output['_bleu_counts_' + str(i)] = bleu.counts[i]
                 logging_output['_bleu_totals_' + str(i)] = bleu.totals[i]
-        return loss, sample_size, logging_output, conf, d_conf
+        return loss, sample_size, logging_output
 
     def reduce_metrics(self, logging_outputs, criterion):
         super().reduce_metrics(logging_outputs, criterion)
@@ -389,7 +389,7 @@ class TranslationTask(FairseqTask):
                 s = self.tokenizer.decode(s)
             return s
 
-        gen_out, conf, d_conf = self.inference_step(generator, [model], sample, None)
+        gen_out = self.inference_step(generator, [model], sample, None)
         hyps, refs = [], []
         for i in range(len(gen_out)):
             hyps.append(decode(gen_out[i][0]['tokens']))
@@ -401,6 +401,6 @@ class TranslationTask(FairseqTask):
             logger.info('example hypothesis: ' + hyps[0])
             logger.info('example reference: ' + refs[0])
         if self.args.eval_tokenized_bleu:
-            return sacrebleu.corpus_bleu(hyps, [refs], tokenize='none'), conf, d_conf
+            return sacrebleu.corpus_bleu(hyps, [refs], tokenize='none')
         else:
-            return sacrebleu.corpus_bleu(hyps, [refs]), conf, d_conf
+            return sacrebleu.corpus_bleu(hyps, [refs])
