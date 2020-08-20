@@ -283,6 +283,8 @@ def batch_head_importance(attn_variables, one_minus=False):
 def batch_head_stats(attn_variables, triu_masking=False):
     # Retrieve context (shape bsz x nheads x L x dhead), mask (shape bsz x L) and weights (shape bsz x nheads x L x l)
     ctx = attn_variables["context"].detach()
+    print("Guy comment - > ctx size {}".format(ctx.size()))
+
     in_mask = attn_variables["in_mask"]
     out_mask = attn_variables["out_mask"]
     p = attn_variables["weights"].detach()
@@ -420,6 +422,7 @@ def estimate_head_importance(args, trainer, task, epoch_itr):
         # Retrieve importance scores for the encoder
         for layer in range(encoder_layers):
             self_attn_variables = trainer.model.encoder.layers[layer].self_attn_variables
+
             importance, denom = batch_head_importance(
                 self_attn_variables, one_minus=args.one_minus)
             head_importance["encoder_self"][layer] += importance
