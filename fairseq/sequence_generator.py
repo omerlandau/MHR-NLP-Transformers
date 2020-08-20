@@ -156,7 +156,6 @@ class SequenceGenerator(nn.Module):
             bos_token (int, optional): beginning of sentence token
                 (default: self.eos)
         """
-        #print("Guy comment -> inside sequence_generator.generate")
         return self._generate(sample, **kwargs)
 
     def _generate(
@@ -714,7 +713,6 @@ class EnsembleModel(nn.Module):
             if self.has_encoder():
                 encoder_out = encoder_outs[i]
             # decode each model
-            #print("Guy comment - > calling decoder forward from seq_gen")
             if self.has_incremental_states():
                 decoder_out = model.decoder.forward(
                     tokens,
@@ -723,7 +721,6 @@ class EnsembleModel(nn.Module):
                 )
             else:
                 decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out)
-            #print("Guy comment - > decoder out is {}".format(decoder_out))
 
             attn: Optional[Tensor] = None
             decoder_len = len(decoder_out)
@@ -737,7 +734,6 @@ class EnsembleModel(nn.Module):
                     elif attn_holder is not None:
                         attn = attn_holder[0]
                 if attn is not None:
-                    #print("Guy comment - > attn is {}".format(attn))
                     attn = attn[:, -1, :]
 
             decoder_out_tuple = (
