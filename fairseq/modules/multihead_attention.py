@@ -408,7 +408,9 @@ class MultiheadAttention(nn.Module):
         attn = self.out_proj(ctx)
         attn_weights: Optional[Tensor] = None
         #print("Guy comment - > need_weights is {}".format(need_weights))
+        print("Guy comment -> before need_weights")
         if need_weights:
+            print("Guy comment -> inside need_weights")
             attn_weights = attn_weights_float.view(
                 bsz, self.num_heads, tgt_len, src_len
             ).transpose(1, 0)
