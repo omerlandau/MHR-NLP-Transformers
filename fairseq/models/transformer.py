@@ -820,7 +820,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             # average probabilities over heads
 
             attn = attn.mean(dim=0)
-        print("Guy comment - > Inside transformer decoder attn size {}".format(attn.size()))
+        #print("Guy comment - > Inside transformer decoder attn size {}".format(attn.size()))
         if self.layer_norm is not None:
             x = self.layer_norm(x)
 
@@ -829,7 +829,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         if self.project_out_dim is not None:
             x = self.project_out_dim(x)
-        print("Guy comment - > Inside MHA attn_weights size {}".format(attn.size()))
+        #print("Guy comment - > Inside MHA attn_weights size {}".format(attn.size()))
         return x, {"attn": [attn], "inner_states": inner_states}
 
     def output_layer(self, features):
