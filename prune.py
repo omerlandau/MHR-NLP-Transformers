@@ -424,7 +424,6 @@ def estimate_head_importance(args, trainer, task, epoch_itr):
         # Retrieve importance scores for the encoder
         for layer in range(encoder_layers):
             self_attn_variables = trainer.model.encoder.layers[layer].self_attn_variables
-            print("Guy comment - > layer {}, self_attn_variables - {}".format(layer,self_attn_variables))
             importance, denom = batch_head_importance(
                 self_attn_variables, one_minus=args.one_minus)
             head_importance["encoder_self"][layer] += importance
