@@ -129,7 +129,8 @@ def main(args):
     '''
     # Load the latest checkpoint if one is available
     extra_state, epoch_itr = checkpoint_utils.load_checkpoint(args, trainer)
-
+    print("Guy comment - > args.valid_subset {} ".format(args.valid_subset))
+    print("Guy comment - > task.dataset(args.valid_subset) {} ".format(task.dataset(args.valid_subset)))
     # Train until the learning rate gets too small
     prune_meter = StopwatchMeter()
     prune_meter.start()
@@ -231,6 +232,7 @@ def main(args):
 
         # Apply pruning
         mask_heads(model, to_prune, args.transformer_mask_rescale)
+
         bleu = eval_bleu_score(
             model,
             task,
