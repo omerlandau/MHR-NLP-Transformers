@@ -145,14 +145,13 @@ def main(
         # train for one epoch
         valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
         ####### for try ########
-        #with open("/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-2-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
+        # with open("/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-2-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
         #    pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
         if should_stop:
             break
 
         # only use first validation loss to update the learning rate
         lr = trainer.lr_step(epoch_itr.epoch, valid_losses[0])
-
 
         epoch_itr = trainer.get_train_iterator(
             epoch_itr.next_epoch_idx,
@@ -161,9 +160,6 @@ def main(
         )
     train_meter.stop()
     logger.info("done training in {:.1f} seconds".format(train_meter.sum))
-
-
-
 
 
 def should_stop_early(args, valid_loss):
@@ -242,21 +238,25 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     mhr(model, swaps, head_dim, num_heads, epoch_itr.epoch)
 
-
-
     trainer.begin_epoch(epoch_itr.epoch)
-
-
-
 
     valid_subsets = args.valid_subset.split(",")
     should_stop = False
+
+    conf = {"encoder": [], "decoder": []}
 
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples)
 
-            print(model.decoder.layers[0].self_attn.head_conf)
+            for i,j in zip(range(args.encoder_layer),range(args.decoder_layer)):
+
+                conf["decoder"].append({"layer": j, "self_attn": model.decoder.layers[j].self_attn.head_conf,
+                                        "encoder_attn": model.decoder.layers[i].encoder_attn.head_conf})
+                conf["encoder"].append({"layer": i, "self_attn": model.encoder.layers[i].self_attn.head_conf})
+
+    print(conf)
+    exit()
 
 
             if log_output is None:  # OOM, overflow, ...
@@ -282,7 +282,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
-    progress.print(stats, tag="train", step=num_updates)
+    progress.
+    print(stats, tag="train", step=num_updates)
 
     # reset epoch-level meters
     metrics.reset_meters("train")
@@ -358,7 +359,8 @@ def validate(args, trainer, task, epoch_itr, subsets):
 
         # log validation stats
         stats = get_valid_stats(args, trainer, agg.get_smoothed_values())
-        progress.print(stats, tag=subset, step=trainer.get_num_updates())
+        progress.
+        print(stats, tag=subset, step=trainer.get_num_updates())
 
         valid_losses.append(stats[args.best_checkpoint_metric])
     return valid_losses

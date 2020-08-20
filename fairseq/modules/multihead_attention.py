@@ -374,16 +374,16 @@ class MultiheadAttention(nn.Module):
                     voita_conf["heads"].append(conf_temp)
 
                 # Take max for each source word, than average all
-                for j in range(self.num_heads):
-                    conf_temp = 0
-                    for batch in range(bsz):
-                        word_attn_sum = 0
-                        for tgt in range(tgt_len - 1):
-                            word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt,
-                                             :-1].max()
-                        conf_temp += word_attn_sum / (tgt_len - 1)
-                    word_max["heads"].append(conf_temp)
-            conf = {"voita": voita_conf, "word_max": word_max}
+                #for j in range(self.num_heads):
+                #    conf_temp = 0
+                #    for batch in range(bsz):
+                #        word_attn_sum = 0
+                #        for tgt in range(tgt_len - 1):
+                #            word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt,
+                #                             :-1].max()
+                #        conf_temp += word_attn_sum / (tgt_len - 1)
+                #    word_max["heads"].append(conf_temp)
+            conf = {"voita": voita_conf}
 
         self.head_conf = conf
 
