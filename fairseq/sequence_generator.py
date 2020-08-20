@@ -196,11 +196,11 @@ class SequenceGenerator(nn.Module):
                 self.min_len <= max_len
         ), "min_len cannot be larger than max_len, please adjust these!"
         # compute the encoder output for each beam
-        encoder_outs = self.model.forward_encoder(net_input)
+        encoder_outs, conf = self.model.forward_encoder(net_input)[0]
 
-        e_conf = encoder_outs[1]
+        e_conf = encoder_outs[0][1]
 
-        encoder_outs = [encoder_outs[0]]
+        encoder_outs = [encoder_outs[0][0]]
 
         # placeholder of indices for bsz * beam_size to hold tokens and accumulative scores
         new_order = torch.arange(bsz).view(-1, 1).repeat(1, beam_size).view(-1)
