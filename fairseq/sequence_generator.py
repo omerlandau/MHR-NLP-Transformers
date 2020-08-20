@@ -196,8 +196,11 @@ class SequenceGenerator(nn.Module):
                 self.min_len <= max_len
         ), "min_len cannot be larger than max_len, please adjust these!"
         # compute the encoder output for each beam
-        print("Guy comment -> calling encoder forward")
-        encoder_outs, conf, d_conf = self.model.forward_encoder(net_input)
+        encoder_outs = self.model.forward_encoder(net_input)
+
+        print(encoder_outs)
+
+        exit()
 
         # placeholder of indices for bsz * beam_size to hold tokens and accumulative scores
         new_order = torch.arange(bsz).view(-1, 1).repeat(1, beam_size).view(-1)
@@ -273,9 +276,7 @@ class SequenceGenerator(nn.Module):
                 incremental_states,
                 self.temperature,
             )
-            for layer in range(len(self.model.single_model.decoder.layers)):
-                test = self.model.single_model.decoder.layers[layer].self_attn_confidence
-                print("Guy comment - > decoder layer {} self_attn_conf is : {}".format(layer, test))
+
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
             lprobs[:, self.pad] = -math.inf  # never select pad
