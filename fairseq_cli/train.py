@@ -243,7 +243,6 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     mhr(model, swaps, head_dim, num_heads, epoch_itr.epoch)
 
-    print(model.decoder.layers[0].self_attn.head_conf)
 
 
     trainer.begin_epoch(epoch_itr.epoch)
@@ -257,6 +256,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output, e_conf = trainer.train_step(samples)
+
+            print(model.decoder.layers[0].self_attn.head_conf)
 
             batches_conf.append(e_conf)
 
