@@ -396,7 +396,7 @@ class TransformerDecoderLayer(nn.Module):
                 key_padding_mask=encoder_padding_mask,
                 incremental_state=incremental_state,
                 static_kv=True,
-                need_weights=True,  # (not self.training and self.need_attn)
+                need_weights=True # or (not self.training and self.need_attn)
             )
             self.encoder_attn_variables["weights"] = attn
             self.encoder_attn_variables["context"] = context
