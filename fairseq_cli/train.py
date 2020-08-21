@@ -243,8 +243,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
     valid_subsets = args.valid_subset.split(",")
     should_stop = False
 
-    conf = {"encoder": [{"self_attn": None} for i in range(args.encoder_layers)],
-            "decoder": [{"self_attn": None, "enc_attn": None} for i in range(args.decoder_layers)]}
+    conf = {"encoder": [{"self_attn": np.empty((1,num_heads+1))} for i in range(args.encoder_layers)],
+            "decoder": [{"self_attn": np.empty((1,num_heads+1)), "enc_attn": np.empty((1,num_heads+1))} for i in range(args.decoder_layers)]}
 
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
