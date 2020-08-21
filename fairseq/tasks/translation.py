@@ -348,7 +348,7 @@ class TranslationTask(FairseqTask):
         """Like train_step but we retain_grad for some variables"""
         model.eval()
         # Forward pass
-        loss, sample_size, logging_output = criterion(model, sample)
+        loss, sample_size, logging_output = criterion(model, sample, calc_head_importance=True)
         # Retain grads wrt. attn context (for computing the importance score)
         for layer in model.encoder.layers:
             layer.self_attn_variables["context"].retain_grad()

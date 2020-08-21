@@ -279,7 +279,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
         """
         print("Guy comment -> inside TransformerModel forward, calc_head_importance is {}".format(calc_head_importance))
         encoder_out = self.encoder(
-            src_tokens, src_lengths=src_lengths, return_all_hiddens=return_all_hiddens
+            src_tokens, src_lengths=src_lengths, return_all_hiddens=return_all_hiddens, calc_head_importance=calc_head_importance,
         )
         decoder_out = self.decoder(
             prev_output_tokens,
@@ -289,6 +289,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
             alignment_heads=alignment_heads,
             src_lengths=src_lengths,
             return_all_hiddens=return_all_hiddens,
+            calc_head_importance=calc_head_importance,
         )
 
 
@@ -380,6 +381,7 @@ class TransformerEncoder(FairseqEncoder):
             src_lengths,
             cls_input: Optional[Tensor] = None,
             return_all_hiddens: bool = False,
+            calc_head_importance = False,
     ):
         """
         Args:
@@ -670,6 +672,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             alignment_heads: Optional[int] = None,
             src_lengths: Optional[Any] = None,
             return_all_hiddens: bool = False,
+            calc_head_importance=False,
     ):
         """
         Args:
