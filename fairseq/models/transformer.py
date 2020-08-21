@@ -420,7 +420,7 @@ class TransformerEncoder(FairseqEncoder):
             # add LayerDrop (see https://arxiv.org/abs/1909.11556 for description)
             dropout_probability = torch.empty(1).uniform_()
             if not self.training or (dropout_probability > self.encoder_layerdrop):
-                x, layer_attn = layer(x, encoder_padding_mask,calc_head_importance)
+                x, layer_attn = layer(x, encoder_padding_mask, calc_head_importance=calc_head_importance)
                 self.self_attns.append(layer.self_attn_variables["weights"])
                 if return_all_hiddens:
                     assert encoder_states is not None
@@ -695,6 +695,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             incremental_state=incremental_state,
             alignment_layer=alignment_layer,
             alignment_heads=alignment_heads,
+            calc_head_importance=calc_head_importance
         )
         if not features_only:
             x = self.output_layer(x)
@@ -708,6 +709,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             full_context_alignment: bool = False,
             alignment_layer: Optional[int] = None,
             alignment_heads: Optional[int] = None,
+            calc_head_importance=False,
+
     ):
         return self.extract_features_scriptable(
             prev_output_tokens,
@@ -716,6 +719,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             full_context_alignment,
             alignment_layer,
             alignment_heads,
+            calc_head_importance=calc_head_importance
         )
 
     """
@@ -732,6 +736,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             full_context_alignment: bool = False,
             alignment_layer: Optional[int] = None,
             alignment_heads: Optional[int] = None,
+            calc_head_importance=False,
     ):
         """
         Similar to *forward* but only return features.
@@ -811,6 +816,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 self_attn_padding_mask=self_attn_padding_mask,
                 need_attn=bool((idx == alignment_layer)),
                 need_head_weights=bool((idx == alignment_layer)),
+                calc_head_importance=calc_head_importance
             )
             inner_states.append(x)
             self.attns.append(attn)
