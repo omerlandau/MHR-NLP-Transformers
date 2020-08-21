@@ -1,7 +1,8 @@
+#!/usr/bin/env python3
 import sys
 import collections
 import torch
-from fairseq.model_parallel.megatron_trainer import MegatronTrainer
+
 from fairseq import options, progress_bar, tasks, utils
 from fairseq.trainer import Trainer
 from fairseq.meters import AverageMeter, StopwatchMeter
@@ -10,7 +11,7 @@ from fairseq_cli.train import (
     load_checkpoint,
 )
 from itertools import islice
-from fairseq import checkpoint_utils
+
 from fairseq.sequence_generator import SequenceGenerator
 from fairseq_cli.interactive import translate_corpus, parse_head_pruning_descriptors, mask_heads
 from math import ceil
@@ -19,20 +20,20 @@ import os
 
 
 def eval_bleu_score(
-        model,
-        task,
-        eval_data,
-        beam=5,
-        replace_unk=True,
-        lenpen=1.0,
-        buffer_size=100,
-        use_cuda=True,
-        remove_bpe=False,
-        max_sentences=32,
-        max_tokens=9999,
-        stop_early=True,
-        normalize_scores=True,
-        min_len=2,
+    model,
+    task,
+    eval_data,
+    beam=5,
+    replace_unk=True,
+    lenpen=1.0,
+    buffer_size=100,
+    use_cuda=True,
+    remove_bpe=False,
+    max_sentences=32,
+    max_tokens=9999,
+    stop_early=True,
+    normalize_scores=True,
+    min_len=2,
 ):
     print(len(task.target_dictionary))
     # Initialize generator
@@ -40,7 +41,6 @@ def eval_bleu_score(
         [model], task.target_dictionary, beam_size=beam, min_len=min_len,
         normalize_scores=normalize_scores,
         len_penalty=lenpen,
-
     )
 
     results = translate_corpus(
@@ -97,23 +97,18 @@ def main(args):
         task.max_positions(),
         model.max_positions(),
     )
-    '''
     dummy_batch = task.dataset('train').get_dummy_batch(
         args.max_tokens, max_positions)
-'''
-    quantizer = None
+
     # Build trainer
-    if args.model_parallel_size == 1:
-        trainer = Trainer(args, task, model, criterion, quantizer)
-    else:
-        trainer = MegatronTrainer(args, task, model, criterion)
+    trainer = Trainer(args, task, model, criterion, dummy_batch)
     print('| training on {} GPUs'.format(args.distributed_world_size))
     print('| max tokens per GPU = {} and max sentences per GPU = {}'.format(
         args.max_tokens,
         args.max_sentences,
     ))
     print('| Optimizer {}'.format(trainer.optimizer.__class__.__name__))
-    '''
+
     # Initialize dataloader
     epoch_itr = task.get_batch_iterator(
         dataset=task.dataset(args.train_subset),
@@ -126,9 +121,9 @@ def main(args):
         num_shards=args.distributed_world_size,
         shard_id=args.distributed_rank,
     )
-    '''
     # Load the latest checkpoint if one is available
-    extra_state, epoch_itr = checkpoint_utils.load_checkpoint(args, trainer)
+    if not load_checkpoint(args, trainer, epoch_itr):
+        trainer.dummy_train_step([dummy_batch])
 
     # Train until the learning rate gets too small
     prune_meter = StopwatchMeter()
@@ -139,8 +134,8 @@ def main(args):
     prune_meter.stop()
     print('| done estimating head importance in {:.1f} seconds'.format(
         prune_meter.sum))
-    # torch.save(
-    #    head_stats, f"{os.path.dirname(args.restore_file)}/heads_stats.bin")
+    torch.save(
+        head_stats, f"{os.path.dirname(args.restore_file)}/heads_stats.bin")
     # Print
     print("Head importances")
     print("Encoder self attention")
@@ -184,6 +179,7 @@ def main(args):
         return
 
     tot_n_heads = len(sorted_profiles)
+
     # Eval pruning
     if args.one_head:
         kept_layers = set()
@@ -228,10 +224,8 @@ def main(args):
             reverse_descriptors=False
         )
         print(f"Evaluating following profile: \t{' '.join(to_prune_profile)}")
-
         # Apply pruning
         mask_heads(model, to_prune, args.transformer_mask_rescale)
-        print("Guy comment - > before eval_bleu_score")
         bleu = eval_bleu_score(
             model,
             task,
@@ -255,7 +249,7 @@ def main(args):
 def get_profile(importances, prefix):
     n_layers, n_heads = importances.size()
     return {
-        f"{prefix}:{layer + 1}:{head + 1}": importances[layer, head]
+        f"{prefix}:{layer+1}:{head+1}": importances[layer, head]
         for layer in range(n_layers)
         for head in range(n_heads)
     }
@@ -320,10 +314,10 @@ def batch_head_stats(attn_variables, triu_masking=False):
     p_mask = in_mask.unsqueeze(1).unsqueeze(1)
     # Entropy
     plogp = p * logp
-    plogp[p == 0] = 0
+    plogp[p==0] = 0
     if triu_masking:
         plogp.masked_fill_(triu_mask.unsqueeze(0).unsqueeze(0), 0)
-        # plogp.masked_fill_(p_mask.eq(0), 0)
+    #plogp.masked_fill_(p_mask.eq(0), 0)
     H_p = -plogp.sum(-1)
     results["entropy"] = reduce_head(H_p)
     # Cross entropy
@@ -342,10 +336,10 @@ def batch_head_stats(attn_variables, triu_masking=False):
         exit()
     # avg output disagreement
     out = ctx / (torch.sqrt((ctx ** 2).sum(-1, keepdim=True)) + 1e-20)
-    out_dis = torch.einsum("bild,bjld->bijl", [out, out]) / out.size(1) ** 2
+    out_dis = torch.einsum("bild,bjld->bijl", [out, out]) / out.size(1)**2
     results["out_dis"] = reduce_head_pairs(out_dis)
     # avg attn disagreement
-    attn_dis = torch.einsum("bilk,bjlk->bijl", [p, p]) / p.size(1) ** 2
+    attn_dis = torch.einsum("bilk,bjlk->bijl", [p, p]) / p.size(1)**2
     results["attn_dis"] = reduce_head_pairs(attn_dis)
     # Avg attn offset
     self_pos = torch.arange(p.size(2)).to(device).float().view(1, 1, -1)
@@ -354,7 +348,7 @@ def batch_head_stats(attn_variables, triu_masking=False):
     else:
         masked_p = p
     attn_pos = masked_p.argmax(dim=-1).float()
-    attn_offset = self_pos - attn_pos
+    attn_offset = self_pos-attn_pos
     results["attn_pos"] = reduce_head(attn_pos)
     results["attn_offset"] = reduce_head(attn_offset)
     # Avg attn offset
@@ -429,8 +423,8 @@ def estimate_head_importance(args, trainer, task, epoch_itr):
             head_importance["encoder_self"][layer] += importance
             denoms["encoder_self"][layer] += denom
             # Stats
-            # aggregate_stats(head_stats["encoder_self"][layer],
-            #                batch_head_stats(self_attn_variables)[0])
+            aggregate_stats(head_stats["encoder_self"][layer],
+                            batch_head_stats(self_attn_variables)[0])
         # Retrieve importance scores for the decoder
         for layer in range(decoder_layers):
             # Self attention
@@ -439,16 +433,16 @@ def estimate_head_importance(args, trainer, task, epoch_itr):
                 self_attn_variables, one_minus=args.one_minus)
             head_importance["decoder_self"][layer] += importance
             denoms["decoder_self"][layer] += denom
-            # aggregate_stats(head_stats["decoder_self"][layer],
-            #                batch_head_stats(self_attn_variables, triu_masking=True)[0])
+            aggregate_stats(head_stats["decoder_self"][layer],
+                            batch_head_stats(self_attn_variables, triu_masking=True)[0])
             # Encoder attention
             encoder_attn_variables = trainer.model.decoder.layers[layer].encoder_attn_variables
             importance, denom = batch_head_importance(
                 encoder_attn_variables, one_minus=args.one_minus)
             head_importance["encoder_decoder"][layer] += importance
             denoms["encoder_decoder"][layer] += denom
-            # aggregate_stats(head_stats["encoder_decoder"][layer],
-            #                batch_head_stats(encoder_attn_variables)[0])
+            aggregate_stats(head_stats["encoder_decoder"][layer],
+                            batch_head_stats(encoder_attn_variables)[0])
         # log mid-epoch stats
         stats = get_pruning_stats(trainer)
         for k, v in log_output.items():
@@ -476,7 +470,7 @@ def estimate_head_importance(args, trainer, task, epoch_itr):
         for layer in range(encoder_layers):
             for attn_type, importance in head_importance.items():
                 head_importance[attn_type][layer] /= torch.sqrt(
-                    torch.sum(importance[layer] ** 2))
+                    torch.sum(importance[layer]**2))
     return {k: v.cpu() for k, v in head_importance.items()}, head_stats
 
 
@@ -500,8 +494,7 @@ def add_pruning_args(parser):
     group.add_argument("--one-minus", action="store_true")
     group.add_argument("--one-head", action="store_true")
     group.add_argument("--encoder-self-only", action="store_true", help="Only prune from the encoder self attention")
-    group.add_argument("--encoder-decoder-only", action="store_true",
-                       help="Only prune from the encoder decoder attention")
+    group.add_argument("--encoder-decoder-only", action="store_true", help="Only prune from the encoder decoder attention")
     group.add_argument("--decoder-self-only", action="store_true", help="Only prune from the decoder self attention")
 
 
