@@ -370,8 +370,8 @@ class MultiheadAttention(nn.Module):
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1)
-                    #heads = np.array(heads.cpu())
-                    #heads = np.append(heads,[bsz])
+                    heads = np.array(heads.cpu())
+                    heads = np.append(heads,[bsz])
 
                 # Take max for each source word, than average all
                 #for j in range(self.num_heads):
