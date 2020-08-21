@@ -5,9 +5,8 @@ for filename in os.listdir(directory):
     file = os.path.join(directory, filename)
     print(file)
     with open(file, 'rb') as fd:
-        fd.read().replace('\r\n', '\n')
         tmp = pickle.load(fd)
     fd.close()
     with open(os.path.join(directory, filename), 'wb') as fd2:
-        pickle.dump(tmp, fd2, protocol=3)
-    fd2.close()
+        pickle.dump(tmp, fd, protocol=3)
+    fd.close()
