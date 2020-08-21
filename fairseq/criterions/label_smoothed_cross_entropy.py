@@ -57,8 +57,9 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
         if gamma_conf is not None:
 
-            l_conf = torch.max([model.encoder.layers[0].self_attn.head_conf])[0] - torch.min(model.encoder.layers[0].self_attn.head_conf)[0]
+            l_conf = model.encoder.layers[0].self_attn.head_conf.max()[0] - model.encoder.layers[0].self_attn.head_conf.min()[0]
             print(l_conf)
+
 
 
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
