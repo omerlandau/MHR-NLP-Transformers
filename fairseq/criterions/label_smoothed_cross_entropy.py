@@ -74,7 +74,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             loss + gamma_conf * l_conf
             print(loss)
 
-        return loss, sample_size, logging_output
+        return loss, sample_size, logging_output,dddd
 
     def compute_loss(self, model, net_output, sample, reduce=True):
         lprobs = model.get_normalized_probs(net_output, log_probs=True)
