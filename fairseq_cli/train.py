@@ -243,8 +243,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
     valid_subsets = args.valid_subset.split(",")
     should_stop = False
 
-    conf = {"encoder": [{"self_attn": np.empty((1,num_heads+1))} for i in range(args.encoder_layers)],
-            "decoder": [{"self_attn": np.empty((1,num_heads+1)), "enc_attn": np.empty((1,num_heads+1))} for i in range(args.decoder_layers)]}
+    conf = {"encoder": [{"self_attn":[]} for i in range(args.encoder_layers)],
+            "decoder": [{"self_attn": [], "enc_attn":[]} for i in range(args.decoder_layers)]}
 
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
@@ -254,9 +254,9 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
                 continue
 
         for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-            conf["decoder"][d]["self_attn"] = np.append(conf["decoder"][d]["self_attn"], [model.decoder.layers[d].self_attn.head_conf], axis=0)
-            conf["decoder"][d]["enc_attn"] = np.append(conf["decoder"][d]["enc_attn"], [model.decoder.layers[d].encoder_attn.head_conf],axis=0)
-            conf["encoder"][e]["self_attn"] = np.append(conf["encoder"][e]["self_attn"], [model.encoder.layers[e].self_attn.head_conf],axis=0)
+            conf["decoder"][d]["self_attn"].append(model.decoder.layers[d].self_attn.head_conf)
+            conf["decoder"][d]["enc_attn"].append(model.decoder.layers[d].encoder_attn.head_conf)
+            conf["encoder"][e]["self_attn"].append(model.encoder.layers[e].self_attn.head_conf)
 
         print(conf["encoder"][0]["self_attn"])
 
@@ -277,6 +277,15 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
         if should_stop:
             break
+
+    for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+        conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
+        conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
+        conf["encoder"][e]["self_attn"] = np.array(["encoder"][e]["self_attn"])
+
+    print(conf["encoder"][0]["self_attn"])
+
+    exit()
 
     with open(args.save_dir.replace("checkpoints", "confs") + "-epoch-{0}".format(epoch_itr.epoch), 'wb') as fd:
         pickle.dump(conf, fd, protocol=3)
