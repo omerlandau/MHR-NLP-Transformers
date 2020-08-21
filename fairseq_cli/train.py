@@ -250,8 +250,6 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples)
 
-            print("hhhhhh - hh - hh - {0}".format(len(samples)))
-
             if log_output is None:  # OOM, overflow, ...
                 continue
 
@@ -259,6 +257,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
             conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
             conf["decoder"][d]["enc_attn"].append(np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
             conf["encoder"][e]["self_attn"].append(np.append(np.array(model.encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[model.encoder.layers[e].self_attn.bsz]))
+
         #print(np.array(conf["encoder"][0]["self_attn"])[0, :-1] / (np.array(conf["encoder"][0]["self_attn"])[0, -1]))
         # log mid-epoch stats
         num_updates = trainer.get_num_updates()
@@ -283,7 +282,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
         conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
         conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
 
-    print(conf["encoder"][0]["self_attn"].shape)
+    print(conf["encoder"][0]["self_attn"])
 
 
     #exit()
