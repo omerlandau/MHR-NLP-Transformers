@@ -269,6 +269,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
             features_only: bool = False,
             alignment_layer: Optional[int] = None,
             alignment_heads: Optional[int] = None,
+            calc_head_importance: Optional[bool] = False,
     ):
         """
         Run the forward pass for an encoder-decoder model.
@@ -276,6 +277,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
         Copied from the base class, but without ``**kwargs``,
         which are not supported by TorchScript.
         """
+        print("Guy comment -> inside TransformerModel forward, calc_head_importance is {}".format(calc_head_importance))
         encoder_out = self.encoder(
             src_tokens, src_lengths=src_lengths, return_all_hiddens=return_all_hiddens
         )
