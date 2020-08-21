@@ -205,6 +205,8 @@ class TranslationTask(FairseqTask):
                                                                              "'enc-dec last layer swapping'")
 
         parser.add_argument('--head-confidence-method', type=str, default=None, help="overall_max or mean_word_max")
+        parser.add_argument('--gamma-conf', type=float, default=None, help="gamma for conf loss")
+
         # fmt: on
 
     def __init__(self, args, src_dict, tgt_dict):
