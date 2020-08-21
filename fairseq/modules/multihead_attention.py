@@ -370,7 +370,7 @@ class MultiheadAttention(nn.Module):
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1)
-                    voita_conf["heads"].append(heads)
+                    heads = torch.cat((heads,bsz),0)
 
                 # Take max for each source word, than average all
                 #for j in range(self.num_heads):
@@ -382,7 +382,10 @@ class MultiheadAttention(nn.Module):
                 #                             :-1].max()
                 #        conf_temp += word_attn_sum / (tgt_len - 1)
                 #    word_max["heads"].append(conf_temp)
-            conf = {"voita": voita_conf}
+            conf = heads
+
+            print(heads)
+            exit()
 
         self.head_conf = conf
 
