@@ -314,7 +314,7 @@ class FairseqTask(object):
         )
 
     def train_step(
-            self, sample, model, criterion, optimizer, update_num, ignore_grad=False
+            self, sample, model, criterion, optimizer, update_num, ignore_grad=False, batch_num=None
     ):
         """
         Do forward and backward, and return the loss as computed by *criterion*
@@ -341,7 +341,7 @@ class FairseqTask(object):
         with torch.autograd.profiler.record_function("forward"):
 
             if(str(criterion) == "LabelSmoothedCrossEntropyCriterion()"):
-                loss, sample_size, logging_output = criterion(model, sample, gamma_conf=self.args.gamma_conf)
+                loss, sample_size, logging_output = criterion(model, sample, gamma_conf=self.args.gamma_conf, batch_num=batch_num)
             else:
                 loss, sample_size, logging_output = criterion(model, sample)
 

@@ -425,7 +425,7 @@ class Trainer(object):
         self.task.begin_epoch(epoch, self.get_model())
 
     @metrics.aggregate("train")
-    def train_step(self, samples, dummy_batch=False, raise_oom=False):
+    def train_step(self, samples, dummy_batch=False, raise_oom=False, batch_num=None):
         """Do forward, backward and parameter update."""
         #if self._dummy_batch == "DUMMY":
         #    self._dummy_batch = samples[0]
@@ -473,7 +473,7 @@ class Trainer(object):
                         criterion=self.criterion,
                         optimizer=self.optimizer,
                         update_num=self.get_num_updates(),
-                        ignore_grad=is_dummy_batch,
+                        ignore_grad=is_dummy_batch, batch_num=batch_num
                     )
                     del loss
 

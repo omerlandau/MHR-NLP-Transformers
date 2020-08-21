@@ -141,9 +141,11 @@ def main(
     train_meter = meters.StopwatchMeter()
     train_meter.start()
     experiment_path = args.mhr_experiment  # path for experiment configuration
+    total_samples = 0
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
-        valid_losses, should_stop = train(args, trainer, task, epoch_itr, model, experiment_path)
+        valid_losses, should_stop, total_samples_temp = train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=total_samples)
+        total_samples = total_samples_temp
         ####### for try ########
         # with open("/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-2-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
         #    pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
@@ -205,7 +207,7 @@ def tpu_data_loader(args, itr):
 
 
 @metrics.aggregate("train")
-def train(args, trainer, task, epoch_itr, model, experiment_path):
+def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=None):
     """Train the model for one epoch and return validation losses."""
     # Initialize data iterator
     itr = epoch_itr.next_epoch_itr(
@@ -246,13 +248,16 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
     conf = {"encoder": [{"self_attn":[]} for i in range(args.encoder_layers)],
             "decoder": [{"self_attn": [], "enc_attn":[]} for i in range(args.decoder_layers)]}
 
+    batch_regression = 1
+
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
-            log_output = trainer.train_step(samples)
+            log_output = trainer.train_step(samples, batch_num=total_samples)
 
             if log_output is None:  # OOM, overflow, ...
                 continue
-
+        total_samples += model.decoder.layers[0].self_attn.bsz
+        batch_regression = 1 - total_samples/160239*36 #need to find more generic way to find total samples and epoch num.
         for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
             conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
             conf["decoder"][d]["enc_attn"].append(np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
@@ -295,7 +300,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
 
     # reset epoch-level meters
     metrics.reset_meters("train")
-    return valid_losses, should_stop
+    return valid_losses, should_stop, total_samples
 
 
 def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoch):
