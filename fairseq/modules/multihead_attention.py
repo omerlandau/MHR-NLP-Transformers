@@ -357,13 +357,13 @@ class MultiheadAttention(nn.Module):
         t0 = time.time()
         if self.head_confidence_method == "base":
             ## computing confidence of all heads over bsz sentences
-            # confidence_arch = "base" # for testing
-            # Voita's confidence
-            # if confidence_arch == "base":
-            # print("Guy comment - > Inside MHA, should be here in inference and calculate thr confidence")
-            # print("Guy comment - > attn_weights: {}".format(attn_weights))
-            voita_conf = {"heads": [], "batch_size": bsz}
-            word_max = {"heads": [], "batch_size": bsz}
+
+            ## heads is an np array of shape [head_nums+1] which contains confidence*bsz for each head and bsz:
+            ## [conf_h_1*bsz,conf_h_2*bsz,...,conf_h_n*bsz,bsz]
+            # Viota's confidence is based on:
+            # Word attn confidence is an upgraded more delicate version of conf,
+            #where
+
             with torch.no_grad():
                 if attn_weights is not None:
                     a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)

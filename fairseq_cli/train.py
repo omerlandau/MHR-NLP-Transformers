@@ -243,7 +243,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
     valid_subsets = args.valid_subset.split(",")
     should_stop = False
 
-    conf = {"encoder": [], "decoder": []}
+    conf = {"encoder": [{"self_attn": []} for i in range(args.encoder_layers)],
+            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
 
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
@@ -252,11 +253,12 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
             if log_output is None:  # OOM, overflow, ...
                 continue
 
-        for i, j in zip(range(args.encoder_layers), range(args.decoder_layers)):
-            conf["decoder"].append({"layer": j, "self_attn": model.decoder.layers[j].self_attn.head_conf,
-                                    "encoder_attn": model.decoder.layers[i].encoder_attn.head_conf})
-            conf["encoder"].append({"layer": i, "self_attn": model.encoder.layers[i].self_attn.head_conf})
+        for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+            conf["decoder"][d]["self_attn"] = np.append((conf["decoder"]["self_attn"], model.decoder.layers[d].self_attn.head_conf),1)
+            conf["decoder"][d]["enc_attn"] = np.append((conf["decoder"]["enc_attn"], model.decoder.layers[d].encoder_attn.head_conf),1)
+            conf["encoder"][e]["self_attn"] = np.append((conf["encoder"]["self_attn"], model.encoder.layers[d].self_attn.head_conf),1)
 
+        print(conf["decoder"][0]["self_attn"])
         # log mid-epoch stats
         num_updates = trainer.get_num_updates()
         if num_updates % args.log_interval == 0:
