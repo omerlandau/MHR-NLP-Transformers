@@ -370,7 +370,7 @@ class MultiheadAttention(nn.Module):
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1)
-                    heads = torch.cat((heads,torch.Tensor(bsz)),0)
+                    heads = torch.cat((heads.to_cpu(),torch.Tensor(bsz)),0)
 
                 # Take max for each source word, than average all
                 #for j in range(self.num_heads):
