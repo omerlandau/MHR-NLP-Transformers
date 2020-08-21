@@ -72,6 +72,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
             l_conf = model.encoder.layers[0].self_attn.head_conf.max() - model.encoder.layers[0].self_attn.head_conf.min()
             loss + gamma_conf * l_conf
+            print(loss)
 
         return loss, sample_size, logging_output
 
