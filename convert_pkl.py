@@ -4,8 +4,8 @@ directory = "/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-
 for filename in os.listdir(directory):
     file = os.path.join(directory, filename)
     print(file)
-    fd.seek(0)
     with open(file, 'rb') as fd:
+        fd.seek(0)
         tmp = pickle.load(fd)
     fd.close()
     with open(os.path.join(directory, filename), 'wb') as fd2:
