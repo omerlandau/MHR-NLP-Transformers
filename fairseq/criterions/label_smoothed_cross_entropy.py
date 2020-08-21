@@ -45,7 +45,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                             help='epsilon for label smoothing, 0 means no label smoothing')
         # fmt: on
 
-    def forward(self, model, sample, reduce=True):
+    def forward(self, model, sample,gamma_conf, reduce=True):
         """Compute the loss for the given sample.
 
         Returns a tuple with three elements:
@@ -54,6 +54,12 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         3) logging outputs to display while training
         """
         net_output = model(**sample['net_input'])
+
+        if gamma_conf is not None:
+
+            l_conf = torch.max([model.encoder.layers[0].self_attn.head_conf])[0] - torch.min(model.encoder.layers[0].self_attn.head_conf)[0]
+            print(l_conf)
+
 
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.sentence_avg else sample['ntokens']
@@ -64,7 +70,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             'nsentences': sample['target'].size(0),
             'sample_size': sample_size,
         }
-        return loss, sample_size, logging_output
+        return loss + gamma_conf*l_conf, sample_size, logging_output
 
     def compute_loss(self, model, net_output, sample, reduce=True):
         lprobs = model.get_normalized_probs(net_output, log_probs=True)

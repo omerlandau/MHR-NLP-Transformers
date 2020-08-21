@@ -254,10 +254,10 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
                 continue
 
         for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-            conf["decoder"][d]["self_attn"].append(model.decoder.layers[d].self_attn.head_conf)
-            conf["decoder"][d]["enc_attn"].append(model.decoder.layers[d].encoder_attn.head_conf)
-            conf["encoder"][e]["self_attn"].append(model.encoder.layers[e].self_attn.head_conf)
-        print(np.array(conf["encoder"][0]["self_attn"])[0, :-1] / (np.array(conf["encoder"][0]["self_attn"])[0, -1]))
+            conf["decoder"][d]["self_attn"].append(model.decoder.layers[d].self_attn.head_conf.clone().cpu())
+            conf["decoder"][d]["enc_attn"].append(model.decoder.layers[d].encoder_attn.head_conf.clone().cpu())
+            conf["encoder"][e]["self_attn"].append(model.encoder.layers[e].self_attn.head_conf.clone().cpu())
+        #print(np.array(conf["encoder"][0]["self_attn"])[0, :-1] / (np.array(conf["encoder"][0]["self_attn"])[0, -1]))
         exit()
         # log mid-epoch stats
         num_updates = trainer.get_num_updates()
@@ -285,7 +285,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
     print(conf["encoder"][0]["self_attn"].shape)
 
 
-    exit()
+    #exit()
 
     with open(args.save_dir.replace("checkpoints", "confs") + "-epoch-{0}".format(epoch_itr.epoch), 'wb') as fd:
         pickle.dump(conf, fd, protocol=3)

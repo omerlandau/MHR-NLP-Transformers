@@ -364,25 +364,24 @@ class MultiheadAttention(nn.Module):
             # Word attn confidence is an upgraded more delicate version of conf,
             #where
 
-            with torch.no_grad():
-                if attn_weights is not None:
-                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
-                    heads = a[:, :, :, :].max(dim=3)
-                    heads = heads[0].max(dim=2)
-                    heads = heads[0].sum(dim=1)
-                    heads = np.array(heads.cpu())
-                    heads = np.append(heads,[bsz])
+            if attn_weights is not None:
+                a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
+                heads = a[:, :, :, :].max(dim=3)
+                heads = heads[0].max(dim=2)
+                heads = heads[0].sum(dim=1)/bsz
+                #heads = np.array(heads.cpu())
+                #heads = np.append(heads,[bsz])
 
-                # Take max for each source word, than average all
-                #for j in range(self.num_heads):
-                #    conf_temp = 0
-                #    for batch in range(bsz):
-                #        word_attn_sum = 0
-                #        for tgt in range(tgt_len - 1):
-                #            word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt,
-                #                             :-1].max()
-                #        conf_temp += word_attn_sum / (tgt_len - 1)
-                #    word_max["heads"].append(conf_temp)
+            # Take max for each source word, than average all
+            #for j in range(self.num_heads):
+            #    conf_temp = 0
+            #    for batch in range(bsz):
+            #        word_attn_sum = 0
+            #        for tgt in range(tgt_len - 1):
+            #            word_attn_sum += attn_weights.view(self.num_heads, bsz, tgt_len, src_len)[j, batch, tgt,
+            #                             :-1].max()
+            #        conf_temp += word_attn_sum / (tgt_len - 1)
+            #    word_max["heads"].append(conf_temp)
             conf = heads
 
 
