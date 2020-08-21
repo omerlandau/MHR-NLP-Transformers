@@ -45,7 +45,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                             help='epsilon for label smoothing, 0 means no label smoothing')
         # fmt: on
 
-    def forward(self, model, sample,gamma_conf, reduce=True):
+    def forward(self, model, sample, reduce=True, gamma_conf=None):
         """Compute the loss for the given sample.
 
         Returns a tuple with three elements:
