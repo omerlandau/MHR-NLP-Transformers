@@ -339,11 +339,12 @@ class FairseqTask(object):
         model.train()
         model.set_num_updates(update_num)
         with torch.autograd.profiler.record_function("forward"):
-            print(criterion)
+
             if(str(criterion) == "LabelSmoothedCrossEntropyCriterion()"):
-                print("dick")
-                exit()
-            loss, sample_size, logging_output = criterion(model, sample)
+                loss, sample_size, logging_output = criterion(model, sample, gamma_conf=self.args.gamma_conf)
+            else:
+                loss, sample_size, logging_output = criterion(model, sample)
+
         if ignore_grad:
             loss *= 0
         with torch.autograd.profiler.record_function("backward"):
