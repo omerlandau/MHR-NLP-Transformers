@@ -385,8 +385,6 @@ class MultiheadAttention(nn.Module):
                 #    word_max["heads"].append(conf_temp)
             conf = heads
 
-            print(conf)
-            exit()
 
         self.head_conf = conf
 
