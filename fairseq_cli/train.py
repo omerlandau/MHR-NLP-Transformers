@@ -279,8 +279,9 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
     for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
         conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
         conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
-        conf["encoder"][e]["self_attn"] = np.array(["encoder"][e]["self_attn"])
+        conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
 
+    print(conf["encoder"][0]["self_attn"].shape)
     print(conf["encoder"][0]["self_attn"])
 
     exit()
