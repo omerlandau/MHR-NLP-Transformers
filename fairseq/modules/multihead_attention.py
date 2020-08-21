@@ -409,14 +409,15 @@ class MultiheadAttention(nn.Module):
         attn = self.out_proj(ctx)
         attn_weights: Optional[Tensor] = None
         if calc_head_importance:
-            print("calc_head_importance is {}".format(calc_head_importance))
-        if need_weights:
-            attn_weights = attn_weights_float.view(
-                bsz, self.num_heads, tgt_len, src_len
-            ).transpose(1, 0)
-            if not need_head_weights:
-                # average attention weights over heads
-                attn_weights = attn_weights.mean(dim=0)
+            attn_weights = attn_weights_float.view(bsz, self.num_heads, tgt_len, src_len)
+        else:
+            if need_weights:
+                attn_weights = attn_weights_float.view(
+                    bsz, self.num_heads, tgt_len, src_len
+                ).transpose(1, 0)
+                if not need_head_weights:
+                    # average attention weights over heads
+                    attn_weights = attn_weights.mean(dim=0)
         return attn, attn_weights, save_ctx
 
     @staticmethod
