@@ -283,13 +283,9 @@ def batch_head_importance(attn_variables, one_minus=False):
 def batch_head_stats(attn_variables, triu_masking=False):
     # Retrieve context (shape bsz x nheads x L x dhead), mask (shape bsz x L) and weights (shape bsz x nheads x L x l)
     ctx = attn_variables["context"].detach()
-    print("Guy comment - > ctx size {}".format(ctx.size()))
-
     in_mask = attn_variables["in_mask"]
     out_mask = attn_variables["out_mask"]
     p = attn_variables["weights"].detach()
-    print("Guy comment - > p size {}".format(p.size()))
-
     logp = torch.log(p)
     device = p.device
     # Results
