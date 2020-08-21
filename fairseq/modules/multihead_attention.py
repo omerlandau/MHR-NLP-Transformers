@@ -53,6 +53,7 @@ class MultiheadAttention(nn.Module):
         self.dropout = dropout
         self.head_conf = ["monkey"]
         self.head_dim = embed_dim // num_heads
+        self.bsz = 0
         assert (
                 self.head_dim * num_heads == self.embed_dim
         ), "embed_dim must be divisible by num_heads"
@@ -148,6 +149,7 @@ class MultiheadAttention(nn.Module):
             need_weights = True
 
         tgt_len, bsz, embed_dim = query.size()
+        self.bsz = bsz
         assert embed_dim == self.embed_dim
         assert list(query.size()) == [tgt_len, bsz, embed_dim]
 
