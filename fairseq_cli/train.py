@@ -256,9 +256,9 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
                 continue
 
         for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-            conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().cpu()),[model.decoder.layers[d].self_attn.bsz]))
-            conf["decoder"][d]["enc_attn"].append(np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
-            conf["encoder"][e]["self_attn"].append(np.append(np.array(model.encoder.layers[e].self_attn.head_conf.clone().cpu(model.encoder.layers[e].self_attn.bsz)),[]))
+            conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone(requires_grad=False).cpu()),[model.decoder.layers[d].self_attn.bsz]))
+            conf["decoder"][d]["enc_attn"].append(np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone(requires_grad=False).cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
+            conf["encoder"][e]["self_attn"].append(np.append(np.array(model.encoder.layers[e].self_attn.head_conf.clone(requires_grad=False).cpu(model.encoder.layers[e].self_attn.bsz)),[]))
         #print(np.array(conf["encoder"][0]["self_attn"])[0, :-1] / (np.array(conf["encoder"][0]["self_attn"])[0, -1]))
         # log mid-epoch stats
         num_updates = trainer.get_num_updates()
