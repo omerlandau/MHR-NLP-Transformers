@@ -92,7 +92,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
 
 
-            loss += gamma_conf*l_conf_enc + l_growth_enc*gamma_conf + l_growth_dec_e*gamma*0.4
+            loss += gamma_conf*l_conf_enc + l_growth_enc*gamma_conf + l_growth_dec_e*gamma_conf*0.4
 
         logging_output = {
             'loss': loss.data,
