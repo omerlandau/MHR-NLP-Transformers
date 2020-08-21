@@ -38,10 +38,9 @@ def eval_bleu_score(
     print(len(task.target_dictionary))
     # Initialize generator
     translator = SequenceGenerator(
-        [model], task.target_dictionary, beam_size=beam, minlen=min_len,
-        stop_early=stop_early, normalize_scores=normalize_scores,
+        [model], task.target_dictionary, beam_size=beam, min_len=min_len,
+        normalize_scores=normalize_scores,
         len_penalty=lenpen,
-        sampling=False,
     )
 
     results = translate_corpus(
