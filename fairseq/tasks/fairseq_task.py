@@ -342,7 +342,6 @@ class FairseqTask(object):
 
             if(str(criterion) == "LabelSmoothedCrossEntropyCriterion()"):
                 loss, sample_size, logging_output = criterion(model, sample, gamma_conf=self.args.gamma_conf)
-
             else:
                 loss, sample_size, logging_output = criterion(model, sample)
 
