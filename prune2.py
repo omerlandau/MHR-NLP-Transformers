@@ -179,6 +179,7 @@ def main(args):
         return
 
     tot_n_heads = len(sorted_profiles)
+
     # Eval pruning
     if args.one_head:
         kept_layers = set()
