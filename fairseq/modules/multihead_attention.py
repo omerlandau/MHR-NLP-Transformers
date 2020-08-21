@@ -387,7 +387,7 @@ class MultiheadAttention(nn.Module):
 
 
         self.head_conf = conf
-        print(head_conf)
+        print(self.head_conf)
 
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
