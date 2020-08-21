@@ -101,7 +101,7 @@ class TransformerEncoderLayer(nn.Module):
                     state_dict["{}.{}.{}".format(name, new, m)] = state_dict[k]
                     del state_dict[k]
 
-    def forward(self, x, encoder_padding_mask, attn_mask: Optional[Tensor] = None):
+    def forward(self, x, encoder_padding_mask, attn_mask: Optional[Tensor] = None, calc_head_importance = False):
         """
         Args:
             x (Tensor): input to the layer of shape `(seq_len, batch, embed_dim)`
@@ -134,6 +134,7 @@ class TransformerEncoderLayer(nn.Module):
             value=x,
             key_padding_mask=encoder_padding_mask,
             attn_mask=attn_mask,
+            calc_head_importance=calc_head_importance
         )
         self.self_attn_variables["weights"] = layer_attn
         self.self_attn_variables["context"] = context
@@ -302,6 +303,7 @@ class TransformerDecoderLayer(nn.Module):
             self_attn_padding_mask: Optional[torch.Tensor] = None,
             need_attn: bool = False,
             need_head_weights: bool = False,
+            calc_head_importance=False,
     ):
         """
         Args:
@@ -364,6 +366,7 @@ class TransformerDecoderLayer(nn.Module):
             incremental_state=incremental_state,
             need_weights=False,
             attn_mask=self_attn_mask,
+            calc_head_importance=calc_head_importance,
         )
         self.self_attn_variables["weights"] = attn
         self.self_attn_variables["context"] = context
@@ -398,6 +401,7 @@ class TransformerDecoderLayer(nn.Module):
                 static_kv=True,
                 need_weights=need_attn or (not self.training and self.need_attn),
                 need_head_weights=need_head_weights,
+                calc_head_importance=calc_head_importance,
             )
 
             self.encoder_attn_variables["weights"] = attn

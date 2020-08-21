@@ -124,6 +124,7 @@ class MultiheadAttention(nn.Module):
             attn_mask: Optional[Tensor] = None,
             before_softmax: bool = False,
             need_head_weights: bool = False,
+            calc_head_importance = False,
     ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor], Optional[Tensor]]:
         """Input shape: Time x Batch x Channel
 
@@ -407,6 +408,8 @@ class MultiheadAttention(nn.Module):
             ctx = ctx.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
         attn = self.out_proj(ctx)
         attn_weights: Optional[Tensor] = None
+        if calc_head_importance:
+            print("calc_head_importance is {}".format(calc_head_importance))
         if need_weights:
             attn_weights = attn_weights_float.view(
                 bsz, self.num_heads, tgt_len, src_len

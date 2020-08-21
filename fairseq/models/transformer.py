@@ -277,7 +277,6 @@ class TransformerModel(FairseqEncoderDecoderModel):
         Copied from the base class, but without ``**kwargs``,
         which are not supported by TorchScript.
         """
-        print("Guy comment -> inside TransformerModel forward, calc_head_importance is {}".format(calc_head_importance))
         encoder_out = self.encoder(
             src_tokens, src_lengths=src_lengths, return_all_hiddens=return_all_hiddens, calc_head_importance=calc_head_importance,
         )
@@ -421,7 +420,7 @@ class TransformerEncoder(FairseqEncoder):
             # add LayerDrop (see https://arxiv.org/abs/1909.11556 for description)
             dropout_probability = torch.empty(1).uniform_()
             if not self.training or (dropout_probability > self.encoder_layerdrop):
-                x, layer_attn = layer(x, encoder_padding_mask)
+                x, layer_attn = layer(x, encoder_padding_mask,calc_head_importance)
                 self.self_attns.append(layer.self_attn_variables["weights"])
                 if return_all_hiddens:
                     assert encoder_states is not None
