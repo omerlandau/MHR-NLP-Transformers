@@ -28,6 +28,19 @@ def label_smoothed_nll_loss(lprobs, target, epsilon, ignore_index=None, reduce=T
     loss = (1. - epsilon) * nll_loss + eps_i * smooth_loss
     return loss, nll_loss
 
+def get_conf_inc_loss_self_driven(x):
+    """
+    :param x: features tensor
+    :return:
+
+    This function implements stepwise version of conf growth.
+    """
+    radius = x.detach()
+    assert radius.requires_grad == False
+    radius = radius + 0.1
+    l = ((x - radius) ** 2).mean()
+    return l
+
 
 @register_criterion('label_smoothed_cross_entropy')
 class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
@@ -62,8 +75,14 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.sentence_avg else sample['ntokens']
         if gamma_conf is not None:
+            print(len(model.encoder.layers))
             l_conf = model.encoder.layers[0].self_attn.head_conf.max() - model.encoder.layers[0].self_attn.head_conf.min()
-            loss + gamma_conf * l_conf
+            l_growth = get_conf_inc_loss_self_driven(model.encoder.layers[0].self_attn.head_conf)
+            loss += gamma_conf* l_conf + l_growth*0.3*gamma_conf
+
+            exit()
+
+
 
         logging_output = {
             'loss': loss.data,
