@@ -55,11 +55,6 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         """
         net_output = model(**sample['net_input'])
 
-        if gamma_conf is not None:
-
-            print(model.encoder.layers[0].self_attn.head_conf.max())
-
-            l_conf = model.encoder.layers[0].self_attn.head_conf.max() - model.encoder.layers[0].self_attn.head_conf.min()
 
 
 
@@ -73,7 +68,12 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             'nsentences': sample['target'].size(0),
             'sample_size': sample_size,
         }
-        return loss + gamma_conf*l_conf, sample_size, logging_output
+        if gamma_conf is not None:
+
+            l_conf = model.encoder.layers[0].self_attn.head_conf.max() - model.encoder.layers[0].self_attn.head_conf.min()
+            loss + gamma_conf * l_conf
+
+        return loss, sample_size, logging_output
 
     def compute_loss(self, model, net_output, sample, reduce=True):
         lprobs = model.get_normalized_probs(net_output, log_probs=True)
