@@ -257,7 +257,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
             conf["decoder"][d]["self_attn"].append(model.decoder.layers[d].self_attn.head_conf)
             conf["decoder"][d]["enc_attn"].append(model.decoder.layers[d].encoder_attn.head_conf)
             conf["encoder"][e]["self_attn"].append(model.encoder.layers[e].self_attn.head_conf)
-
+        print(conf["encoder"][0]["self_attn"][0, :-1] / (conf["encoder"][0]["self_attn"][0, -1]))
+        exit()
         # log mid-epoch stats
         num_updates = trainer.get_num_updates()
         if num_updates % args.log_interval == 0:
@@ -282,7 +283,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
         conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
 
     print(conf["encoder"][0]["self_attn"].shape)
-    print(conf["encoder"][0]["self_attn"])
+
 
     exit()
 
