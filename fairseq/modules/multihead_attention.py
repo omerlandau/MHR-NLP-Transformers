@@ -384,12 +384,9 @@ class MultiheadAttention(nn.Module):
                 #        conf_temp += word_attn_sum / (tgt_len - 1)
                 #    word_max["heads"].append(conf_temp)
             conf = heads
-            print(heads)
-            exit()
 
 
         self.head_conf = conf
-
 
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),

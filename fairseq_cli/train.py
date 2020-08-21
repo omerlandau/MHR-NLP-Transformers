@@ -254,6 +254,9 @@ def train(args, trainer, task, epoch_itr, model, experiment_path):
                 continue
 
         for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+            print(model.decoder.layers[d].self_attn.head_conf)
+            print(np.append(conf["decoder"][d]["self_attn"], model.decoder.layers[d].self_attn.head_conf))
+            exit()
             conf["decoder"][d]["self_attn"] = np.append(conf["decoder"][d]["self_attn"], model.decoder.layers[d].self_attn.head_conf)
             conf["decoder"][d]["enc_attn"] = np.append(conf["decoder"][d]["enc_attn"], model.decoder.layers[d].encoder_attn.head_conf)
             conf["encoder"][e]["self_attn"] = np.append(conf["encoder"][e]["self_attn"], model.encoder.layers[e].self_attn.head_conf)
