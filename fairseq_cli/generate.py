@@ -135,8 +135,9 @@ def _main(args, output_file):
     has_target = True
     wps_meter = TimeMeter()
 
-    conf = {"encoder": [{"self_attn": []} for i in range(len(models[0].encoder.layers))],
-            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(len(models[0].decoder.layers))]}
+    if args.head_confidence_method is not None:
+        conf = {"encoder": [{"self_attn": []} for i in range(len(models[0].encoder.layers))],
+                "decoder": [{"self_attn": [], "enc_attn": []} for i in range(len(models[0].decoder.layers))]}
 
     for sample in progress:
         sample = utils.move_to_cuda(sample) if use_cuda else sample
@@ -272,8 +273,8 @@ def _main(args, output_file):
             conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
-
-        with open(args.path.replace("checkpoints", "confs_eval"), 'wb') as fd:
+        os.mkdir(args.conf_eval_dir)
+        with open(args.conf_eval_dir + '//' + args.path.split('/')[-1], 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
     logger.info('NOTE: hypothesis and token scores are output in base 2')
