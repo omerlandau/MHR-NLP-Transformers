@@ -273,7 +273,7 @@ def _main(args, output_file):
             conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
-        path = f''.join(args.path.split('/')[:-1],'/').replace("checkpoint","confs_eval")
+        path = f'/'.join(args.path.split('/')[:-1]).replace("checkpoint","confs_eval")
         print(path)
 
         os.mkdir(f"{0}".format(path), 'rwx')
