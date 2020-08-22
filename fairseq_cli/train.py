@@ -289,7 +289,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
 
-        os.mkdir(args.save_dir.replace("checkpoints", "confs"),777)
+        os.mkdir(args.save_dir.replace("checkpoints", "confs"),0o775)
         with open(args.save_dir.replace("checkpoints", "confs") + "//epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
     # log end-of-epoch stats

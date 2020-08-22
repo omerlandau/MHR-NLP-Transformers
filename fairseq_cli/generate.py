@@ -275,7 +275,7 @@ def _main(args, output_file):
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
         path = f'/'.join(args.path.split('/')[:-1]).replace("checkpoints","confs_eval")
 
-        os.mkdir(path, 777)
+        os.mkdir(path, 0o775)
 
         with open(args.path.replace("checkpoints","confs_eval"), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
