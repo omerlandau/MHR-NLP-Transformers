@@ -358,6 +358,8 @@ class MultiheadAttention(nn.Module):
         conf = None
         t0 = time.time()
         if self.head_confidence_method == "base":
+
+            print("##### got into conf calc #####")
             ## computing confidence of all heads over bsz sentences
 
             ## heads is an np array of shape [head_nums+1] which contains confidence*bsz for each head and bsz:
@@ -367,6 +369,7 @@ class MultiheadAttention(nn.Module):
             #where
 
             if attn_weights is not None:
+                print("##### got into conf calc2 #####")
                 a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
                 heads = a[:, :, :, :].max(dim=3)
                 heads = heads[0].max(dim=2)
