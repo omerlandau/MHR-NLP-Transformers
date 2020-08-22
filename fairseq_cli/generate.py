@@ -273,8 +273,9 @@ def _main(args, output_file):
             conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
-        os.mkdir(''.join(args.path.split('/')[:-1]).replace("checkpoint","conf_eval"))
-        with open(args.path.replace("checkpoints","conf_eval"), 'wb') as fd:
+
+        os.mkdir(''.join(args.path.split('/')[:-1]).replace("checkpoint","confs_eval"))
+        with open(args.path.replace("checkpoints","confs_eval"), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
     logger.info('NOTE: hypothesis and token scores are output in base 2')
