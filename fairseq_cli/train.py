@@ -261,7 +261,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                 continue
         print(total_samples)
         total_samples += model.decoder.layers[0].self_attn.bsz
-        batch_regression = 1 - total_samples/160239*36 #need to find more generic way to find total samples and epoch num.
+        batch_regression = 1.0 - total_samples/160239*50 #need to find more generic way to find total samples and epoch num.
+        print(batch_regression)
         if args.head_confidence_method is not None:
             for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
                 conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
