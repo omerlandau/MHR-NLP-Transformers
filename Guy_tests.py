@@ -12,15 +12,16 @@ def plot_one_head_conf_as_function_of_epoch(experiment, num_of_epochs, module_ty
     directory = "/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/{}".format(experiment)
     for epoch in reversed(range(num_of_epochs)):
         epochs.append(epoch)
-        for filename in os.listdir(directory):
-            with open(directory + "/" + filename, 'rb') as fd:
-                epoch_data = pickle.load(fd)
-            num_of_batches_in_epoch = (epoch_data[module_type][head_layer][attn_type].shape[0])
-            confs_tmp = []
-            for batch in range(num_of_batches_in_epoch):
-                epoch_data_tmp = epoch_data[module_type][head_layer][attn_type][batch]
-                # epoch_data_denormalized = denorm_conf(epoch_data_tmp)
-                confs_tmp.append(epoch_data_tmp[head_num])
+        filename = directory + "/" + experiment + "-epoch-{}".format(epoch)
+        print("File name : {}".format(filename))
+        with open(filename, 'rb') as fd:
+            epoch_data = pickle.load(fd)
+        num_of_batches_in_epoch = (epoch_data[module_type][head_layer][attn_type].shape[0])
+        confs_tmp = []
+        for batch in range(num_of_batches_in_epoch):
+            epoch_data_tmp = epoch_data[module_type][head_layer][attn_type][batch]
+            # epoch_data_denormalized = denorm_conf(epoch_data_tmp)
+            confs_tmp.append(epoch_data_tmp[head_num])
         confs.append(sum(confs_tmp) / len(confs_tmp))
     print(confs)
 
