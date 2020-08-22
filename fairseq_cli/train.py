@@ -250,9 +250,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
     conf = {"encoder": [{"self_attn":[]} for i in range(args.encoder_layers)],
             "decoder": [{"self_attn": [], "enc_attn":[]} for i in range(args.decoder_layers)]}
 
-    batch_regression = 1
-
-
+    batch_regression = 1.0  - (total_samples/(160239*40))
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
@@ -260,8 +258,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             if log_output is None:  # OOM, overflow, ...
                 continue
         total_samples += model.decoder.layers[0].self_attn.bsz
-        batch_regression = 1.0 - (total_samples/(160239*50)) #need to find more generic way to find total samples and epoch num.
-        print(batch_regression)
+        batch_regression = 1.0 - (total_samples/(160239*40)) #need to find more generic way to find total samples and epoch num.
         if args.head_confidence_method is not None:
             for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
                 conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
