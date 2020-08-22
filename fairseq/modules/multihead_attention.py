@@ -52,6 +52,7 @@ class MultiheadAttention(nn.Module):
         self.num_heads = num_heads
         self.dropout = dropout
         self.head_conf = ["monkey"]
+        self.head_loss_conf = ["monkey"]
         self.head_dim = embed_dim // num_heads
         self.bsz = 0
         assert (
@@ -356,16 +357,15 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
         conf = None
-        t0 = time.time()
-        if self.head_confidence_method == "base":
 
-            ## computing confidence of all heads over bsz sentences
+        ## computing confidence of all heads over bsz sentences
 
-            ## heads is an np array of shape [head_nums+1] which contains confidence*bsz for each head and bsz:
-            ## [conf_h_1*bsz,conf_h_2*bsz,...,conf_h_n*bsz,bsz]
-            # Viota's confidence is based on:
-            # Word attn confidence is an upgraded more delicate version of conf,
-            #where
+        ## heads is an np array of shape [head_nums+1] which contains confidence*bsz for each head and bsz:
+        ## [conf_h_1*bsz,conf_h_2*bsz,...,conf_h_n*bsz,bsz]
+        # Viota's confidence is based on:
+        # Word attn confidence is an upgraded more delicate version of conf,
+        #where
+        if self.head_confidence_method is not None:
 
             if attn_weights is not None:
                 if(self.head_confidence_method == "base"):
@@ -378,6 +378,9 @@ class MultiheadAttention(nn.Module):
                     heads = a[:, :, :, :].max(dim=2)
                     heads = heads[0].sum(dim=2)/tgt_len
                     heads = heads.sum(dim=1)/bsz
+
+
+
 
 
 

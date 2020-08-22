@@ -66,6 +66,9 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         2) the sample size, which is used as the denominator for the gradient
         3) logging outputs to display while training
         """
+
+        print(batch_num)
+
         net_output = model(**sample['net_input'])
 
 
@@ -75,6 +78,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.sentence_avg else sample['ntokens']
         if gamma_conf is not None and (batch_num<0.6):
+
             l_conf_enc = 0
             l_conf_dec = 0
             l_growth_enc = 0
@@ -85,9 +89,9 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                 l_conf_enc += model.encoder.layers[i].self_attn.head_conf.max() - model.encoder.layers[i].self_attn.head_conf.min()
                 l_growth_enc += get_conf_inc_loss_self_driven(model.encoder.layers[i].self_attn.head_conf)
             for i in range(len(model.decoder.layers)):
-                #l_conf_dec += model.decoder.layers[i].self_attn.head_conf.max() - model.decoder.layers[i].self_attn.head_conf.min()
-                #l_growth_dec += get_conf_inc_loss_self_driven(model.decoder.layers[i].self_attn.head_conf)
-                #l_conf_dec_e += model.decoder.layers[i].encoder_attn.head_conf.max() - model.decoder.layers[i].encoder_attn.head_conf.min()
+                l_conf_dec += model.decoder.layers[i].self_attn.head_conf.max() - model.decoder.layers[i].self_attn.head_conf.min()
+                l_growth_dec += get_conf_inc_loss_self_driven(model.decoder.layers[i].self_attn.head_conf)
+                l_conf_dec_e += model.decoder.layers[i].encoder_attn.head_conf.max() - model.decoder.layers[i].encoder_attn.head_conf.min()
                 l_growth_dec_e += get_conf_inc_loss_self_driven(model.decoder.layers[i].encoder_attn.head_conf)
 
 
