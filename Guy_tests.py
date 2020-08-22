@@ -13,7 +13,7 @@ def plot_one_head_conf_as_function_of_epoch(experiment, num_of_epochs, module_ty
     for epoch in reversed(range(num_of_epochs)):
         epochs.append(epoch)
         for filename in os.listdir(directory):
-            with open(filename, 'rb') as fd:
+            with open(directory + "/" + filename, 'rb') as fd:
                 epoch_data = pickle.load(fd)
             num_of_batches_in_epoch = (epoch_data[module_type][head_layer][attn_type].shape[0])
             confs_tmp = []
