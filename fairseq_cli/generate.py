@@ -135,8 +135,8 @@ def _main(args, output_file):
     has_target = True
     wps_meter = TimeMeter()
 
-    conf = {"encoder": [{"self_attn": []} for i in range(len(models[0].encoder))],
-            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(len(models[0].decoder))]}
+    conf = {"encoder": [{"self_attn": []} for i in range(len(models[0].encoder.layers))],
+            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(len(models[0].decoder.layers))]}
 
     for sample in progress:
         sample = utils.move_to_cuda(sample) if use_cuda else sample
@@ -151,10 +151,10 @@ def _main(args, output_file):
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
 
         if args.head_confidence_method is not None:
-            for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-                conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
-                conf["decoder"][d]["enc_attn"].append(np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
-                conf["encoder"][e]["self_attn"].append(np.append(np.array(model.encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[model.encoder.layers[e].self_attn.bsz]))
+            for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
+                conf["decoder"][d]["self_attn"].append(np.append(np.array(models[0].decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
+                conf["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
+                conf["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[model.encoder.layers[e].self_attn.bsz]))
 
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
@@ -268,7 +268,7 @@ def _main(args, output_file):
 
 
     if args.head_confidence_method is not None:
-        for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+        for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
             conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
