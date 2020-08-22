@@ -289,9 +289,11 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
 
-        path = args.save_dir.replace("checkpoints", "confs")
-        if not os.path.isdir(path):
+        path = args.save_dir.replace("checkpoints", "confs") + "-method={0}".format(args.head_confidence_method)
+        try:
             os.mkdir(path,0o775)
+        except:
+            pass
         with open(args.save_dir.replace("checkpoints", "confs") + "//epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
     # log end-of-epoch stats
