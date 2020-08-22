@@ -276,7 +276,7 @@ def _main(args, output_file):
         path = f'/'.join(args.path.split('/')[:-1]).replace("checkpoint","confs_eval")
         print(path)
 
-        os.mkdir(f"{0}".format(path), 777)
+        os.mkdir(path+'//', 777)
         with open(args.path.replace("checkpoints","confs_eval"), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
