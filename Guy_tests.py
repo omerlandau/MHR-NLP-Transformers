@@ -1,6 +1,6 @@
 import os
 import pickle
-
+import matplotlib.pyplot as plt
 
 def denorm_conf(epoch_data_to_denorm, number_of_heads):
     return [epoch_data_to_denorm[i] * epoch_data_to_denorm[number_of_heads] for i in range(number_of_heads)]
@@ -24,6 +24,10 @@ def plot_one_head_conf_as_function_of_epoch(experiment, num_of_epochs, module_ty
             confs_tmp.append(epoch_data_tmp[head_num])
         confs.append(sum(confs_tmp) / len(confs_tmp))
     print(confs)
+    plt.title("{} - {} Head {} Layer {} - Conf Along Training".format(module_type, attn_type, head_num, head_layer))
+    plt.xlabel("Epoch")
+    plt.ylabel("Confidence")
+    plt.plot(epochs, confs)
 
 
 plot_one_head_conf_as_function_of_epoch(
