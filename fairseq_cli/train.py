@@ -282,19 +282,15 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
         if should_stop:
             break
+    if args.head_confidence_method is not None:
+        for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+            conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
+            conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
+            conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
 
-    for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-        conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
-        conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
-        conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
-
-    print(conf["encoder"][0]["self_attn"])
-
-
-    #exit()
-
-    with open(args.save_dir.replace("checkpoints", "confs") + "-epoch-{0}".format(epoch_itr.epoch), 'wb') as fd:
-        pickle.dump(conf, fd, protocol=3)
+        print(conf["encoder"][0]["self_attn"])
+        with open(args.save_dir.replace("checkpoints", "confs") + "-epoch-{0}".format(epoch_itr.epoch), 'wb') as fd:
+            pickle.dump(conf, fd, protocol=3)
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
     progress.print(stats, tag="train", step=num_updates)
