@@ -134,6 +134,10 @@ def _main(args, output_file):
     num_sentences = 0
     has_target = True
     wps_meter = TimeMeter()
+
+    conf = {"encoder": [{"self_attn": []} for i in range(args.encoder_layers)],
+            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
+
     for sample in progress:
         sample = utils.move_to_cuda(sample) if use_cuda else sample
         if 'net_input' not in sample:
@@ -145,6 +149,13 @@ def _main(args, output_file):
 
         gen_timer.start()
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
+
+        if args.head_confidence_method is not None:
+            for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+                conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
+                conf["decoder"][d]["enc_attn"].append(np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
+                conf["encoder"][e]["self_attn"].append(np.append(np.array(model.encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[model.encoder.layers[e].self_attn.bsz]))
+
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
@@ -255,6 +266,15 @@ def _main(args, output_file):
         progress.log({'wps': round(wps_meter.avg)})
         num_sentences += sample['nsentences']
 
+
+    if args.head_confidence_method is not None:
+        for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+            conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
+            conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
+            conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
+
+        with open(args.path.replace("checkpoints", "confs_eval"), 'wb') as fd:
+            pickle.dump(conf, fd, protocol=3)
 
     logger.info('NOTE: hypothesis and token scores are output in base 2')
     logger.info('Translated {} sentences ({} tokens) in {:.1f}s ({:.2f} sentences/s, {:.2f} tokens/s)'.format(

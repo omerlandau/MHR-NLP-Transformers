@@ -33,6 +33,7 @@ from fairseq.model_parallel.megatron_trainer import MegatronTrainer
 from fairseq.trainer import Trainer
 import json
 import pickle
+import os
 
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
@@ -288,8 +289,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
 
-        print(conf["encoder"][0]["self_attn"])
-        with open(args.save_dir.replace("checkpoints", "confs") + "-epoch-{0}".format(epoch_itr.epoch), 'wb') as fd:
+        os.mkdir(args.save_dir.replace("checkpoints", "confs"))
+        with open(args.save_dir.replace("checkpoints", "confs") + "//epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
