@@ -39,7 +39,7 @@ def get_conf_inc_loss_self_driven(x):
     assert radius.requires_grad == False
     radius = radius + 0.1
     l = ((x - radius) ** 2).mean()
-    return l
+    return -l
 
 
 @register_criterion('label_smoothed_cross_entropy')
