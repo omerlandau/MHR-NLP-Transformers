@@ -52,7 +52,6 @@ class MultiheadAttention(nn.Module):
         self.num_heads = num_heads
         self.dropout = dropout
         self.head_conf = ["monkey"]
-        self.head_loss_conf = ["monkey"]
         self.head_dim = embed_dim // num_heads
         self.bsz = 0
         assert (
