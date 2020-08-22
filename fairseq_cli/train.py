@@ -235,10 +235,10 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
     num_heads = args.decoder_attention_heads
     head_dim = args.decoder_embed_dim // num_heads
-    with open(experiment_path, 'r') as f:
-        swaps = json.load(f)
-
-    mhr(model, swaps, head_dim, num_heads, epoch_itr.epoch)
+    if experiment_path is not None:
+        with open(experiment_path, 'r') as f:
+            swaps = json.load(f)
+        mhr(model, swaps, head_dim, num_heads, epoch_itr.epoch)
 
     trainer.begin_epoch(epoch_itr.epoch)
 
