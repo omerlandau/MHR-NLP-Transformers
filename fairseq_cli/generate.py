@@ -273,10 +273,10 @@ def _main(args, output_file):
             conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
-        path = f'/'.join(args.path.split('/')[:-1]).replace("checkpoint","confs_eval")
-        print(path)
+        path = f'/'.join(args.path.split('/')[:-1]).replace("checkpoints","confs_eval")
 
-        os.mkdir(path+'//', 777)
+        os.mkdir(path, 0755)
+
         with open(args.path.replace("checkpoints","confs_eval"), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
