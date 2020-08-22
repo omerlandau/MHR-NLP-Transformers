@@ -251,7 +251,6 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
     batch_regression = 1
 
-    print(total_samples)
 
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
@@ -259,6 +258,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
             if log_output is None:  # OOM, overflow, ...
                 continue
+        print(total_samples)
         total_samples += model.decoder.layers[0].self_attn.bsz
         batch_regression = 1 - total_samples/160239*36 #need to find more generic way to find total samples and epoch num.
         if args.head_confidence_method is not None:
