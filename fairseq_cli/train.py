@@ -147,6 +147,7 @@ def main(
         # train for one epoch
         valid_losses, should_stop, total_samples_temp = train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=total_samples)
         total_samples = total_samples_temp
+        print("in epoch ########## {0}".format(total_samples))
         ####### for try ########
         # with open("/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-2-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
         #    pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
