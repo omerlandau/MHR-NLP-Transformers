@@ -125,7 +125,7 @@ class MultiheadAttention(nn.Module):
             attn_mask: Optional[Tensor] = None,
             before_softmax: bool = False,
             need_head_weights: bool = False,
-            calc_head_importance = False,
+            calc_head_importance = False
     ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor], Optional[Tensor]]:
         """Input shape: Time x Batch x Channel
 
@@ -357,6 +357,7 @@ class MultiheadAttention(nn.Module):
         attn_weights = attn_weights_float.type_as(attn_weights)
         conf = None
 
+
         ## computing confidence of all heads over bsz sentences
 
         ## heads is an np array of shape [head_nums+1] which contains confidence*bsz for each head and bsz:
@@ -367,8 +368,7 @@ class MultiheadAttention(nn.Module):
         if self.head_confidence_method is not None:
 
             if attn_weights is not None:
-                if(self.head_confidence_method == "base"):
-                    print("hello")
+                if(self.head_confidence_method == "base1"):
                     a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
