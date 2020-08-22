@@ -154,11 +154,10 @@ def _main(args, output_file):
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
 
         if args.head_confidence_method is not None:
-            print(models[0])
             for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
-                conf["decoder"][d]["self_attn"].append(np.append(np.array(models[0].decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
-                conf["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
-                conf["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[model.encoder.layers[e].self_attn.bsz]))
+                conf["decoder"][d]["self_attn"].append(np.append(np.array(models[0].decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[models[0].decoder.layers[d].self_attn.bsz]))
+                conf["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [models[0].decoder.layers[d].encoder_attn.bsz]))
+                conf["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[models[0].encoder.layers[e].self_attn.bsz]))
 
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
