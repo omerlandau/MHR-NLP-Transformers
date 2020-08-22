@@ -124,10 +124,13 @@ def plot_heat_map_of_all_epochs(num_of_epochs, epochs_dir, number_of_layers, num
     sns.heatmap(epoch_grid, ax=ax, cmap="Blues")
     ax.set_xlabel("heads")
     ax.set_ylabel("layers")
-    ax.set_title('{} - {}'.format(module_type, attn_type))
-    plt.show()
+    title = '{} - {}'.format(module_type, attn_type)
+    ax.set_title(title)
+    plt.savefig("output_dir/{}.png".format(title))
+
 
 
 epoch_dir = "/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l_with_conf_work_monkey_gamma_20_enc_g_mm_dec_e_g_start_late_40p_nd_decay"
 plot_heat_map_of_all_epochs(36, epoch_dir, 6, 8, "encoder", "self_attn",
                             "exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l_with_conf_work_monkey_gamma_20_enc_g_mm_dec_e_g_start_late_40p_nd_decay")
+output_dir = "/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/Plots"
