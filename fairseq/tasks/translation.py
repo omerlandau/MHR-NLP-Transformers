@@ -207,6 +207,9 @@ class TranslationTask(FairseqTask):
         parser.add_argument('--head-confidence-method', type=str, default=None, help="overall_max or mean_word_max")
         parser.add_argument('--gamma-conf', type=float, default=None, help="gamma for conf loss")
 
+        parser.add_argument('--conf-eval-dir', type=str, default=None, help="path for saving conf eval")
+
+
         # fmt: on
 
     def __init__(self, args, src_dict, tgt_dict):
