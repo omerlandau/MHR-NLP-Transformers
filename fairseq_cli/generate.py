@@ -282,7 +282,7 @@ def _main(args, output_file):
             pass
 
 
-        with open(args.path.replace("checkpoints","confs_eval").replace(".pt","-{0}.pkl".format(args.head_confidence_method), 'wb') as fd:
+        with open(args.path.replace("checkpoints","confs_eval").replace(".pt","-{0}.pkl".format(args.head_confidence_method)), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
     logger.info('NOTE: hypothesis and token scores are output in base 2')
