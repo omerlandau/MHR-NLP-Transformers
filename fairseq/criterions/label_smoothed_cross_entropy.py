@@ -67,7 +67,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         3) logging outputs to display while training
         """
 
-        print(batch_num)
+        #print(batch_num)
 
         net_output = model(**sample['net_input'])
 
