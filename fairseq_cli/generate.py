@@ -135,8 +135,8 @@ def _main(args, output_file):
     has_target = True
     wps_meter = TimeMeter()
 
-    conf = {"encoder": [{"self_attn": []} for i in range(args.encoder_layers)],
-            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
+    conf = {"encoder": [{"self_attn": []} for i in range(len(models[0].encoder))],
+            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(len(models[0].decoder))]}
 
     for sample in progress:
         sample = utils.move_to_cuda(sample) if use_cuda else sample
