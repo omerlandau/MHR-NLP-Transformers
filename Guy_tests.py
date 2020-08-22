@@ -10,7 +10,7 @@ def plot_one_head_conf_as_function_of_epoch(experiment, num_of_epochs, module_ty
     confs = []
     epochs = []
     directory = "/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/{}".format(experiment)
-    for epoch in reversed(range(num_of_epochs)):
+    for epoch in reversed(range(1, num_of_epochs+1)):
         epochs.append(epoch)
         filename = directory + "/" + experiment + "-epoch-{}".format(epoch)
         print("File name : {}".format(filename))
