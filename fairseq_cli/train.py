@@ -258,10 +258,11 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                 continue
         total_samples += model.decoder.layers[0].self_attn.bsz
         batch_regression = 1 - total_samples/160239*36 #need to find more generic way to find total samples and epoch num.
-        for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-            conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
-            conf["decoder"][d]["enc_attn"].append(np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
-            conf["encoder"][e]["self_attn"].append(np.append(np.array(model.encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[model.encoder.layers[e].self_attn.bsz]))
+        if args.head_confidence_method is not None:
+            for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+                conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
+                conf["decoder"][d]["enc_attn"].append(np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
+                conf["encoder"][e]["self_attn"].append(np.append(np.array(model.encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[model.encoder.layers[e].self_attn.bsz]))
 
         #print(np.array(conf["encoder"][0]["self_attn"])[0, :-1] / (np.array(conf["encoder"][0]["self_attn"])[0, -1]))
         # log mid-epoch stats
