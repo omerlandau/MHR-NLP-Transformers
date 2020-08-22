@@ -1,118 +1,129 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# Copyright (c) Facebook, Inc. and its affiliates.
+# All rights reserved.
 #
-# Adapted from https://github.com/facebookresearch/MIXER/blob/master/prepareData.sh
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
 
-echo 'Cloning Moses github repository (for tokenization scripts)...'
-git clone https://github.com/moses-smt/mosesdecoder.git
+SRCS=(
+    "fr"
+)
+TGT=en
 
-echo 'Cloning Subword NMT repository (for BPE pre-processing)...'
-git clone https://github.com/rsennrich/subword-nmt.git
+ROOT=$(dirname "$0")
+SCRIPTS=$ROOT/../../scripts
+SPM_TRAIN=$SCRIPTS/spm_train.py
+SPM_ENCODE=$SCRIPTS/spm_encode.py
 
-SCRIPTS=mosesdecoder/scripts
-TOKENIZER=$SCRIPTS/tokenizer/tokenizer.perl
-LC=$SCRIPTS/tokenizer/lowercase.perl
-CLEAN=$SCRIPTS/training/clean-corpus-n.perl
-BPEROOT=subword-nmt/subword_nmt
-BPE_TOKENS=10000
+BPESIZE=16384
+ORIG=$ROOT/iwslt17_orig
+DATA=$ROOT/iwslt17.fr.en.bpe16k
+mkdir -p "$ORIG" "$DATA"
 
-URL="https://wit3.fbk.eu/archive/2017-01-trnted/texts/de/en/de-en.tgz"
-GZ=de-en.tgz
+TRAIN_MINLEN=1  # remove sentences with <1 BPE token
+TRAIN_MAXLEN=250  # remove sentences with >250 BPE tokens
 
-if [ ! -d "$SCRIPTS" ]; then
-    echo "Please set SCRIPTS variable correctly to point to Moses scripts."
-    exit
-fi
+URLS=(
+    "https://wit3.fbk.eu/archive/2017-01-trnted/texts/fr/en/fr-en.tgz"
+)
+ARCHIVES=(
+    "fr-en.tgz"
+)
+VALID_SETS=(
+    "IWSLT17.TED.dev2010.fr-en IWSLT17.TED.tst2010.fr-en IWSLT17.TED.tst2011.fr-en IWSLT17.TED.tst2012.fr-en IWSLT17.TED.tst2013.fr-en IWSLT17.TED.tst2014.fr-en IWSLT17.TED.tst2015.fr-en"
+)
 
-src=de
-tgt=en
-lang=de-en
-prep=iwslt17.tokenized.de-en
-tmp=$prep/tmp
-orig=orig
-
-mkdir -p $orig $tmp $prep
-
-echo "Downloading data from ${URL}..."
-cd $orig
-wget "$URL"
-
-if [ -f $GZ ]; then
-    echo "Data successfully downloaded."
-else
-    echo "Data not successfully downloaded."
-    exit
-fi
-
-tar zxvf $GZ
-cd ..
+# download and extract data
+for ((i=0;i<${#URLS[@]};++i)); do
+    ARCHIVE=$ORIG/${ARCHIVES[i]}
+    if [ -f "$ARCHIVE" ]; then
+        echo "$ARCHIVE already exists, skipping download"
+    else
+        URL=${URLS[i]}
+        wget -P "$ORIG" "$URL"
+        if [ -f "$ARCHIVE" ]; then
+            echo "$URL successfully downloaded."
+        else
+            echo "$URL not successfully downloaded."
+            exit 1
+        fi
+    fi
+    FILE=${ARCHIVE: -4}
+    if [ -e "$FILE" ]; then
+        echo "$FILE already exists, skipping extraction"
+    else
+        tar -C "$ORIG" -xzvf "$ARCHIVE"
+    fi
+done
 
 echo "pre-processing train data..."
-for l in $src $tgt; do
-    f=train.tags.$lang.$l
-    tok=train.tags.$lang.tok.$l
-
-    cat $orig/$lang/$f | \
-    grep -v '<url>' | \
-    grep -v '<talkid>' | \
-    grep -v '<keywords>' | \
-    sed -e 's/<title>//g' | \
-    sed -e 's/<\/title>//g' | \
-    sed -e 's/<description>//g' | \
-    sed -e 's/<\/description>//g' | \
-    perl $TOKENIZER -threads 8 -l $l > $tmp/$tok
-    echo ""
-done
-perl $CLEAN -ratio 1.5 $tmp/train.tags.$lang.tok $src $tgt $tmp/train.tags.$lang.clean 1 175
-for l in $src $tgt; do
-    perl $LC < $tmp/train.tags.$lang.clean.$l > $tmp/train.tags.$lang.$l
-done
-
-echo "pre-processing valid/test data..."
-for l in $src $tgt; do
-    for o in `ls $orig/$lang/IWSLT17.TED*.$l.xml`; do
-    fname=${o##*/}
-    f=$tmp/${fname%.*}
-    echo $o $f
-    grep '<seg id' $o | \
-        sed -e 's/<seg id="[0-9]*">\s*//g' | \
-        sed -e 's/\s*<\/seg>\s*//g' | \
-        sed -e "s/\’/\'/g" | \
-    perl $TOKENIZER -threads 8 -l $l | \
-    perl $LC > $f
-    echo ""
+for SRC in "${SRCS[@]}"; do
+    for LANG in "${SRC}" "${TGT}"; do
+        cat "$ORIG/${SRC}-${TGT}/train.tags.${SRC}-${TGT}.${LANG}" \
+            | grep -v '<url>' \
+            | grep -v '<talkid>' \
+            | grep -v '<keywords>' \
+            | grep -v '<speaker>' \
+            | grep -v '<reviewer' \
+            | grep -v '<translator' \
+            | grep -v '<doc' \
+            | grep -v '</doc>' \
+            | sed -e 's/<title>//g' \
+            | sed -e 's/<\/title>//g' \
+            | sed -e 's/<description>//g' \
+            | sed -e 's/<\/description>//g' \
+            | sed 's/^\s*//g' \
+            | sed 's/\s*$//g' \
+            > "$DATA/train.${SRC}-${TGT}.${LANG}"
     done
 done
 
-
-echo "creating train, valid, test..."
-for l in $src $tgt; do
-    awk '{if (NR%23 == 0)  print $0; }' $tmp/train.tags.de-en.$l > $tmp/valid.$l
-    awk '{if (NR%23 != 0)  print $0; }' $tmp/train.tags.de-en.$l > $tmp/train.$l
-
-
-    cat $tmp/IWSLT17.TED.dev2010.de-en.$l \
-        $tmp/IWSLT17.TED.tst2010.de-en.$l \
-        $tmp/IIWSLT17.TED.tst2011.de-en.$l \
-        $tmp/IWSLT17.TED.tst2012.de-en.$l \
-        $tmp/IWSLT17.TED.tst2013.de-en.$l \
-        $tmp/IWSLT17.TED.tst2014.de-en.$l \
-        $tmp/IWSLT17.TED.tst2015.de-en.$l \
-        > $tmp/test.$l
+echo "pre-processing valid data..."
+for ((i=0;i<${#SRCS[@]};++i)); do
+    SRC=${SRCS[i]}
+    VALID_SET=(${VALID_SETS[i]})
+    for ((j=0;j<${#VALID_SET[@]};++j)); do
+        FILE=${VALID_SET[j]}
+        for LANG in "$SRC" "$TGT"; do
+            grep '<seg id' "$ORIG/${SRC}-${TGT}/${FILE}.${LANG}.xml" \
+                | sed -e 's/<seg id="[0-9]*">\s*//g' \
+                | sed -e 's/\s*<\/seg>\s*//g' \
+                | sed -e "s/\’/\'/g" \
+                > "$DATA/valid${j}.${SRC}-${TGT}.${LANG}"
+        done
+    done
 done
 
-TRAIN=$tmp/train.en-de
-BPE_CODE=$prep/code
-rm -f $TRAIN
-for l in $src $tgt; do
-    cat $tmp/train.$l >> $TRAIN
+# learn BPE with sentencepiece
+TRAIN_FILES=$(for SRC in "${SRCS[@]}"; do echo $DATA/train.${SRC}-${TGT}.${SRC}; echo $DATA/train.${SRC}-${TGT}.${TGT}; done | tr "\n" ",")
+echo "learning joint BPE over ${TRAIN_FILES}..."
+python "$SPM_TRAIN" \
+    --input=$TRAIN_FILES \
+    --model_prefix=$DATA/sentencepiece.bpe \
+    --vocab_size=$BPESIZE \
+    --character_coverage=1.0 \
+    --model_type=bpe
+
+# encode train/valid
+echo "encoding train with learned BPE..."
+for SRC in "${SRCS[@]}"; do
+    python "$SPM_ENCODE" \
+        --model "$DATA/sentencepiece.bpe.model" \
+        --output_format=piece \
+        --inputs $DATA/train.${SRC}-${TGT}.${SRC} $DATA/train.${SRC}-${TGT}.${TGT} \
+        --outputs $DATA/train.bpe.${SRC}-${TGT}.${SRC} $DATA/train.bpe.${SRC}-${TGT}.${TGT} \
+        --min-len $TRAIN_MINLEN --max-len $TRAIN_MAXLEN
 done
 
-echo "learn_bpe.py on ${TRAIN}..."
-python $BPEROOT/learn_bpe.py -s $BPE_TOKENS < $TRAIN > $BPE_CODE
-
-for L in $src $tgt; do
-    for f in train.$L valid.$L test.$L; do
-        echo "apply_bpe.py to ${f}..."
-        python $BPEROOT/apply_bpe.py -c $BPE_CODE < $tmp/$f > $prep/$f
+echo "encoding valid with learned BPE..."
+for ((i=0;i<${#SRCS[@]};++i)); do
+    SRC=${SRCS[i]}
+    VALID_SET=(${VALID_SETS[i]})
+    for ((j=0;j<${#VALID_SET[@]};++j)); do
+        python "$SPM_ENCODE" \
+            --model "$DATA/sentencepiece.bpe.model" \
+            --output_format=piece \
+            --inputs $DATA/valid${j}.${SRC}-${TGT}.${SRC} $DATA/valid${j}.${SRC}-${TGT}.${TGT} \
+            --outputs $DATA/valid${j}.bpe.${SRC}-${TGT}.${SRC} $DATA/valid${j}.bpe.${SRC}-${TGT}.${TGT}
     done
 done
