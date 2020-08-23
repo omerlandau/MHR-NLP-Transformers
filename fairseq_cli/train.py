@@ -514,16 +514,6 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
     print(num_heads)
     for s_key, d_key in zip(src_parameters.keys(), dst_parameters.keys()):
         with torch.no_grad():
-            # one source parameter(holds all heads)
-            # print("######## before #########")
-            # print(d_key)
-            # print(model.state_dict()[d_key][0:3,0:4])
-            # print(model.state_dict()[d_key][0:3, 128:132])
-            # print(model.state_dict()[d_key].size())
-            # print(s_key)
-            # print(model.state_dict()[s_key][0:3,0:4])
-            # print(model.state_dict()[s_key][0:3, 128:132])
-            # print(model.state_dict()[s_key].size())
 
             ms = model.state_dict()
 
@@ -559,15 +549,6 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
                 del dst_parameter
                 torch.cuda.empty_cache()
 
-                # print("######## after ########")
-                # print(d_key)
-                # print(model.state_dict()[d_key][0:3, 0:4])
-                # print(model.state_dict()[d_key][0:3, 128:132])
-                # print(model.state_dict()[d_key].size())
-                # print(s_key)
-                # print(model.state_dict()[s_key][0:3, 0:4])
-                # print(model.state_dict()[s_key][0:3, 128:132])
-                # print(model.state_dict()[s_key].size())
 
     print(
         "Done swapping parameters for creation of head {} in layer {} and head {} in layer {}".format(src_head,
