@@ -641,9 +641,6 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
     if(current_epoch-last_epoch_used == (frequency+1) or (start_epoch == current_epoch)):
 
-        print("######## DUCKswap ########")
-
-
         if not local_only:
             if type == "Hard":
                 conf_arg_sort = conf.flatten().argsort().astype(int)
@@ -664,14 +661,12 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
                 mhr(model, swaps, head_dim, num_heads, current_epoch)
 
-                print(swaps)
-
                 return swaps, current_epoch
 
-            if type == "soft":
+            if type == "Soft":
                 return swaps, current_epoch
 
-            if type == "random":
+            if type == "Random":
                 return swaps, current_epoch
 
 def convert_confs(conf, args):
