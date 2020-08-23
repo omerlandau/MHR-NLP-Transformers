@@ -6,6 +6,7 @@
 # LICENSE file in the root directory of this source tree.
 
 SRCS=(
+    "de"
     "fr"
 )
 TGT=en
@@ -17,19 +18,22 @@ SPM_ENCODE=$SCRIPTS/spm_encode.py
 
 BPESIZE=16384
 ORIG=$ROOT/iwslt17_orig
-DATA=$ROOT/iwslt17.fr.en.bpe16k
+DATA=$ROOT/iwslt17.de_fr.en.bpe16k
 mkdir -p "$ORIG" "$DATA"
 
 TRAIN_MINLEN=1  # remove sentences with <1 BPE token
 TRAIN_MAXLEN=250  # remove sentences with >250 BPE tokens
 
 URLS=(
+    "https://wit3.fbk.eu/archive/2017-01-trnted/texts/de/en/de-en.tgz"
     "https://wit3.fbk.eu/archive/2017-01-trnted/texts/fr/en/fr-en.tgz"
 )
 ARCHIVES=(
+    "de-en.tgz"
     "fr-en.tgz"
 )
 VALID_SETS=(
+    "IWSLT17.TED.dev2010.de-en IWSLT17.TED.tst2010.de-en IWSLT17.TED.tst2011.de-en IWSLT17.TED.tst2012.de-en IWSLT17.TED.tst2013.de-en IWSLT17.TED.tst2014.de-en IWSLT17.TED.tst2015.de-en"
     "IWSLT17.TED.dev2010.fr-en IWSLT17.TED.tst2010.fr-en IWSLT17.TED.tst2011.fr-en IWSLT17.TED.tst2012.fr-en IWSLT17.TED.tst2013.fr-en IWSLT17.TED.tst2014.fr-en IWSLT17.TED.tst2015.fr-en"
 )
 
@@ -123,7 +127,7 @@ for ((i=0;i<${#SRCS[@]};++i)); do
         python "$SPM_ENCODE" \
             --model "$DATA/sentencepiece.bpe.model" \
             --output_format=piece \
-            --inputs $DATA/valid.${SRC}-${TGT}.${SRC} $DATA/valid.${SRC}-${TGT}.${TGT} \
-            --outputs $DATA/valid.bpe.${SRC}-${TGT}.${SRC} $DATA/valid.bpe.${SRC}-${TGT}.${TGT}
+            --inputs $DATA/valid${j}.${SRC}-${TGT}.${SRC} $DATA/valid${j}.${SRC}-${TGT}.${TGT} \
+            --outputs $DATA/valid${j}.bpe.${SRC}-${TGT}.${SRC} $DATA/valid${j}.bpe.${SRC}-${TGT}.${TGT}
     done
 done
