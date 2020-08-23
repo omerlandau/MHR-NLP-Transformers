@@ -208,7 +208,7 @@ class TranslationTask(FairseqTask):
         parser.add_argument('--gamma-conf', type=float, default=None, help="gamma for conf loss")
         parser.add_argument('--dynamic-swap-frequency', type=float, default=None, help="frequency for swapping")
         parser.add_argument('--start-dynamic-mhr', type=float, default=None, help="epoch to start dynamic MHR")
-        parser.add_argument('--dynamic-max-switches', type=float, default=None, help="max head to be switched")
+        parser.add_argument('--dynamic-max-switches', type=int, default=None, help="max head to be switched")
         parser.add_argument('--dynamic-type', type=str, default=None, help="type of automatic swapping")
 
 
