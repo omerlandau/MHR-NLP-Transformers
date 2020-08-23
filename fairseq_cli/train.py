@@ -296,10 +296,11 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         with open(args.save_dir.replace("checkpoints", "confs")+ "-method={0}".format(args.head_confidence_method) + "/epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
-    restore, last_epoch_num = dynamic_mhr(model, args.start_dynamic_mhr, "encoder", "self_attn",
-                                          restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch +1,
-                                          args.dynamic_max_switches, val_conf[0], num_heads, head_dim,
-                                          args.encoder_layers,local_only=False, type=args.dynamic_type, rest=args.dynamic_rest)
+    if args.dynamic_type is not None:
+        restore, last_epoch_num = dynamic_mhr(model, args.start_dynamic_mhr, "encoder", "self_attn",
+                                              restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch +1,
+                                              args.dynamic_max_switches, val_conf[0], num_heads, head_dim,
+                                              args.encoder_layers,local_only=False, type=args.dynamic_type, rest=args.dynamic_rest)
 
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
@@ -613,13 +614,11 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 current_epoch, max_switches, conf ,num_heads, head_dim, num_layers,local_only=False, type="Hard", rest=1):
 
 
-
-
     if(max_switches>(num_heads*num_layers - max_switches)):
 
         raise NameError("must have an even number of swaps")
 
-    if start_epoch < current_epoch:
+    if start_epoch > current_epoch:
 
         return None, 0
 
