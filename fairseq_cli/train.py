@@ -320,6 +320,9 @@ def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoc
     # Validate
     valid_losses = [None]
     if do_validate:
+
+        print("#############loser###############")
+        exit()
         valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
 
     # Stopping conditions
