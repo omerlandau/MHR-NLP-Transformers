@@ -617,6 +617,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
     print("######## DUCK ########")
 
+    print(num_heads*num_layers - max_switches)
+
     if(max_switches>(num_heads*num_layers - max_switches)):
         print("######## DUCKraise ########")
 
