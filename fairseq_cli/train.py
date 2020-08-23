@@ -590,7 +590,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                    "d_layer_module":"{0}".format(attention_type), "d_transformer_module":"{0}".format(transformer_type)}
     swaps = {"{0}".format(current_epoch):[]}
 
-    if((current_epoch - last_epoch_used == frequency) and restore is not None ):
+    if((current_epoch - last_epoch_used == frequency) and (restore is not None)):
+
         mhr(model,restore, head_dim, num_heads, last_epoch_used)
         return None, last_epoch_used
 
@@ -611,12 +612,18 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                     swap["s_layer"] = "{0}".format(l_ma)
                     swap["s_head"] = h_ma
                     swap["d_layer"] = "{0}".format(l_mi)
-                    swap["s_head"] = h_mi
+                    swap["d_head"] = h_mi
                     swaps["{0}".format(current_epoch)].append(swap)
 
                 mhr(model, swaps, head_dim, num_heads, current_epoch)
 
                 return swaps, current_epoch
+
+            if type == "soft":
+                return
+
+            if type == "random":
+                return
 
 
 
