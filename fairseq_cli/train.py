@@ -209,7 +209,7 @@ def tpu_data_loader(args, itr):
 
 
 @metrics.aggregate("train")
-def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=None,last_epoch_num=0, restore=None):
+def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=None, last_epoch_num=0, restore=None):
     """Train the model for one epoch and return validation losses."""
     # Initialize data iterator
     itr = epoch_itr.next_epoch_itr(
