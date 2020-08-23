@@ -601,15 +601,10 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 return swaps, current_epoch
 
             if type == "soft":
-                return
+                return swaps, current_epoch
 
             if type == "random":
-                return
-
-
-
-
-
+                return swaps, current_epoch
 
 
 
