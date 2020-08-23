@@ -576,6 +576,58 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
                                                                                                       dst_layer))
 
 
+def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, frequency, last_epoch_used,
+                current_epoch, max_switches, conf ,num_heads, head_dim, num_layers,local_only=False, type="Hard"):
+
+    if(max_switches>(num_heads*num_layers - max_switches)):
+        raise NameError("must have an even number of swaps")
+
+    if start_epoch < current_epoch:
+        return None,None
+
+    swap = {"s_layer":"0", "s_head":0, "s_layer_module":"{0}".format(attention_type),
+                   "s_transformer_module":"{0}".format(transformer_type), "d_layer":"0", "d_head":0,
+                   "d_layer_module":"{0}".format(attention_type), "d_transformer_module":"{0}".format(transformer_type)}
+    swaps = {"{0}".format(current_epoch):[]}
+
+    if((current_epoch - last_epoch_used == frequency) and restore is not None ):
+        mhr(model,restore, head_dim, num_heads, last_epoch_used)
+        return None, last_epoch_used
+
+    if(current_epoch-last_epoch_used == (frequency+1)):
+
+        if not local_only:
+            if type == "hard":
+                conf_arg_sort = conf.flatten().argsort().astype(int)
+                heads = conf_arg_sort%num_heads
+                layers = conf_arg_sort//num_heads
+                l_max = layers[-1*max_switches:]
+                l_min = layers[:max_switches]
+                h_max = layers[-1*max_switches:]
+                h_min = layers[:max_switches]
+
+                for h_ma,l_ma,h_mi,l_mi in zip(h_max,l_max, np.flip(h_min), np.flip(l_min)):
+
+                    swap["s_layer"] = "{0}".format(l_ma)
+                    swap["s_head"] = h_ma
+                    swap["d_layer"] = "{0}".format(l_mi)
+                    swap["s_head"] = h_mi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def mhr(model, swaps, head_dim, num_heads, num_epoch):
     '''
 
