@@ -618,7 +618,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
         raise NameError("must have an even number of swaps")
 
     if start_epoch < current_epoch:
-        return None,None
+        return None, 0
 
     swap = {"s_layer":"0", "s_head":0, "s_layer_module":"{0}".format(attention_type),
                    "s_transformer_module":"{0}".format(transformer_type), "d_layer":"0", "d_head":0,
