@@ -299,7 +299,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
     restore, last_epoch_num = dynamic_mhr(model, args.start_dynamic_mhr, "encoder", "self_attn",
                                           restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch +1,
                                           args.dynamic_max_switches, val_conf[0], num_heads, head_dim,
-                                          args.encoder_layers,local_only=False, type=args.dynamic_type)
+                                          args.encoder_layers,local_only=False, type=args.dynamic_type, rest=args.dynamic_rest)
 
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
@@ -610,7 +610,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
 
 
 def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, frequency, last_epoch_used,
-                current_epoch, max_switches, conf ,num_heads, head_dim, num_layers,local_only=False, type="Hard"):
+                current_epoch, max_switches, conf ,num_heads, head_dim, num_layers,local_only=False, type="Hard", rest=1):
 
 
 
@@ -633,7 +633,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
         mhr(model,restore, head_dim, num_heads, last_epoch_used)
         return None, last_epoch_used
 
-    if(current_epoch-last_epoch_used == (frequency+1) or (start_epoch == current_epoch)):
+    if(current_epoch-last_epoch_used == (frequency+rest) or (start_epoch == current_epoch)):
 
         if not local_only:
             if type == "Hard":
