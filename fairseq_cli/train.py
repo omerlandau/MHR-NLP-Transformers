@@ -143,14 +143,14 @@ def main(
     train_meter.start()
     experiment_path = args.mhr_experiment  # path for experiment configuration
     total_samples = 0
+    restore = None
+    last_epoch_num = 0
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
-        valid_losses, should_stop, total_samples_temp = train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=total_samples)
+        valid_losses, should_stop, total_samples_temp, restore, last_epoch_num = train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=total_samples)
         total_samples = total_samples_temp
-        print("in epoch ########## {0}".format(total_samples))
-        ####### for try ########
-        # with open("/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-2-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
-        #    pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
+
+
         if should_stop:
             break
 
@@ -209,7 +209,7 @@ def tpu_data_loader(args, itr):
 
 
 @metrics.aggregate("train")
-def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=None):
+def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=None,last_epoch_num=0, restore=None):
     """Train the model for one epoch and return validation losses."""
     # Initialize data iterator
     itr = epoch_itr.next_epoch_itr(
@@ -234,6 +234,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         ),
         default_log_format=("tqdm" if not args.no_progress_bar else "simple"),
     )
+
 
     num_heads = args.decoder_attention_heads
     head_dim = args.decoder_embed_dim // num_heads
@@ -296,13 +297,18 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             pickle.dump(conf, fd, protocol=3)
 
 
+    restore, last_epoch_num = dynamic_mhr(model, args.start_dynamic_mhr, "encoder", "self_attn",
+                                          restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch +1,
+                                          args.dynamic_max_switches, val_conf, num_heads, head_dim,
+                                          args.encoder_layers,local_only=False, type=args.dynamic_type)
+
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
     progress.print(stats, tag="train", step=num_updates)
 
     # reset epoch-level meters
     metrics.reset_meters("train")
-    return valid_losses, should_stop, total_samples
+    return valid_losses, should_stop, total_samples, restore, last_epoch_num
 
 
 def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoch):
@@ -325,9 +331,7 @@ def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoc
 
 
         valid_losses, val_conf = validate(args, trainer, task, epoch_itr, valid_subsets)
-        print(val_conf)
 
-        exit()
 
 
 
@@ -414,6 +418,18 @@ def validate(args, trainer, task, epoch_itr, subsets):
             val_conf["decoder"][l_d]["enc_attn"] = np.matmul(val_conf["decoder"][l_d]["enc_attn"][:, -1],
                                                               val_conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
                 val_conf["decoder"][l_d]["enc_attn"][:, -1])
+
+        enc_self_layers = []
+        dec_self_layers = []
+        dec_enc_layers = []
+
+        for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+
+            enc_self_layers.append(val_conf["encoder"][l_e]["self_attn"])
+            dec_self_layers.append(val_conf["decoder"][l_d]["self_attn"])
+            dec_enc_layers.append(val_conf["decoder"][l_d]["enc_attn"])
+
+        val_conf = (np.array(enc_self_layers), np.array(dec_self_layers), np.array(dec_enc_layers))
 
     return valid_losses, val_conf
 
@@ -614,7 +630,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
         mhr(model,restore, head_dim, num_heads, last_epoch_used)
         return None, last_epoch_used
 
-    if(current_epoch-last_epoch_used == (frequency+1)):
+    if(current_epoch-last_epoch_used == (frequency+1) or start_epoch == current_epoch):
 
         if not local_only:
             if type == "hard":
