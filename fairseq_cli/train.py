@@ -259,13 +259,12 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                 continue
         total_samples += model.decoder.layers[0].self_attn.bsz
         batch_regression = 1.0 - (total_samples/(160239*40)) #need to find more generic way to find total samples and epoch num.
-        if args.head_confidence_method is not None:
-            for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-                conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
-                conf["decoder"][d]["enc_attn"].append(np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
-                conf["encoder"][e]["self_attn"].append(np.append(np.array(model.encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[model.encoder.layers[e].self_attn.bsz]))
 
-        #print(np.array(conf["encoder"][0]["self_attn"])[0, :-1] / (np.array(conf["encoder"][0]["self_attn"])[0, -1]))
+        # Get Confidence for each Head.
+        if args.head_confidence_method is not None:
+
+           conf = get_batch_confs(model, conf, args)
+
         # log mid-epoch stats
         num_updates = trainer.get_num_updates()
         if num_updates % args.log_interval == 0:
@@ -277,17 +276,16 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             metrics.reset_meters("train_inner")
 
         end_of_epoch = not itr.has_next()
-        valid_losses, should_stop = validate_and_save(
+        valid_losses, should_stop, val_conf = validate_and_save(
             args, trainer, task, epoch_itr, valid_subsets, end_of_epoch
         )
 
         if should_stop:
             break
+
     if args.head_confidence_method is not None:
-        for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-            conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
-            conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
-            conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
+
+        conf = convert_confs(conf, args)
 
         path = args.save_dir.replace("checkpoints", "confs") + "-method={0}".format(args.head_confidence_method)
         try:
@@ -296,6 +294,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             pass
         with open(args.save_dir.replace("checkpoints", "confs")+ "-method={0}".format(args.head_confidence_method) + "/epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
+
+
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
     progress.print(stats, tag="train", step=num_updates)
@@ -321,9 +321,14 @@ def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoc
     valid_losses = [None]
     if do_validate:
 
-        print("#############loser###############")
+
+        valid_losses, val_conf = validate(args, trainer, task, epoch_itr, valid_subsets)
+        print(val_conf)
+
         exit()
-        valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
+
+
+
 
     # Stopping conditions
     max_update = args.max_update or math.inf
@@ -336,7 +341,7 @@ def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoc
     if do_save or should_stop:
         checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
 
-    return valid_losses, should_stop
+    return valid_losses, should_stop, val_conf
 
 
 def get_training_stats(stats):
@@ -350,6 +355,11 @@ def validate(args, trainer, task, epoch_itr, subsets):
     if args.fixed_validation_seed is not None:
         # set fixed seed for every validation
         utils.set_torch_seed(args.fixed_validation_seed)
+
+    model = trainer.model
+
+    val_conf = {"encoder": [{"self_attn": []} for i in range(args.encoder_layers)],
+            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
 
     valid_losses = []
     for subset in subsets:
@@ -375,12 +385,35 @@ def validate(args, trainer, task, epoch_itr, subsets):
             for sample in progress:
                 trainer.valid_step(sample)
 
+                # Get confidence for each head
+                if args.head_confidence_method is not None:
+                    val_conf = get_batch_confs(model, val_conf, args)
+
         # log validation stats
         stats = get_valid_stats(args, trainer, agg.get_smoothed_values())
         progress.print(stats, tag=subset, step=trainer.get_num_updates())
 
         valid_losses.append(stats[args.best_checkpoint_metric])
-    return valid_losses
+
+    if args.head_confidence_method is not None:
+
+        val_conf = convert_confs(val_conf, args)
+
+        for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+
+            val_conf["encoder"][l_e]["self_attn"] = np.matmul(val_conf["encoder"][l_e]["self_attn"][:, -1],
+                                                              val_conf["encoder"][l_e]["self_attn"][:, :-1]) / np.sum(
+                val_conf["encoder"][l_e]["self_attn"][:, -1])
+
+            val_conf["decoder"][l_d]["self_attn"] = np.matmul(val_conf["decoder"][l_d]["self_attn"][:, -1],
+                                                              val_conf["decoder"][l_d]["self_attn"][:, :-1]) / np.sum(
+                val_conf["decoder"][l_d]["self_attn"][:, -1])
+
+            val_conf["decoder"][l_d]["enc_attn"] = np.matmul(val_conf["decoder"][l_d]["enc_attn"][:, -1],
+                                                              val_conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
+                val_conf["decoder"][l_d]["enc_attn"][:, -1])
+
+    return valid_losses, val_conf
 
 
 def get_valid_stats(args, trainer, stats):
@@ -609,14 +642,27 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
             if type == "random":
                 return swaps, current_epoch
 
+def convert_confs(conf, args):
 
+    for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+        conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
+        conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
+        conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
+    return conf
 
+def get_batch_confs(model, conf, args):
 
-
-
-
-
-
+    for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+        conf["decoder"][d]["self_attn"].append(
+            np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),
+                      [model.decoder.layers[d].self_attn.bsz]))
+        conf["decoder"][d]["enc_attn"].append(
+            np.append(np.array(model.decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()),
+                      [model.decoder.layers[d].encoder_attn.bsz]))
+        conf["encoder"][e]["self_attn"].append(
+            np.append(np.array(model.encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),
+                      [model.encoder.layers[e].self_attn.bsz]))
+    return conf
 
 
 def mhr(model, swaps, head_dim, num_heads, num_epoch):

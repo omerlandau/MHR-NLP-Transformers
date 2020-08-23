@@ -378,7 +378,6 @@ class MultiheadAttention(nn.Module):
                     heads = a[:, :, :, :].max(dim=2)
                     heads = heads[0].sum(dim=2)/tgt_len
                     heads = heads.sum(dim=1)/bsz
-                    heads = heads
 
 
 
