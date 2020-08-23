@@ -664,6 +664,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
                 mhr(model, swaps, head_dim, num_heads, current_epoch)
 
+                print(swaps)
+
                 return swaps, current_epoch
 
             if type == "soft":
