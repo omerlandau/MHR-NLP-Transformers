@@ -294,7 +294,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             os.mkdir(path,0o775)
         except:
             pass
-        with open(args.save_dir.replace("checkpoints", "confs")+ "-method={0}".format(args.head_confidence_method) + "//epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
+        with open(args.save_dir.replace("checkpoints", "confs")+ "-method={0}".format(args.head_confidence_method) + "/epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
