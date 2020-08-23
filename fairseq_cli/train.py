@@ -603,8 +603,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 layers = conf_arg_sort//num_heads
                 l_max = layers[-1*max_switches:]
                 l_min = layers[:max_switches]
-                h_max = layers[-1*max_switches:]
-                h_min = layers[:max_switches]
+                h_max = heads[-1*max_switches:]
+                h_min = heads[:max_switches]
 
                 for h_ma,l_ma,h_mi,l_mi in zip(h_max,l_max, np.flip(h_min), np.flip(l_min)):
 
@@ -612,6 +612,11 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                     swap["s_head"] = h_ma
                     swap["d_layer"] = "{0}".format(l_mi)
                     swap["s_head"] = h_mi
+                    swaps["{0}".format(current_epoch)].append(swap)
+
+                mhr(model, swaps, head_dim, num_heads, current_epoch)
+
+                return swaps, current_epoch
 
 
 
