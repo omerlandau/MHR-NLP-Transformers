@@ -12,6 +12,8 @@ import math
 import os
 import sys
 
+import pickle
+
 import numpy as np
 
 import torch
@@ -150,12 +152,12 @@ def _main(args, output_file):
 
         gen_timer.start()
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
-
+        print(models)
         if args.head_confidence_method is not None:
             for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
-                conf["decoder"][d]["self_attn"].append(np.append(np.array(models[0].decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
-                conf["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [model.decoder.layers[d].encoder_attn.bsz]))
-                conf["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[model.encoder.layers[e].self_attn.bsz]))
+                conf["decoder"][d]["self_attn"].append(np.append(np.array(models[0].decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[models[0].decoder.layers[d].self_attn.bsz]))
+                conf["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [models[0].decoder.layers[d].encoder_attn.bsz]))
+                conf["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[models[0].encoder.layers[e].self_attn.bsz]))
 
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
@@ -273,11 +275,14 @@ def _main(args, output_file):
             conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
-        path = ''.join(args.path.split('/')[:-1]).replace("checkpoint","confs_eval")
-        print(path)
+        path = f'/'.join(args.path.split('/')[:-1]).replace("checkpoints","confs_eval")
+        try:
+            os.mkdir(path, 0o775)
+        except:
+            pass
 
-        os.mkdir(path, 'rwx')
-        with open(args.path.replace("checkpoints","confs_eval"), 'wb') as fd:
+
+        with open(args.path.replace("checkpoints","confs_eval").replace(".pt","-{0}.pkl".format(args.head_confidence_method)), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
     logger.info('NOTE: hypothesis and token scores are output in base 2')

@@ -147,6 +147,7 @@ def main(
         # train for one epoch
         valid_losses, should_stop, total_samples_temp = train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=total_samples)
         total_samples = total_samples_temp
+        print("in epoch ########## {0}".format(total_samples))
         ####### for try ########
         # with open("/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l-2-epoch-{0}".format(epoch_itr.epoch),'wb') as fd:
         #    pickle.dump(batches_conf, fd, protocol=pickle.HIGHEST_PROTOCOL)
@@ -249,8 +250,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
     conf = {"encoder": [{"self_attn":[]} for i in range(args.encoder_layers)],
             "decoder": [{"self_attn": [], "enc_attn":[]} for i in range(args.decoder_layers)]}
 
-    batch_regression = 1
-
+    batch_regression = 1.0  - (total_samples/(160239*40))
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
@@ -258,7 +258,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             if log_output is None:  # OOM, overflow, ...
                 continue
         total_samples += model.decoder.layers[0].self_attn.bsz
-        batch_regression = 1 - total_samples/160239*36 #need to find more generic way to find total samples and epoch num.
+        batch_regression = 1.0 - (total_samples/(160239*40)) #need to find more generic way to find total samples and epoch num.
         if args.head_confidence_method is not None:
             for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
                 conf["decoder"][d]["self_attn"].append(np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[model.decoder.layers[d].self_attn.bsz]))
@@ -289,8 +289,12 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
             conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
 
-        os.mkdir(args.save_dir.replace("checkpoints", "confs"))
-        with open(args.save_dir.replace("checkpoints", "confs") + "//epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
+        path = args.save_dir.replace("checkpoints", "confs") + "-method={0}".format(args.head_confidence_method)
+        try:
+            os.mkdir(path,0o775)
+        except:
+            pass
+        with open(args.save_dir.replace("checkpoints", "confs")+ "-method={0}".format(args.head_confidence_method) + "//epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))

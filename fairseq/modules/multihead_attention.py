@@ -125,7 +125,7 @@ class MultiheadAttention(nn.Module):
             attn_mask: Optional[Tensor] = None,
             before_softmax: bool = False,
             need_head_weights: bool = False,
-            calc_head_importance = False,
+            calc_head_importance = False
     ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor], Optional[Tensor]]:
         """Input shape: Time x Batch x Channel
 
@@ -356,21 +356,35 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
         conf = None
-        t0 = time.time()
-        if self.head_confidence_method == "base":
-            ## computing confidence of all heads over bsz sentences
 
-            ## heads is an np array of shape [head_nums+1] which contains confidence*bsz for each head and bsz:
-            ## [conf_h_1*bsz,conf_h_2*bsz,...,conf_h_n*bsz,bsz]
-            # Viota's confidence is based on:
-            # Word attn confidence is an upgraded more delicate version of conf,
-            #where
+
+        ## computing confidence of all heads over bsz sentences
+
+        ## heads is an np array of shape [head_nums+1] which contains confidence*bsz for each head and bsz:
+        ## [conf_h_1*bsz,conf_h_2*bsz,...,conf_h_n*bsz,bsz]
+        # Viota's confidence is based on:
+        # Word attn confidence is an upgraded more delicate version of conf,
+        #where
+        if self.head_confidence_method is not None:
 
             if attn_weights is not None:
-                a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
-                heads = a[:, :, :, :].max(dim=3)
-                heads = heads[0].max(dim=2)
-                heads = heads[0].sum(dim=1)/bsz
+                if(self.head_confidence_method == "base1"):
+                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
+                    heads = a[:, :, :, :].max(dim=3)
+                    heads = heads[0].max(dim=2)
+                    heads = heads[0].sum(dim=1)/bsz
+                else:
+                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
+                    heads = a[:, :, :, :].max(dim=2)
+                    heads = heads[0].sum(dim=2)/tgt_len
+                    heads = heads.sum(dim=1)/bsz
+                    heads = heads
+
+
+
+
+
+
                 #heads = np.array(heads.cpu())
                 #heads = np.append(heads,[bsz])
 
