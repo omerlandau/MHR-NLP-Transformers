@@ -645,7 +645,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
 
         if not local_only:
-            if type == "hard":
+            if type == "Hard":
                 conf_arg_sort = conf.flatten().argsort().astype(int)
                 heads = conf_arg_sort%num_heads
                 layers = conf_arg_sort//num_heads
