@@ -299,7 +299,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
     restore, last_epoch_num = dynamic_mhr(model, args.start_dynamic_mhr, "encoder", "self_attn",
                                           restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch +1,
-                                          args.dynamic_max_switches, val_conf, num_heads, head_dim,
+                                          args.dynamic_max_switches, val_conf[0], num_heads, head_dim,
                                           args.encoder_layers,local_only=False, type=args.dynamic_type)
 
     # log end-of-epoch stats
