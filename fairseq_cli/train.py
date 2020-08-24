@@ -301,7 +301,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         restore, last_epoch_num = dynamic_mhr(model, args.start_dynamic_mhr, "encoder", "self_attn",
                                               restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch + 1,
                                               args.dynamic_max_switches, val_conf[0], num_heads, head_dim,
-                                              args.encoder_layers, local_only=False, type=args.dynamic_type,
+                                              args.encoder_layers, local_only=False, d_type=args.dynamic_type,
                                               rest=args.dynamic_rest)
 
     # log end-of-epoch stats
@@ -604,7 +604,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
 
 
 def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, frequency, last_epoch_used,
-                current_epoch, max_switches, conf, num_heads, head_dim, num_layers, local_only=False, type="Hard",
+                current_epoch, max_switches, conf, num_heads, head_dim, num_layers, local_only=False, d_type="Hard",
                 rest=1):
     '''
 
@@ -655,7 +655,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
 
         if not local_only:
-            if type == "Hard":
+            if d_type == "Hard":
                 conf_arg_sort = conf.flatten().argsort().astype(int)
                 heads = conf_arg_sort % num_heads #heads positions
                 layers = conf_arg_sort // num_heads #heads layers
@@ -697,10 +697,10 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
                 return swaps, current_epoch
 
-            if type == "Soft":
+            if d_type == "Soft":
                 return swaps, current_epoch
 
-            if type == "Random":
+            if d_type == "Random":
                 return swaps, current_epoch
 
     return restore, last_epoch_used
