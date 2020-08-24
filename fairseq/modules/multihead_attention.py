@@ -376,7 +376,7 @@ class MultiheadAttention(nn.Module):
                 else:
                     a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     heads = a[:, :, :-1, :-1].max(dim=2)
-                    heads = heads[0].sum(dim=2)/tgt_len
+                    heads = heads[0].sum(dim=2)/(tgt_len -1)
                     heads = heads.sum(dim=1)/bsz
 
 
