@@ -405,7 +405,7 @@ class MultiheadAttention(nn.Module):
             #    word_max["heads"].append(conf_temp)
             conf = heads
 
-        print(attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)[:, :, :-1, :-1])
+        print(attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)[:, :, -1, -1])
 
         exit()
         self.head_conf = conf
