@@ -381,7 +381,6 @@ class MultiheadAttention(nn.Module):
                     graph = make_dot(a)
                     with open('graph_for_debug', 'wb') as fd:
                         pkl.dump(graph,fd)
-                    exit()
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1)/bsz
@@ -410,7 +409,10 @@ class MultiheadAttention(nn.Module):
             #        conf_temp += word_attn_sum / (tgt_len - 1)
             #    word_max["heads"].append(conf_temp)
             conf = heads
-
+        graph = make_dot(attn_weights)
+        with open('graph_for_debug_attn', 'wb') as fd:
+            pkl.dump(graph, fd)
+        exit()
         print(attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)[:, :, -1, -1])
 
         exit()
