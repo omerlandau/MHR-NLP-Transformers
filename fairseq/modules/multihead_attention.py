@@ -383,9 +383,7 @@ class MultiheadAttention(nn.Module):
                     heads = heads[0].sum(dim=2)/(tgt_len -1)
                     heads = heads.sum(dim=1)/bsz
 
-        print(attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)[:, :, :-1, :-1])
 
-        exit()
 
 
 
@@ -405,7 +403,9 @@ class MultiheadAttention(nn.Module):
             #    word_max["heads"].append(conf_temp)
             conf = heads
 
+        print(attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)[:, :, :-1, :-1])
 
+        exit()
         self.head_conf = conf
 
         attn_probs = F.dropout(
