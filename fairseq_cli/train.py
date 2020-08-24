@@ -614,6 +614,17 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 current_epoch, max_switches, conf ,num_heads, head_dim, num_layers,local_only=False, type="Hard", rest=1):
 
 
+    print(current_epoch)
+    print(type(current_epoch))
+
+    print(last_epoch_used)
+
+    current_epoch - last_epoch_used
+
+
+
+
+
     if(max_switches>(num_heads*num_layers - max_switches)):
 
         raise NameError("must have an even number of swaps")
@@ -632,7 +643,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
         mhr(model,restore, head_dim, num_heads, last_epoch_used)
         return None, last_epoch_used
 
-    if(current_epoch-last_epoch_used == (frequency+rest) or (start_epoch == current_epoch)):
+    if(current_epoch - last_epoch_used == (frequency+rest) or (start_epoch == current_epoch)):
 
         if not local_only:
             if type == "Hard":
@@ -644,15 +655,51 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 h_max = heads[-1*max_switches:]
                 h_min = heads[:max_switches]
 
+                print("out of loop lmax {0}".format(l_max))
+
+                print("out of loop lmin {0}".format(l_min))
+
+                print("out of loop hmax {0}".format(h_max))
+
+                print("out of loop hmin {0}".format(h_min))
+
                 for h_ma,l_ma,h_mi,l_mi in zip(h_max,l_max, np.flip(h_min), np.flip(l_min)):
 
                     swap["s_layer"] = "{0}".format(l_ma)
                     swap["s_head"] = h_ma
                     swap["d_layer"] = "{0}".format(l_mi)
                     swap["d_head"] = h_mi
+
+
+
+                    print("in of loop hmin {0}".format(h_min))
+
+                    print("in of loop flip hmin {0}".format(np.flip(h_min)))
+
+                    print("in of loop hmin {0}".format(h_min))
+
+                    print("in of loop flip hmin {0}".format(np.flip(h_min)))
+
+
+
+                    print(swap)
+
+                    print(h_ma)
+                    print(l_ma)
+
+                    print(h_mi)
+
+                    print(l_mi)
+
+
+
                     swaps["{0}".format(current_epoch)].append(swap)
 
+                    print(swaps)
+
                 mhr(model, swaps, head_dim, num_heads, current_epoch)
+
+                print(current_epoch)
 
                 return swaps, current_epoch
 
