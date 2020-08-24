@@ -370,12 +370,12 @@ class MultiheadAttention(nn.Module):
             if attn_weights is not None:
                 if(self.head_confidence_method == "base"):
                     a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
-                    heads = a[:, :, :, :].max(dim=3)
+                    heads = a[:, :, :-1, :-1].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1)/bsz
                 else:
                     a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
-                    heads = a[:, :, :, :].max(dim=2)
+                    heads = a[:, :, :-1, :-1].max(dim=2)
                     heads = heads[0].sum(dim=2)/tgt_len
                     heads = heads.sum(dim=1)/bsz
 
