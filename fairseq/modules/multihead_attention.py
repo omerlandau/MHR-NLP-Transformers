@@ -372,10 +372,6 @@ class MultiheadAttention(nn.Module):
             if attn_weights is not None:
                 if(self.head_confidence_method == "base"):
                     a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
-                    #print(a[:, :, :-1, :-1])
-                    #print(a[:, :, :-1, :-1].shape)
-                    #print(a[:, :, -1, -1])
-                    #print(a[:, :, -1, -1].shape)
                     a[:,:,-1, -1] = torch.zeros((self.num_heads,bsz))
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
