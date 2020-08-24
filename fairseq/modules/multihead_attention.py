@@ -13,6 +13,8 @@ from torch.nn import Parameter
 from fairseq.incremental_decoding_utils import with_incremental_state
 import numpy as np
 import time
+from torchviz import make_dot
+import pickle as pkl
 
 
 @with_incremental_state
@@ -376,6 +378,10 @@ class MultiheadAttention(nn.Module):
                     #print(a[:, :, -1, -1].shape)
                     a[:,:,-1, -1] = torch.zeros((self.num_heads,bsz))
                     print(a)
+                    graph = make_dot(a)
+                    with open('graph_for_debug', 'wb') as fd:
+                        pkl.dump(graph,fd)
+                    exit()
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1)/bsz
