@@ -372,8 +372,9 @@ class MultiheadAttention(nn.Module):
                     a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
                     print(a[:, :, :-1, :-1])
                     print(a[:, :, :-1, :-1].shape)
-                    exit()
-                    heads = a[:, :, :-1, :-1].max(dim=3)
+                    print(a[:, :, -1, -1])
+                    #a[:,:,-1, -1] = torch.zeros((tgt_len,src_len))
+                    heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1)/bsz
                 else:
@@ -382,7 +383,9 @@ class MultiheadAttention(nn.Module):
                     heads = heads[0].sum(dim=2)/(tgt_len -1)
                     heads = heads.sum(dim=1)/bsz
 
+        print(attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)[:, :, :-1, :-1])
 
+        exit()
 
 
 
