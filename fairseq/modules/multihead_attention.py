@@ -371,22 +371,19 @@ class MultiheadAttention(nn.Module):
 
             if attn_weights is not None:
                 if(self.head_confidence_method == "base"):
-                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0).clone()
+                    a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
                     #print(a[:, :, :-1, :-1])
                     #print(a[:, :, :-1, :-1].shape)
                     #print(a[:, :, -1, -1])
                     #print(a[:, :, -1, -1].shape)
                     a[:,:,-1, -1] = torch.zeros((self.num_heads,bsz))
-                    print(a)
-                    graph = make_dot(a)
-                    with open('graph_for_debug', 'wb') as fd:
-                        pkl.dump(graph,fd)
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1)/bsz
                 else:
-                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
-                    heads = a[:, :, :-1, :-1].max(dim=2)
+                    a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
+                    a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
+                    heads = a[:, :, :, :].max(dim=2)
                     heads = heads[0].sum(dim=2)/(tgt_len -1)
                     heads = heads.sum(dim=1)/bsz
 
@@ -409,11 +406,7 @@ class MultiheadAttention(nn.Module):
             #        conf_temp += word_attn_sum / (tgt_len - 1)
             #    word_max["heads"].append(conf_temp)
             conf = heads
-        graph = make_dot(attn_weights)
-        with open('graph_for_debug_attn', 'wb') as fd:
-            pkl.dump(graph, fd)
-        exit()
-        print(attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)[:, :, -1, -1])
+
 
         exit()
         self.head_conf = conf
