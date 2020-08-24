@@ -369,7 +369,7 @@ class MultiheadAttention(nn.Module):
 
             if attn_weights is not None:
                 if(self.head_confidence_method == "base"):
-                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
+                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len)
                     #print(a[:, :, :-1, :-1])
                     #print(a[:, :, :-1, :-1].shape)
                     #print(a[:, :, -1, -1])
@@ -377,7 +377,7 @@ class MultiheadAttention(nn.Module):
                     #a[:,:,-1, -1] = torch.zeros((tgt_len,src_len))
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
-                    heads = heads[0].sum(dim=1)/bsz
+                    heads = heads[0].sum(dim=0)/bsz
                     print(heads)
                     exit()
                 else:
