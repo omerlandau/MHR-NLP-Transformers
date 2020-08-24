@@ -404,7 +404,6 @@ class MultiheadAttention(nn.Module):
             conf = heads
 
 
-        exit()
         self.head_conf = conf
 
         attn_probs = F.dropout(
