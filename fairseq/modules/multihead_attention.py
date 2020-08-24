@@ -373,6 +373,7 @@ class MultiheadAttention(nn.Module):
                     print(a[:, :, :-1, :-1])
                     print(a[:, :, :-1, :-1].shape)
                     print(a[:, :, -1, -1])
+                    print(a[:, :, -1, -1].shape)
                     #a[:,:,-1, -1] = torch.zeros((tgt_len,src_len))
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
