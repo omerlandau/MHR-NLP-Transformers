@@ -687,7 +687,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                     swap["s_head"] = h_ma
                     swap["d_layer"] = "{0}".format(l_mi)
                     swap["d_head"] = h_mi
-                    swaps["{0}".format(current_epoch)].append(swap)
+
+                    swaps["{0}".format(current_epoch)].append(swap.copy())
 
                     print(swap)
 
