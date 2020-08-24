@@ -662,6 +662,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
             if type == "Random":
                 return swaps, current_epoch
 
+    return restore, last_epoch_used
+
 def convert_confs(conf, args):
 
     for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
