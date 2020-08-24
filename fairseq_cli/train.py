@@ -633,11 +633,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
     if start_epoch > current_epoch:
         return None, 0
 
-    print("########### restore ########## {0}".format(restore))
-    print("########### last_epoch_used ########## {0}".format(last_epoch_used))
 
-    print(type(current_epoch))
-    print(current_epoch - last_epoch_used)
 
     swap = {"s_layer": "0", "s_head": 0, "s_layer_module": "{0}".format(attention_type),
             "s_transformer_module": "{0}".format(transformer_type), "d_layer": "0", "d_head": 0,
@@ -645,8 +641,6 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
     swaps = {"{0}".format(current_epoch): []}
 
     if ((current_epoch - last_epoch_used == frequency) and (restore is not None)):
-
-        print("####### restoring #######")
 
         mhr(model, restore, head_dim, num_heads, last_epoch_used)
         return None, last_epoch_used
@@ -664,24 +658,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 h_max = heads[-1 * max_switches:]
                 h_min = heads[:max_switches]
 
-                print(h_min)
-
-                print(np.flip(h_min))
-
-                print(l_min)
-
-                print(np.flip(l_min))
-
 
                 for h_ma, l_ma, h_mi, l_mi in zip(h_max, l_max, np.flip(h_min), np.flip(l_min)):
-
-                    print(h_mi)
-                    print(l_mi)
-
-                    print("####max####")
-
-                    print(h_ma)
-                    print(l_ma)
 
                     swap["s_layer"] = "{0}".format(l_ma)
                     swap["s_head"] = h_ma
@@ -690,9 +668,6 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
                     swaps["{0}".format(current_epoch)].append(swap.copy())
 
-                    print(swap)
-
-                print(swaps)
 
                 mhr(model, swaps, head_dim, num_heads, current_epoch)
 
