@@ -369,7 +369,7 @@ class MultiheadAttention(nn.Module):
 
             if attn_weights is not None:
                 if(self.head_confidence_method == "base"):
-                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
+                    a = attn_weights.view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0).clone()
                     #print(a[:, :, :-1, :-1])
                     #print(a[:, :, :-1, :-1].shape)
                     #print(a[:, :, -1, -1])
