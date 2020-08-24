@@ -147,9 +147,10 @@ def main(
     last_epoch_num = 0
     while lr > args.min_lr and epoch_itr.next_epoch_idx <= max_epoch:
         # train for one epoch
-        valid_losses, should_stop, total_samples_temp, restore, last_epoch_num = train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=total_samples)
+        valid_losses, should_stop, total_samples_temp, restore, last_epoch_num = train(args, trainer, task, epoch_itr,
+                                                                                       model, experiment_path,
+                                                                                       total_samples=total_samples)
         total_samples = total_samples_temp
-
 
         if should_stop:
             break
@@ -235,7 +236,6 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         default_log_format=("tqdm" if not args.no_progress_bar else "simple"),
     )
 
-
     num_heads = args.decoder_attention_heads
     head_dim = args.decoder_embed_dim // num_heads
     if experiment_path is not None:
@@ -248,10 +248,10 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
     valid_subsets = args.valid_subset.split(",")
     should_stop = False
 
-    conf = {"encoder": [{"self_attn":[]} for i in range(args.encoder_layers)],
-            "decoder": [{"self_attn": [], "enc_attn":[]} for i in range(args.decoder_layers)]}
+    conf = {"encoder": [{"self_attn": []} for i in range(args.encoder_layers)],
+            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
 
-    batch_regression = 1.0  - (total_samples/(160239*40))
+    batch_regression = 1.0 - (total_samples / (160239 * 40))
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
@@ -259,12 +259,12 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             if log_output is None:  # OOM, overflow, ...
                 continue
         total_samples += model.decoder.layers[0].self_attn.bsz
-        batch_regression = 1.0 - (total_samples/(160239*40)) #need to find more generic way to find total samples and epoch num.
+        batch_regression = 1.0 - (
+                    total_samples / (160239 * 40))  # need to find more generic way to find total samples and epoch num.
 
         # Get Confidence for each Head.
         if args.head_confidence_method is not None:
-
-           conf = get_batch_confs(model, conf, args)
+            conf = get_batch_confs(model, conf, args)
 
         # log mid-epoch stats
         num_updates = trainer.get_num_updates()
@@ -290,17 +290,19 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
         path = args.save_dir.replace("checkpoints", "confs") + "-method={0}".format(args.head_confidence_method)
         try:
-            os.mkdir(path,0o775)
+            os.mkdir(path, 0o775)
         except:
             pass
-        with open(args.save_dir.replace("checkpoints", "confs")+ "-method={0}".format(args.head_confidence_method) + "/epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
+        with open(args.save_dir.replace("checkpoints", "confs") + "-method={0}".format(
+                args.head_confidence_method) + "/epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
     if args.dynamic_type is not None:
         restore, last_epoch_num = dynamic_mhr(model, args.start_dynamic_mhr, "encoder", "self_attn",
-                                              restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch +1,
+                                              restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch + 1,
                                               args.dynamic_max_switches, val_conf[0], num_heads, head_dim,
-                                              args.encoder_layers,local_only=False, type=args.dynamic_type, rest=args.dynamic_rest)
+                                              args.encoder_layers, local_only=False, type=args.dynamic_type,
+                                              rest=args.dynamic_rest)
 
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
@@ -328,13 +330,7 @@ def validate_and_save(args, trainer, task, epoch_itr, valid_subsets, end_of_epoc
 
     val_conf = None
     if do_validate:
-
-
         valid_losses, val_conf = validate(args, trainer, task, epoch_itr, valid_subsets)
-
-
-
-
 
     # Stopping conditions
     max_update = args.max_update or math.inf
@@ -365,7 +361,7 @@ def validate(args, trainer, task, epoch_itr, subsets):
     model = trainer.model
 
     val_conf = {"encoder": [{"self_attn": []} for i in range(args.encoder_layers)],
-            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
+                "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
 
     valid_losses = []
     for subset in subsets:
@@ -406,7 +402,6 @@ def validate(args, trainer, task, epoch_itr, subsets):
         val_conf = convert_confs(val_conf, args)
 
         for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-
             val_conf["encoder"][l_e]["self_attn"] = np.matmul(val_conf["encoder"][l_e]["self_attn"][:, -1],
                                                               val_conf["encoder"][l_e]["self_attn"][:, :-1]) / np.sum(
                 val_conf["encoder"][l_e]["self_attn"][:, -1])
@@ -416,7 +411,7 @@ def validate(args, trainer, task, epoch_itr, subsets):
                 val_conf["decoder"][l_d]["self_attn"][:, -1])
 
             val_conf["decoder"][l_d]["enc_attn"] = np.matmul(val_conf["decoder"][l_d]["enc_attn"][:, -1],
-                                                              val_conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
+                                                             val_conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
                 val_conf["decoder"][l_d]["enc_attn"][:, -1])
 
         enc_self_layers = []
@@ -424,7 +419,6 @@ def validate(args, trainer, task, epoch_itr, subsets):
         dec_enc_layers = []
 
         for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-
             enc_self_layers.append(val_conf["encoder"][l_e]["self_attn"])
             dec_self_layers.append(val_conf["decoder"][l_d]["self_attn"])
             dec_enc_layers.append(val_conf["decoder"][l_d]["enc_attn"])
@@ -602,7 +596,6 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
                 del dst_parameter
                 torch.cuda.empty_cache()
 
-
     print(
         "Done swapping parameters for creation of head {} in layer {} and head {} in layer {}".format(src_head,
                                                                                                       src_layer,
@@ -611,95 +604,64 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
 
 
 def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, frequency, last_epoch_used,
-                current_epoch, max_switches, conf ,num_heads, head_dim, num_layers,local_only=False, type="Hard", rest=1):
+                current_epoch, max_switches, conf, num_heads, head_dim, num_layers, local_only=False, type="Hard",
+                rest=1):
+    '''
 
+    :param model: The model.
+    :param start_epoch: Epoch to start swapping.
+    :param transformer_type: Transformer module (e.g - encoder-decoder).
+    :param attention_type: self_attn, enc-dec attn.
+    :param restore: A dictionary represent the last swap.
+    :param frequency: Train for frequency epochs before swapping parameters back.
+    :param last_epoch_used: The last epoch that used for replacing.
+    :param current_epoch: The current epoch.
+    :param max_switches: Maximum numbers of heads swapping.
+    :param conf: An np.array of shape (num_layers X num_heads) holds the confidence values of each head in each layer.
+    :param num_heads: Number of heads.
+    :param head_dim: The dimension of each head.
+    :param num_layers: Number of layers in Encoder-Decoder.
+    :param local_only: Swap only in the same layer.
+    :param type: Type of algorithms to choose heads for swapping.
+    :param rest: After done swapping back let the model be trained (with the configuration before the swap).
+    :return:
+    '''
 
-    print(current_epoch)
-    print(type(current_epoch))
-
-    print(last_epoch_used)
-
-    current_epoch - last_epoch_used
-
-
-
-
-
-    if(max_switches>(num_heads*num_layers - max_switches)):
-
+    if max_switches > (num_heads * num_layers - max_switches):
         raise NameError("must have an even number of swaps")
 
     if start_epoch > current_epoch:
-
         return None, 0
 
-    swap = {"s_layer":"0", "s_head":0, "s_layer_module":"{0}".format(attention_type),
-                   "s_transformer_module":"{0}".format(transformer_type), "d_layer":"0", "d_head":0,
-                   "d_layer_module":"{0}".format(attention_type), "d_transformer_module":"{0}".format(transformer_type)}
-    swaps = {"{0}".format(current_epoch):[]}
+    swap = {"s_layer": "0", "s_head": 0, "s_layer_module": "{0}".format(attention_type),
+            "s_transformer_module": "{0}".format(transformer_type), "d_layer": "0", "d_head": 0,
+            "d_layer_module": "{0}".format(attention_type), "d_transformer_module": "{0}".format(transformer_type)}
+    swaps = {"{0}".format(current_epoch): []}
 
-    if((current_epoch - last_epoch_used == frequency) and (restore is not None)):
-
-        mhr(model,restore, head_dim, num_heads, last_epoch_used)
+    if ((current_epoch - last_epoch_used == frequency) and (restore is not None)):
+        mhr(model, restore, head_dim, num_heads, last_epoch_used)
         return None, last_epoch_used
 
-    if(current_epoch - last_epoch_used == (frequency+rest) or (start_epoch == current_epoch)):
+    if (current_epoch - last_epoch_used == (frequency + rest) or (start_epoch == current_epoch)):
 
         if not local_only:
             if type == "Hard":
                 conf_arg_sort = conf.flatten().argsort().astype(int)
-                heads = conf_arg_sort%num_heads
-                layers = conf_arg_sort//num_heads
-                l_max = layers[-1*max_switches:]
+                heads = conf_arg_sort % num_heads #heads positions
+                layers = conf_arg_sort // num_heads #heads layers
+                l_max = layers[-1 * max_switches:]
                 l_min = layers[:max_switches]
-                h_max = heads[-1*max_switches:]
+                h_max = heads[-1 * max_switches:]
                 h_min = heads[:max_switches]
 
-                print("out of loop lmax {0}".format(l_max))
-
-                print("out of loop lmin {0}".format(l_min))
-
-                print("out of loop hmax {0}".format(h_max))
-
-                print("out of loop hmin {0}".format(h_min))
-
-                for h_ma,l_ma,h_mi,l_mi in zip(h_max,l_max, np.flip(h_min), np.flip(l_min)):
-
+                for h_ma, l_ma, h_mi, l_mi in zip(h_max, l_max, np.flip(h_min), np.flip(l_min)):
                     swap["s_layer"] = "{0}".format(l_ma)
                     swap["s_head"] = h_ma
                     swap["d_layer"] = "{0}".format(l_mi)
                     swap["d_head"] = h_mi
-
-
-
-                    print("in of loop hmin {0}".format(h_min))
-
-                    print("in of loop flip hmin {0}".format(np.flip(h_min)))
-
-                    print("in of loop hmin {0}".format(h_min))
-
-                    print("in of loop flip hmin {0}".format(np.flip(h_min)))
-
-
-
-                    print(swap)
-
-                    print(h_ma)
-                    print(l_ma)
-
-                    print(h_mi)
-
-                    print(l_mi)
-
-
-
                     swaps["{0}".format(current_epoch)].append(swap)
 
-                    print(swaps)
-
                 mhr(model, swaps, head_dim, num_heads, current_epoch)
-
-                print(current_epoch)
 
                 return swaps, current_epoch
 
@@ -711,16 +673,16 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
     return restore, last_epoch_used
 
-def convert_confs(conf, args):
 
+def convert_confs(conf, args):
     for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
         conf["decoder"][d]["self_attn"] = np.array(conf["decoder"][d]["self_attn"])
         conf["decoder"][d]["enc_attn"] = np.array(conf["decoder"][d]["enc_attn"])
         conf["encoder"][e]["self_attn"] = np.array(conf["encoder"][e]["self_attn"])
     return conf
 
-def get_batch_confs(model, conf, args):
 
+def get_batch_confs(model, conf, args):
     for e, d in zip(range(args.encoder_layers), range(args.decoder_layers)):
         conf["decoder"][d]["self_attn"].append(
             np.append(np.array(model.decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),
