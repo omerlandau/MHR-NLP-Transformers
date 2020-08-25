@@ -301,7 +301,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             pickle.dump(conf, fd, protocol=3)
 
 
-    if args.dynamic_type is not None and :
+    if args.dynamic_type is not None and args.head_confidence_method is not None:
 
         conf = calc_conf_per_epoch(conf, args)
 
