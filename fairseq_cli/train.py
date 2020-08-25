@@ -662,6 +662,9 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
     :return:
     '''
 
+    print(transformer_type)
+    print(end_epoch)
+
     if max_switches > (num_heads * num_layers - max_switches):
         raise NameError("must have an even number of swaps")
 
