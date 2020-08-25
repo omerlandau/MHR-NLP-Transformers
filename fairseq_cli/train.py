@@ -304,40 +304,40 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         restore['enc_self_attn'], last_epoch_num['enc_self_attn'] = dynamic_mhr(model, args.start_dynamic_mhr,
                                                                                 "encoder", "self_attn",
                                                                                 restore['enc_self_attn'],
-                                                                                args.dynamic_swap_frequency[0],
+                                                                                int(args.dynamic_swap_frequency[0]),
                                                                                 last_epoch_num['enc_self_attn'],
                                                                                 epoch_itr.epoch + 1,
-                                                                                args.dynamic_max_switches[0], val_conf[0],
+                                                                                int(args.dynamic_max_switches[0]), val_conf[0],
                                                                                 num_heads, head_dim,
                                                                                 args.encoder_layers, local_only=False,
                                                                                 d_type=args.dynamic_type[0],
-                                                                                rest=args.dynamic_rest[0],
-                                                                                end_epoch=args.dynamic_end_epoch[0])
+                                                                                rest=int(args.dynamic_rest[0]),
+                                                                                end_epoch=int(args.dynamic_end_epoch[0]))
 
         restore['dec_self_attn'], last_epoch_num['dec_self_attn'] = dynamic_mhr(model, args.start_dynamic_mhr,
                                                                                 "decoder", "self_attn",
                                                                                 restore['dec_self_attn'],
-                                                                                args.dynamic_swap_frequency[1],
+                                                                                int(args.dynamic_swap_frequency[1]),
                                                                                 last_epoch_num['dec_self_attn'],
                                                                                 epoch_itr.epoch + 1,
-                                                                                args.dynamic_max_switches[1], val_conf[1],
+                                                                                int(args.dynamic_max_switches[1]), val_conf[1],
                                                                                 num_heads, head_dim,
                                                                                 args.encoder_layers, local_only=False,
                                                                                 d_type=args.dynamic_type[1],
-                                                                                rest=args.dynamic_rest[1],
-                                                                                end_epoch=args.dynamic_end_epoch[1])
+                                                                                rest=int(args.dynamic_rest[1]),
+                                                                                end_epoch=int(args.dynamic_end_epoch[1]))
         restore['dec_enc_attn'], last_epoch_num['dec_enc_attn'] = dynamic_mhr(model, args.start_dynamic_mhr,
                                                                               "decoder", "encoder_attn",
                                                                               restore['dec_enc_attn'],
-                                                                              args.dynamic_swap_frequency[2],
+                                                                              int(args.dynamic_swap_frequency[2]),
                                                                               last_epoch_num['dec_enc_attn'],
                                                                               epoch_itr.epoch + 1,
-                                                                              args.dynamic_max_switches[2], val_conf[2],
+                                                                              int(args.dynamic_max_switches[2]), val_conf[2],
                                                                               num_heads, head_dim,
                                                                               args.encoder_layers, local_only=False,
                                                                               d_type=args.dynamic_type[2],
-                                                                              rest=args.dynamic_rest[2],
-                                                                              end_epoch=args.dynamic_end_epoch[2])
+                                                                              rest=int(args.dynamic_rest[2]),
+                                                                              end_epoch=int(args.dynamic_end_epoch[2]))
 
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
@@ -690,7 +690,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
     if (current_epoch - last_epoch_used == (frequency + rest) or (start_epoch == current_epoch)):
 
         if not local_only:
-            if d_type == "Hard":
+            if d_type == "H":
                 conf_arg_sort = conf.flatten().argsort().astype(int)
                 heads = conf_arg_sort % num_heads  # heads positions
                 layers = conf_arg_sort // num_heads  # heads layers
@@ -711,10 +711,10 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
                 return swaps, current_epoch
 
-            if d_type == "Soft":
+            if d_type == "S":
                 return swaps, current_epoch
 
-            if d_type == "Random":
+            if d_type == "R":
 
                 conf_arg_sort = conf.flatten().argsort().astype(int).copy()
                 np.random.shuffle(conf_arg_sort)
