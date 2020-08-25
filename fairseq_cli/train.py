@@ -580,39 +580,41 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
 
     for s_key, d_key in zip(src_parameters.keys(), dst_parameters.keys()):
 
-        ms = model.state_dict()
+        with torch.no_grad():
 
-        if ("bias" in s_key and "bias" in d_key):
-            # all source bias's weights
-            src_parameter = ms[s_key]
-            # all dst bias's weights
-            dst_parameter = ms[d_key]
-            # getting only bias's weights which relates to a specific head computation
-            src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim].clone()
-            dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim].clone()
-            # rotating bias's weights
-            dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim] = src_head_parameter
-            src_parameter[src_head * head_dim:(src_head + 1) * head_dim] = dst_head_parameter
-            del src_parameter
-            del dst_parameter
-            torch.cuda.empty_cache()
-        else:
-            # all source layer heads
-            src_parameter = ms[s_key]
+            ms = model.state_dict()
 
-            # all dst layer heads
-            dst_parameter = ms[d_key]
+            if ("bias" in s_key and "bias" in d_key):
+                # all source bias's weights
+                src_parameter = ms[s_key]
+                # all dst bias's weights
+                dst_parameter = ms[d_key]
+                # getting only bias's weights which relates to a specific head computation
+                src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim].clone()
+                dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim].clone()
+                # rotating bias's weights
+                dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim] = src_head_parameter
+                src_parameter[src_head * head_dim:(src_head + 1) * head_dim] = dst_head_parameter
+                del src_parameter
+                del dst_parameter
+                torch.cuda.empty_cache()
+            else:
+                # all source layer heads
+                src_parameter = ms[s_key]
 
-            # Get specific head parameters
+                # all dst layer heads
+                dst_parameter = ms[d_key]
 
-            src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :].clone()
-            dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :].clone()
-            dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :] = src_head_parameter
-            src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :] = dst_head_parameter
+                # Get specific head parameters
 
-            del src_parameter
-            del dst_parameter
-            torch.cuda.empty_cache()
+                src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :].clone()
+                dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :].clone()
+                dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :] = src_head_parameter
+                src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :] = dst_head_parameter
+
+                del src_parameter
+                del dst_parameter
+                torch.cuda.empty_cache()
 
     print(
         "Done swapping parameters for creation of head {} in layer {} and head {} in layer {}".format(src_head,
