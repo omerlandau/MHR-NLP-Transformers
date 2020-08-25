@@ -301,7 +301,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
     if args.dynamic_type is not None:
 
-        restore['enc_self_attn'], last_epoch_num['enc_self_attn'] = dynamic_mhr(model, args.start_dynamic_mhr,
+        restore['enc_self_attn'], last_epoch_num['enc_self_attn'] = dynamic_mhr(model, int(args.start_dynamic_mhr[0]),
                                                                                 "encoder", "self_attn",
                                                                                 restore['enc_self_attn'],
                                                                                 int(args.dynamic_swap_frequency[0]),
@@ -314,7 +314,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                                                                                 rest=int(args.dynamic_rest[0]),
                                                                                 end_epoch=int(args.dynamic_end_epoch[0]))
 
-        restore['dec_self_attn'], last_epoch_num['dec_self_attn'] = dynamic_mhr(model, args.start_dynamic_mhr,
+        restore['dec_self_attn'], last_epoch_num['dec_self_attn'] = dynamic_mhr(model, int(args.start_dynamic_mhr[1]),
                                                                                 "decoder", "self_attn",
                                                                                 restore['dec_self_attn'],
                                                                                 int(args.dynamic_swap_frequency[1]),
@@ -326,7 +326,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                                                                                 d_type=args.dynamic_type[1],
                                                                                 rest=int(args.dynamic_rest[1]),
                                                                                 end_epoch=int(args.dynamic_end_epoch[1]))
-        restore['dec_enc_attn'], last_epoch_num['dec_enc_attn'] = dynamic_mhr(model, args.start_dynamic_mhr,
+        restore['dec_enc_attn'], last_epoch_num['dec_enc_attn'] = dynamic_mhr(model, int(args.start_dynamic_mhr[2]),
                                                                               "decoder", "encoder_attn",
                                                                               restore['dec_enc_attn'],
                                                                               int(args.dynamic_swap_frequency[2]),
