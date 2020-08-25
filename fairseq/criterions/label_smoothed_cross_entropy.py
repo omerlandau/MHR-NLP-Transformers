@@ -37,7 +37,7 @@ def get_conf_inc_loss_self_driven(x):
     """
     radius = x.detach()
     assert radius.requires_grad == False
-    radius = radius + 0.1
+    radius = radius + 0.2
     l = ((x - radius) ** 2).mean()
     return l
 
@@ -86,17 +86,18 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             l_growth_dec_e = 0
             for i in range(len(model.encoder.layers)):
                 l_conf_enc += model.encoder.layers[i].self_attn.head_conf.var()
-                #l_growth_enc += get_conf_inc_loss_self_driven(model.encoder.layers[i].self_attn.head_conf)
+                l_growth_enc += get_conf_inc_loss_self_driven(model.encoder.layers[i].self_attn.head_conf)
             for i in range(len(model.decoder.layers)):
                 l_conf_dec += model.decoder.layers[i].self_attn.head_conf.var()
-                #l_growth_dec += get_conf_inc_loss_self_driven(model.decoder.layers[i].self_attn.head_conf)
+                l_growth_dec += get_conf_inc_loss_self_driven(model.decoder.layers[i].self_attn.head_conf)
                 l_conf_dec_e += model.decoder.layers[i].encoder_attn.head_conf.var()
-                #l_growth_dec_e += get_conf_inc_loss_self_driven(model.decoder.layers[i].encoder_attn.head_conf)
+                l_growth_dec_e += get_conf_inc_loss_self_driven(model.decoder.layers[i].encoder_attn.head_conf)
 
 
 
             loss += gamma_conf*(batch_num+0.4)*l_conf_enc + l_conf_dec_e*gamma_conf*(batch_num +0.3)\
-                    + l_conf_dec*gamma_conf*(batch_num +0.3)
+                    + l_conf_dec*gamma_conf*(batch_num +0.3) + gamma_conf*0.5*l_growth_enc + \
+                    gamma_conf*0.5*l_growth_dec +gamma_conf*0.5*l_growth_dec_e
 
         logging_output = {
             'loss': loss.data,
