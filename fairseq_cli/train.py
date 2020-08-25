@@ -290,6 +290,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
         conf = convert_confs(conf, args)
 
+
         path = args.save_dir.replace("checkpoints", "confs") + "-method={0}".format(args.head_confidence_method)
         try:
             os.mkdir(path, 0o775)
@@ -299,7 +300,10 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                 args.head_confidence_method) + "/epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
-    if args.dynamic_type is not None:
+
+    if args.dynamic_type is not None and :
+
+        conf = calc_conf_per_epoch(conf, args)
 
         restore['enc_self_attn'], last_epoch_num['enc_self_attn'] = dynamic_mhr(model, int(args.start_dynamic_mhr[0]),
                                                                                 "encoder", "self_attn",
@@ -307,7 +311,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                                                                                 int(args.dynamic_swap_frequency[0]),
                                                                                 last_epoch_num['enc_self_attn'],
                                                                                 epoch_itr.epoch + 1,
-                                                                                int(args.dynamic_max_switches[0]), val_conf[0],
+                                                                                int(args.dynamic_max_switches[0]), conf[0],
                                                                                 num_heads, head_dim,
                                                                                 args.encoder_layers, local_only=False,
                                                                                 d_type=args.dynamic_type[0],
@@ -320,7 +324,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                                                                                 int(args.dynamic_swap_frequency[1]),
                                                                                 last_epoch_num['dec_self_attn'],
                                                                                 epoch_itr.epoch + 1,
-                                                                                int(args.dynamic_max_switches[1]), val_conf[1],
+                                                                                int(args.dynamic_max_switches[1]), conf[1],
                                                                                 num_heads, head_dim,
                                                                                 args.encoder_layers, local_only=False,
                                                                                 d_type=args.dynamic_type[1],
@@ -332,7 +336,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                                                                               int(args.dynamic_swap_frequency[2]),
                                                                               last_epoch_num['dec_enc_attn'],
                                                                               epoch_itr.epoch + 1,
-                                                                              int(args.dynamic_max_switches[2]), val_conf[2],
+                                                                              int(args.dynamic_max_switches[2]), conf[2],
                                                                               num_heads, head_dim,
                                                                               args.encoder_layers, local_only=False,
                                                                               d_type=args.dynamic_type[2],
@@ -436,29 +440,9 @@ def validate(args, trainer, task, epoch_itr, subsets):
 
         val_conf = convert_confs(val_conf, args)
 
-        for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-            val_conf["encoder"][l_e]["self_attn"] = np.matmul(val_conf["encoder"][l_e]["self_attn"][:, -1],
-                                                              val_conf["encoder"][l_e]["self_attn"][:, :-1]) / np.sum(
-                val_conf["encoder"][l_e]["self_attn"][:, -1])
+        val_conf = calc_conf_per_epoch(val_conf,args)
 
-            val_conf["decoder"][l_d]["self_attn"] = np.matmul(val_conf["decoder"][l_d]["self_attn"][:, -1],
-                                                              val_conf["decoder"][l_d]["self_attn"][:, :-1]) / np.sum(
-                val_conf["decoder"][l_d]["self_attn"][:, -1])
 
-            val_conf["decoder"][l_d]["enc_attn"] = np.matmul(val_conf["decoder"][l_d]["enc_attn"][:, -1],
-                                                             val_conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
-                val_conf["decoder"][l_d]["enc_attn"][:, -1])
-
-        enc_self_layers = []
-        dec_self_layers = []
-        dec_enc_layers = []
-
-        for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-            enc_self_layers.append(val_conf["encoder"][l_e]["self_attn"])
-            dec_self_layers.append(val_conf["decoder"][l_d]["self_attn"])
-            dec_enc_layers.append(val_conf["decoder"][l_d]["enc_attn"])
-
-        val_conf = (np.array(enc_self_layers), np.array(dec_self_layers), np.array(dec_enc_layers))
 
     return valid_losses, val_conf
 
@@ -596,39 +580,41 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
 
     for s_key, d_key in zip(src_parameters.keys(), dst_parameters.keys()):
 
-        ms = model.state_dict()
+        with torch.no_grad():
 
-        if ("bias" in s_key and "bias" in d_key):
-            # all source bias's weights
-            src_parameter = ms[s_key]
-            # all dst bias's weights
-            dst_parameter = ms[d_key]
-            # getting only bias's weights which relates to a specific head computation
-            src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim].clone()
-            dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim].clone()
-            # rotating bias's weights
-            dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim] = src_head_parameter
-            src_parameter[src_head * head_dim:(src_head + 1) * head_dim] = dst_head_parameter
-            del src_parameter
-            del dst_parameter
-            torch.cuda.empty_cache()
-        else:
-            # all source layer heads
-            src_parameter = ms[s_key]
+            ms = model.state_dict()
 
-            # all dst layer heads
-            dst_parameter = ms[d_key]
+            if ("bias" in s_key and "bias" in d_key):
+                # all source bias's weights
+                src_parameter = ms[s_key]
+                # all dst bias's weights
+                dst_parameter = ms[d_key]
+                # getting only bias's weights which relates to a specific head computation
+                src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim].clone()
+                dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim].clone()
+                # rotating bias's weights
+                dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim] = src_head_parameter
+                src_parameter[src_head * head_dim:(src_head + 1) * head_dim] = dst_head_parameter
+                del src_parameter
+                del dst_parameter
+                torch.cuda.empty_cache()
+            else:
+                # all source layer heads
+                src_parameter = ms[s_key]
 
-            # Get specific head parameters
+                # all dst layer heads
+                dst_parameter = ms[d_key]
 
-            src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :].clone()
-            dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :].clone()
-            dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :] = src_head_parameter
-            src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :] = dst_head_parameter
+                # Get specific head parameters
 
-            del src_parameter
-            del dst_parameter
-            torch.cuda.empty_cache()
+                src_head_parameter = src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :].clone()
+                dst_head_parameter = dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :].clone()
+                dst_parameter[dst_head * head_dim:(dst_head + 1) * head_dim, :] = src_head_parameter
+                src_parameter[src_head * head_dim:(src_head + 1) * head_dim, :] = dst_head_parameter
+
+                del src_parameter
+                del dst_parameter
+                torch.cuda.empty_cache()
 
     print(
         "Done swapping parameters for creation of head {} in layer {} and head {} in layer {}".format(src_head,
@@ -737,6 +723,34 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 return swaps, current_epoch
 
     return restore, last_epoch_used
+
+def calc_conf_per_epoch(val_conf, args):
+
+    for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+        val_conf["encoder"][l_e]["self_attn"] = np.matmul(val_conf["encoder"][l_e]["self_attn"][:, -1],
+                                                          val_conf["encoder"][l_e]["self_attn"][:, :-1]) / np.sum(
+            val_conf["encoder"][l_e]["self_attn"][:, -1])
+
+        val_conf["decoder"][l_d]["self_attn"] = np.matmul(val_conf["decoder"][l_d]["self_attn"][:, -1],
+                                                          val_conf["decoder"][l_d]["self_attn"][:, :-1]) / np.sum(
+            val_conf["decoder"][l_d]["self_attn"][:, -1])
+
+        val_conf["decoder"][l_d]["enc_attn"] = np.matmul(val_conf["decoder"][l_d]["enc_attn"][:, -1],
+                                                         val_conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
+            val_conf["decoder"][l_d]["enc_attn"][:, -1])
+
+    enc_self_layers = []
+    dec_self_layers = []
+    dec_enc_layers = []
+
+    for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
+        enc_self_layers.append(val_conf["encoder"][l_e]["self_attn"])
+        dec_self_layers.append(val_conf["decoder"][l_d]["self_attn"])
+        dec_enc_layers.append(val_conf["decoder"][l_d]["enc_attn"])
+
+    val_conf = (np.array(enc_self_layers), np.array(dec_self_layers), np.array(dec_enc_layers))
+
+    return val_conf
 
 
 def convert_confs(conf, args):
