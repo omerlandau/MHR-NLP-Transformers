@@ -679,10 +679,10 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
             if d_type == "Random":
 
-                conf_arg_sort = conf.flatten().argsort().astype(int)
+                conf_arg_sort = conf.flatten().argsort().astype(int).copy()
                 print("Before Rand")
                 print(conf_arg_sort)
-                conf_arg_sort = np.random.shuffle(conf_arg_sort)
+                np.random.shuffle(conf_arg_sort)
                 print("After Rand")
                 print(conf_arg_sort)
 
