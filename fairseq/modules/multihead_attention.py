@@ -15,7 +15,6 @@ import numpy as np
 import time
 
 
-
 @with_incremental_state
 class MultiheadAttention(nn.Module):
     """Multi-headed attention.
@@ -126,7 +125,7 @@ class MultiheadAttention(nn.Module):
             attn_mask: Optional[Tensor] = None,
             before_softmax: bool = False,
             need_head_weights: bool = False,
-            calc_head_importance = False
+            calc_head_importance=False
     ) -> Tuple[Tensor, Optional[Tensor], Optional[Tensor], Optional[Tensor]]:
         """Input shape: Time x Batch x Channel
 
@@ -358,41 +357,34 @@ class MultiheadAttention(nn.Module):
         attn_weights = attn_weights_float.type_as(attn_weights)
         conf = None
 
-
         ## computing confidence of all heads over bsz sentences
 
         ## heads is an np array of shape [head_nums+1] which contains confidence*bsz for each head and bsz:
         ## [conf_h_1*bsz,conf_h_2*bsz,...,conf_h_n*bsz,bsz]
         # Viota's confidence is based on:
         # Word attn confidence is an upgraded more delicate version of conf,
-        #where
+        # where
         if self.head_confidence_method is not None:
 
             if attn_weights is not None:
-                if(self.head_confidence_method == "advanced"):
-                    print("#########guy#############")
-                    a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1,0)
-                    a[:,:,-1, -1] = torch.zeros((self.num_heads,bsz))
+                if (self.head_confidence_method == "base"):
+                    a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
+                    a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
-                    heads = heads[0].sum(dim=1)/bsz
+                    heads = heads[0].sum(dim=1) / bsz
                 else:
                     a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
                     heads = a[:, :, :, :].max(dim=2)
-                    heads = heads[0].sum(dim=2)/(tgt_len -1)
-                    heads = heads.sum(dim=1)/bsz
+                    heads = heads[0].sum(dim=2) / (src_len - 1)
+                    heads = heads.sum(dim=1) / bsz
 
-
-
-
-
-
-                #heads = np.array(heads.cpu())
-                #heads = np.append(heads,[bsz])
+                # heads = np.array(heads.cpu())
+                # heads = np.append(heads,[bsz])
 
             # Take max for each source word, than average all
-            #for j in range(self.num_heads):
+            # for j in range(self.num_heads):
             #    conf_temp = 0
             #    for batch in range(bsz):
             #        word_attn_sum = 0
@@ -402,7 +394,6 @@ class MultiheadAttention(nn.Module):
             #        conf_temp += word_attn_sum / (tgt_len - 1)
             #    word_max["heads"].append(conf_temp)
             conf = heads
-
 
         self.head_conf = conf
 
