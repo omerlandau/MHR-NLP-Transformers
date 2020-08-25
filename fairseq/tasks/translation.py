@@ -209,7 +209,7 @@ class TranslationTask(FairseqTask):
         parser.add_argument('--dynamic-swap-frequency', type=int, nargs="+",default=None, help="frequency for swapping")
         parser.add_argument('--start-dynamic-mhr', type=int, nargs="+", default=None, help="epoch to start dynamic MHR")
         parser.add_argument('--dynamic-max-switches', type=int, nargs="+", default=None, help="max head to be switched")
-        parser.add_argument('--dynamic-type', type=int, nargs="+", default=None, help="type of automatic swapping")
+        parser.add_argument('--dynamic-type', type=str, nargs="+", default=None, help="type of automatic swapping")
         parser.add_argument('--dynamic-rest', type=int, nargs="+", default=[1,1,1], help="type of automatic swapping")
         parser.add_argument('--dynamic-end-epoch', type=int, nargs="+", default=[0,0,0], help="epoch to end dynamic MHR")
 
