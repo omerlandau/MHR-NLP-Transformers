@@ -298,9 +298,9 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             pickle.dump(conf, fd, protocol=3)
 
     if args.dynamic_type is not None:
-        restore, last_epoch_num = dynamic_mhr(model, args.start_dynamic_mhr, "encoder", "self_attn",
+        restore, last_epoch_num = dynamic_mhr(model, args.start_dynamic_mhr, "decoder", "encoder_attn",
                                               restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch + 1,
-                                              args.dynamic_max_switches, val_conf[0], num_heads, head_dim,
+                                              args.dynamic_max_switches, val_conf[2], num_heads, head_dim,
                                               args.encoder_layers, local_only=False, d_type=args.dynamic_type,
                                               rest=args.dynamic_rest)
 
