@@ -379,6 +379,7 @@ class MultiheadAttention(nn.Module):
                     heads = a[:, :, :, :].max(dim=2)
                     heads = heads[0].sum(dim=2) / (src_len - 1)
                     heads = heads.sum(dim=1) / bsz
+                    heads = heads*20
 
 
             # Take max for each source word, than average all
