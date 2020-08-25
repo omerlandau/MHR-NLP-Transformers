@@ -303,7 +303,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                                               restore, args.dynamic_swap_frequency, last_epoch_num, epoch_itr.epoch + 1,
                                               args.dynamic_max_switches, val_conf[2], num_heads, head_dim,
                                               args.encoder_layers, local_only=False, d_type=args.dynamic_type,
-                                              rest=args.dynamic_rest)
+                                              rest=args.dynamic_rest, end_epoch=args.dynamic_end_epoch)
 
     # log end-of-epoch stats
     stats = get_training_stats(metrics.get_smoothed_values("train"))
@@ -606,7 +606,7 @@ def mhr_single_head(model, head_dim, num_heads, src_parameters, dst_parameters, 
 
 def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, frequency, last_epoch_used,
                 current_epoch, max_switches, conf, num_heads, head_dim, num_layers, local_only=False, d_type="Hard",
-                rest=1):
+                rest=1, end_epoch=0):
     '''
 
     :param model: The model.
@@ -633,6 +633,13 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
     if start_epoch > current_epoch:
         return None, 0
+
+    if current_epoch > end_epoch:
+
+        if restore is not None:
+            mhr(model, restore, head_dim, num_heads, last_epoch_used)
+
+        return None, last_epoch_used
 
 
 
@@ -680,13 +687,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
             if d_type == "Random":
 
                 conf_arg_sort = conf.flatten().argsort().astype(int).copy()
-                print("Before Rand")
-                print(conf_arg_sort)
                 np.random.shuffle(conf_arg_sort)
-                print("After Rand")
-                print(conf_arg_sort)
-
-                exit()
                 heads = conf_arg_sort % num_heads  # heads positions
                 layers = conf_arg_sort // num_heads  # heads layers
                 l_max = layers[-1 * max_switches:]

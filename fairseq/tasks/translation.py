@@ -211,6 +211,7 @@ class TranslationTask(FairseqTask):
         parser.add_argument('--dynamic-max-switches', type=int, default=None, help="max head to be switched")
         parser.add_argument('--dynamic-type', type=str, default=None, help="type of automatic swapping")
         parser.add_argument('--dynamic-rest', type=int, default=1, help="type of automatic swapping")
+        parser.add_argument('--dynamic-end-epoch', type=int, default=1, help="epoch to end dynamic MHR")
 
 
 
