@@ -256,6 +256,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
 
+
             if log_output is None:  # OOM, overflow, ...
                 continue
         total_samples += model.decoder.layers[0].self_attn.bsz
@@ -677,6 +678,34 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 return swaps, current_epoch
 
             if d_type == "Random":
+
+                conf_arg_sort = conf.flatten().argsort().astype(int)
+                print("Before Rand")
+                print(conf_arg_sort)
+                conf_arg_sort = np.random.shuffle(conf_arg_sort)
+                print("After Rand")
+                print(conf_arg_sort)
+
+                exit()
+                heads = conf_arg_sort % num_heads  # heads positions
+                layers = conf_arg_sort // num_heads  # heads layers
+                l_max = layers[-1 * max_switches:]
+                l_min = layers[:max_switches]
+                h_max = heads[-1 * max_switches:]
+                h_min = heads[:max_switches]
+
+                for h_ma, l_ma, h_mi, l_mi in zip(h_max, l_max, np.flip(h_min), np.flip(l_min)):
+                    swap["s_layer"] = "{0}".format(l_ma)
+                    swap["s_head"] = h_ma
+                    swap["d_layer"] = "{0}".format(l_mi)
+                    swap["d_head"] = h_mi
+
+                    swaps["{0}".format(current_epoch)].append(swap.copy())
+
+                mhr(model, swaps, head_dim, num_heads, current_epoch)
+
+
+
                 return swaps, current_epoch
 
     return restore, last_epoch_used
