@@ -690,7 +690,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
     if (current_epoch - last_epoch_used == (frequency + rest) or (start_epoch == current_epoch)):
 
         if not local_only:
-            if d_type == "H":
+            if d_type == 'H':
                 conf_arg_sort = conf.flatten().argsort().astype(int)
                 heads = conf_arg_sort % num_heads  # heads positions
                 layers = conf_arg_sort // num_heads  # heads layers
@@ -711,10 +711,10 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
                 return swaps, current_epoch
 
-            if d_type == "S":
+            if d_type == 'S':
                 return swaps, current_epoch
 
-            if d_type == "R":
+            if d_type == 'R':
 
                 conf_arg_sort = conf.flatten().argsort().astype(int).copy()
                 np.random.shuffle(conf_arg_sort)
