@@ -206,12 +206,12 @@ class TranslationTask(FairseqTask):
 
         parser.add_argument('--head-confidence-method', type=str, default=None, help="overall_max or mean_word_max")
         parser.add_argument('--gamma-conf', type=float, default=None, help="gamma for conf loss")
-        parser.add_argument('--dynamic-swap-frequency', type=int, default=None, help="frequency for swapping")
-        parser.add_argument('--start-dynamic-mhr', type=float, default=None, help="epoch to start dynamic MHR")
-        parser.add_argument('--dynamic-max-switches', type=int, default=None, help="max head to be switched")
-        parser.add_argument('--dynamic-type', type=str, default=None, help="type of automatic swapping")
-        parser.add_argument('--dynamic-rest', type=int, default=1, help="type of automatic swapping")
-        parser.add_argument('--dynamic-end-epoch', type=int, default=1, help="epoch to end dynamic MHR")
+        parser.add_argument('--dynamic-swap-frequency', type=tuple, default=None, help="frequency for swapping")
+        parser.add_argument('--start-dynamic-mhr', type=tuple, default=None, help="epoch to start dynamic MHR")
+        parser.add_argument('--dynamic-max-switches', type=tuple, default=None, help="max head to be switched")
+        parser.add_argument('--dynamic-type', type=tuple, default=None, help="type of automatic swapping")
+        parser.add_argument('--dynamic-rest', type=tuple, default=(1,1,1), help="type of automatic swapping")
+        parser.add_argument('--dynamic-end-epoch', type=tuple, default=(0,0,0), help="epoch to end dynamic MHR")
 
 
 
