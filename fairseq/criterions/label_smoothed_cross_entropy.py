@@ -70,6 +70,9 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
         net_output = model(**sample['net_input'])
 
+        l_alpha_enc = 0
+        l_alpha_dec =0
+        l_alpha_dec_e = 0
 
 
         for i in range(len(model.encoder.layers)):
