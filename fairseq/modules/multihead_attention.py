@@ -414,7 +414,7 @@ class MultiheadAttention(nn.Module):
 
         z = ctx.contiguous().view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
 
-        b = z.view(self.num_heads, tgt_len*bsz*self.head_dim)
+        b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
         b = torch.mm(self.alphas,b)
 
