@@ -72,7 +72,7 @@ class MultiheadAttention(nn.Module):
 
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
-        self.alphas = torch.zeros((num_heads,num_heads),device=torch.device('cuda'), requires_grad=True).fill_diagonal_(1)
+        self.alphas = torch.zeros((num_heads,num_heads),device=torch.device('cuda')).fill_diagonal_(1)
 
         if add_bias_kv:
             self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
