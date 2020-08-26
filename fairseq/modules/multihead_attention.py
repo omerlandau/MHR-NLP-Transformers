@@ -420,6 +420,8 @@ class MultiheadAttention(nn.Module):
 
         ctx = b.view(self.num_heads, bsz,tgt_len,self.head_dim).transpose(0,1)
 
+        ctx = ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
+
 
 
 
