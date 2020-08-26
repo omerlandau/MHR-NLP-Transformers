@@ -412,7 +412,7 @@ class MultiheadAttention(nn.Module):
         save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
         ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
-        z = ctx.view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
+        z = ctx.contiguous().view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
 
         b = z.view(self.num_heads, tgt_len*bsz*self.head_dim)
 
