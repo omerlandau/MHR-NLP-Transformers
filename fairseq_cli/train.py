@@ -253,7 +253,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
     conf = {"encoder": [{"self_attn": []} for i in range(args.encoder_layers)],
             "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
 
-    batch_regression = 1.0 - (total_samples / (160239 * 40))
+    batch_regression = 1.0 - (total_samples / (160239 * 50))
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
@@ -262,7 +262,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                 continue
         total_samples += model.decoder.layers[0].self_attn.bsz
         batch_regression = 1.0 - (
-                total_samples / (160239 * 40))  # need to find more generic way to find total samples and epoch num.
+                total_samples / (160239 * 50))  # need to find more generic way to find total samples and epoch num.
 
         # Get Confidence for each Head.
         if args.head_confidence_method is not None:
