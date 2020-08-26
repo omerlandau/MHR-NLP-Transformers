@@ -408,6 +408,15 @@ class MultiheadAttention(nn.Module):
         save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
         ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
+        z = ctx.view(bsz, self.num_heads,tgt_len,self.head_dim)
+
+        alphas = torch.zeros((8,8))
+
+
+        alphas = torch
+
+
+
         assert list(ctx.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
         if self.onnx_trace and ctx.size(1) == 1:
             # when ONNX tracing a single decoder step (sequence length == 1)
