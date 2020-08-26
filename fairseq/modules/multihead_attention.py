@@ -410,6 +410,11 @@ class MultiheadAttention(nn.Module):
 
         z = ctx.view(bsz, self.num_heads,tgt_len,self.head_dim)
 
+        alphas = torch.zeros((8,8))
+
+
+        alphas = torch
+
 
 
         assert list(ctx.size()) == [bsz * self.num_heads, tgt_len, self.head_dim]
