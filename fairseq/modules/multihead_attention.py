@@ -404,21 +404,23 @@ class MultiheadAttention(nn.Module):
             training=self.training,
         )
 
+        print(self.alphas)
+
         assert v is not None
 
         ctx = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
         save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
         ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
-        #z = ctx.view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
+        z = ctx.view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
 
-        #z = z.view(self.num_heads, tgt_len*bsz*self.head_dim)
+        z = z.view(self.num_heads, tgt_len*bsz*self.head_dim)
 
-        #z = torch.mm(self.alphas,z)
+        z = torch.mm(self.alphas,z)
 
-        #z = z.view(self.num_heads, bsz,tgt_len,self.head_dim).transpose(0,1)
+        z = z.view(self.num_heads, bsz,tgt_len,self.head_dim).transpose(0,1)
 
-        #ctx = z
+        ctx = z
 
 
 
