@@ -72,6 +72,8 @@ class MultiheadAttention(nn.Module):
 
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
+        self.alphas = torch.zeros((num_heads,num_heads)).fill_diagonals_(1)
+
         if add_bias_kv:
             self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
             self.bias_v = Parameter(torch.Tensor(1, 1, embed_dim))
@@ -408,12 +410,17 @@ class MultiheadAttention(nn.Module):
         save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
         ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
-        z = ctx.view(bsz, self.num_heads,tgt_len,self.head_dim)
+        #z = ctx.view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
 
-        alphas = torch.zeros((8,8))
+        #z = z.view(self.num_heads, tgt_len*bsz*self.head_dim)
+
+        #z = torch.mm(self.alphas,z)
+
+        #z = z.view(self.num_heads, bsz,tgt_len,self.head_dim).transpose(0,1)
+
+        #ctx = z
 
 
-        alphas = torch
 
 
 

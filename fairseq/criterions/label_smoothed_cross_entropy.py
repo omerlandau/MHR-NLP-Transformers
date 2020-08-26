@@ -71,6 +71,16 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         net_output = model(**sample['net_input'])
 
 
+        #if False:
+
+        #    for i in range(len(model.encoder.layers)):
+        #        l_conf_enc += model.encoder.layers[i].self_attn.alphas.norm(2)
+        #        # l_growth_enc += get_conf_inc_loss_self_driven(model.encoder.layers[i].self_attn.head_conf)
+        #    for i in range(len(model.decoder.layers)):
+        #        l_conf_dec += model.decoder.layers[i].self_attn.head_conf.var()
+        #        # l_growth_dec += get_conf_inc_loss_self_driven(model.decoder.layers[i].self_attn.head_conf)
+        #        l_conf_dec_e += model.decoder.layers[i].encoder_attn.head_conf.var()
+        #        # l_growth_dec_e += get_conf_inc_loss_self_driven(model.decoder.layers[i].encoder_attn.head_conf)
 
 
 
@@ -95,8 +105,8 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
 
 
-            loss += gamma_conf*(batch_num+0.4)*l_conf_enc + 0*l_conf_dec_e*gamma_conf*(batch_num +0.3)\
-                    + 0*l_conf_dec*gamma_conf*(batch_num +0.3)
+            loss += gamma_conf*(batch_num+0.4)*l_conf_enc + l_conf_dec_e*gamma_conf*(batch_num +0.3)\
+                    + l_conf_dec*gamma_conf*(batch_num +0.3)
 
         logging_output = {
             'loss': loss.data,
