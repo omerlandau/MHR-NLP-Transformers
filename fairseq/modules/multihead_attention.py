@@ -376,10 +376,10 @@ class MultiheadAttention(nn.Module):
                 else:
                     a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
-                    heads = a[:, :, :, :].max(dim=2)
-                    heads = heads[0].sum(dim=2) / (src_len - 1)
+                    heads = a[:, :, :, :].max(dim=3)
+                    heads = heads[0].sum(dim=2) / (tgt_len - 1)
                     heads = heads.sum(dim=1) / bsz
-                    heads = heads*20
+                    heads = heads
 
 
             # Take max for each source word, than average all
