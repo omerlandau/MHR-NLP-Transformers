@@ -397,7 +397,7 @@ class MultiheadAttention(nn.Module):
 
         print("QUERY0-1sim")
 
-        cosine_sim = (torch.matmul(q[0, :, :].flatten(), q[1, :, :].flatten()) / (torch.norm(q[0, :, :].flatten()) * torch.norm(q[1, :, :].flatten())))
+        cosine_sim = (torch.matmul(q[0, :, :].flatten(), q[0, :, :].flatten()) / (torch.norm(q[0, :, :].flatten()) * torch.norm(q[0, :, :].flatten())))
 
         print(cosine_sim)
 
