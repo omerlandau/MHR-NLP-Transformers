@@ -295,6 +295,13 @@ class MultiheadAttention(nn.Module):
             # In this branch incremental_state is never None
             assert incremental_state is not None
             incremental_state = self._set_input_buffer(incremental_state, saved_state)
+
+        k0 =k
+
+        q0 = q
+
+        v0 = v
+
         """
         ##########omertemp##########
         t = k.view(bsz, self.num_heads, -1, self.head_dim)
@@ -494,6 +501,13 @@ class MultiheadAttention(nn.Module):
         cosine_sim = torch.norm(q[5, :, :]-q[3, :, :])
 
         print(cosine_sim)
+
+
+        k= k0
+
+        q = q0
+
+        v= v0
 
 
 
