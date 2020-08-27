@@ -328,11 +328,11 @@ class MultiheadAttention(nn.Module):
 
         print("Weights")
 
-        k = self.k_proj.view(self.num_heads,self.head_dim,embed_dim)
+        k = self.k_proj.weight.view(self.num_heads,self.head_dim,embed_dim)
 
-        q = self.q_proj.view(self.num_heads, self.head_dim, embed_dim)
+        q = self.q_proj.weight.view(self.num_heads, self.head_dim, embed_dim)
 
-        v = self.v_proj.view(self.num_heads,self.head_dim,embed_dim)
+        v = self.v_proj.weight.view(self.num_heads,self.head_dim,embed_dim)
 
         print("KEY0")
         print(k[0, :, :])
