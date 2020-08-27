@@ -72,7 +72,7 @@ class MultiheadAttention(nn.Module):
 
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
-        self.alphas = torch.zeros((num_heads,num_heads),device=torch.device('cuda')).fill_diagonal_(1)
+        self.alphas = torch.cuda.zeros((num_heads,num_heads)).fill_diagonal_(1)
 
         if add_bias_kv:
             self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
@@ -404,7 +404,7 @@ class MultiheadAttention(nn.Module):
             training=self.training,
         )
 
-        #print(self.alphas)
+        print(self.alphas)
 
         assert v is not None
 
@@ -412,17 +412,17 @@ class MultiheadAttention(nn.Module):
         save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
         ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
-        #z = ctx.contiguous().view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
+        z = ctx.contiguous().view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
 
-        #b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
+        b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
-        #self.alphas.requires_grad = True
+        self.alphas.requires_grad = True
 
-        #b = torch.mm(self.alphas,b)
+        b = torch.mm(self.alphas,b)
 
-        #ctx = b.contiguous().view(self.num_heads, bsz,tgt_len,self.head_dim).transpose(0,1)
+        ctx = b.contiguous().view(self.num_heads, bsz,tgt_len,self.head_dim).transpose(0,1)
 
-        #ctx = ctx.contiguous().view(bsz * self.num_heads, tgt_len, self.head_dim)
+        ctx = ctx.contiguous().view(bsz * self.num_heads, tgt_len, self.head_dim)
 
 
 

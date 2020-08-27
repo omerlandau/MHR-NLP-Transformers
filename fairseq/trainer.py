@@ -183,12 +183,17 @@ class Trainer(object):
         return self._lr_scheduler
 
     def _build_optimizer(self):
+
         params = list(
             filter(
                 lambda p: p.requires_grad,
                 chain(self.model.parameters(), self.criterion.parameters()),
             )
         )
+
+        print(params)
+
+        exit()
 
         if self.args.fp16 or self.args.bf16:
             if self.cuda and torch.cuda.get_device_capability(0)[0] < 7:
