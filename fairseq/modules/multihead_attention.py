@@ -441,17 +441,12 @@ class MultiheadAttention(nn.Module):
         a = F.pdist(a)
 
 
-        print(a)
 
-        print(a.shape)
+        print(torch.argsort(c))
 
-        print(c.argsort())
+        print(torch.argsort(c_2))
 
-        print(c_2.argsort())
-
-        print(c_5.argsort())
-
-        exit()
+        print(torch.argsort(c_5))
 
 
 
