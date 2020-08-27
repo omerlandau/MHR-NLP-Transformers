@@ -359,7 +359,7 @@ class MultiheadAttention(nn.Module):
         print("QUERY3")
         print(q[3, :, :])
 
-        cosine_sim = (torch.matmul(k[0,:,:], k[1,:,:].transpose((0,1))) / (torch.norm(k[0,:,:]) * torch.norm(k[1,:,:])))
+        cosine_sim = (torch.matmul(k[0,:,:].flatten(), k[1,:,:].flatten()) / (torch.norm(k[0,:,:].flatten()) * torch.norm(k[1,:,:].flatten())))
 
         print("KEY0-1sim")
 
@@ -367,31 +367,31 @@ class MultiheadAttention(nn.Module):
 
         print("KEY0-2sim")
 
-        cosine_sim = (torch.matmul(k[0,:,:], k[2,:,:].transpose((0,1))) / (torch.norm(k[0,:,:]) * torch.norm(k[2,:,:])))
+        cosine_sim = (torch.matmul(k[0,:,:].flatten(), k[2,:,:].flatten()) / (torch.norm(k[0,:,:].flatten()) * torch.norm(k[2,:,:].flatten())))
 
         print(cosine_sim)
 
         print("KEY0-3sim")
 
-        cosine_sim = (torch.matmul(k[0, :, :], k[3, :, :].transpose((0,1))) / (torch.norm(k[0, :, :]) * torch.norm(k[3, :, :])))
+        cosine_sim = (torch.matmul(k[0, :, :].flatten(), k[3, :, :].flatten()) / (torch.norm(k[0, :, :].flatten()) * torch.norm(k[3, :, :].flatten())))
 
         print(cosine_sim)
 
         print("VALUE0-1sim")
 
-        cosine_sim = (torch.matmul(v[0, :, :], v[1, :, :].transpose((0,1))) / (torch.norm(v[0, :, :]) * torch.norm(v[1, :, :])))
+        cosine_sim = (torch.matmul(v[0, :, :].flatten(), v[1, :, :].flatten()) / (torch.norm(v[0, :, :].flatten()) * torch.norm(v[1, :, :].flatten())))
 
         print(cosine_sim)
 
         print("VALUE0-2sim")
 
-        cosine_sim = (torch.matmul(v[0, :, :], v[2, :, :].transpose((0,1))) / (torch.norm(v[0, :, :]) * torch.norm(v[2, :, :])))
+        cosine_sim = (torch.matmul(v[0, :, :].flatten(), v[2, :, :].flatten()) / (torch.norm(v[0, :, :].flatten()) * torch.norm(v[2, :, :].flatten())))
 
         print(cosine_sim)
 
         print("VALUE0-3sim")
 
-        cosine_sim = (torch.matmul(v[0, :, :], v[3, :, :].transpose((0,1))) / (torch.norm(v[0, :, :]) * torch.norm(v[3, :, :])))
+        cosine_sim = (torch.matmul(v[0, :, :].flatten(), v[3, :, :].flatten()) / (torch.norm(v[0, :, :].flatten()) * torch.norm(v[3, :, :].flatten())))
 
         print(cosine_sim)
 
