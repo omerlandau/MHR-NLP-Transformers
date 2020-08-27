@@ -63,9 +63,9 @@ class MultiheadAttention(nn.Module):
         self.encoder_decoder_attention = encoder_decoder_attention
 
         if(self_attention):
-            print("SELF_ATTENTION")
+            print("#########SELF_ATTENTION##########")
         else:
-            print("ENCODER_ATTENTION")
+            print("########ENCODER_ATTENTION########")
 
         assert not self.self_attention or self.qkv_same_dim, (
             "Self-attention requires query, key and " "value to be of the same size"
