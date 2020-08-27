@@ -419,6 +419,8 @@ class MultiheadAttention(nn.Module):
 
         c = c.sum(dim=0)/bsz
 
+        c = c.sum(dim=0)
+
         #c = F.cosine_similarity(a[0,0,:])
 
         a = a.sum(dim=1)
