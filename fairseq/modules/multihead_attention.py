@@ -103,14 +103,12 @@ class MultiheadAttention(nn.Module):
             nn.init.xavier_uniform_(self.k_proj.weight, gain=1 / math.sqrt(2))
             nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
             nn.init.xavier_uniform_(self.q_proj.weight, gain=1 / math.sqrt(2))
-
-            print(self.alphas.data)
-            self.alphas.data.fill_(0).fill_diagonal_(1)
+            self.alphas.data.fill_diagonal_(1)
         else:
             nn.init.xavier_uniform_(self.k_proj.weight)
             nn.init.xavier_uniform_(self.v_proj.weight)
             nn.init.xavier_uniform_(self.q_proj.weight)
-            self.alphas.data.fill_(0).fill_diagonal_(1)
+            self.alphas.data.fill_diagonal_(1)
 
         nn.init.xavier_uniform_(self.out_proj.weight)
         if self.out_proj.bias is not None:
