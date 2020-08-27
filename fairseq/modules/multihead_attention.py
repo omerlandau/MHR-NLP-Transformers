@@ -295,7 +295,7 @@ class MultiheadAttention(nn.Module):
             # In this branch incremental_state is never None
             assert incremental_state is not None
             incremental_state = self._set_input_buffer(incremental_state, saved_state)
-
+        """
         ##########omertemp##########
         t = k.view(bsz, self.num_heads, -1, self.head_dim)
         g = v.view(bsz, self.num_heads, -1, self.head_dim)
@@ -358,12 +358,16 @@ class MultiheadAttention(nn.Module):
         print(v[3, :, :])
         print("QUERY3")
         print(q[3, :, :])
+        """
+
+        k = self.k_proj.weight.view(self.num_heads, self.head_dim, embed_dim)
+
+        q = self.q_proj.weight.view(self.num_heads, self.head_dim, embed_dim)
+
+        v = self.v_proj.weight.view(self.num_heads, self.head_dim, embed_dim)
 
 
-
-        cosine_sim = (torch.matmul(k[0,:,0].flatten(), k[1,:,0].flatten()) / (torch.norm(k[0,:,0].flatten()) * torch.norm(k[1,:,0].flatten())))
-
-        cosine_sim = sp.distance.cdist(k[0,:,:].detach().cpu().numpy(), k[7,:,:].detach().cpu().numpy(), 'cosine')
+        cosine_sim = (torch.matmul(k[0,:,:].flatten(), k[1,:,:].flatten()) / (torch.norm(k[0,:,:].flatten()) * torch.norm(k[1,:,:].flatten())))
 
         print("KEY0-1sim")
 
@@ -371,9 +375,9 @@ class MultiheadAttention(nn.Module):
 
         print(cosine_sim.shape)
 
-        print("KEY0-2sim")
+        print("KEY0-7sim")
 
-        cosine_sim = (torch.matmul(k[0,:,:].flatten(), k[2,:,:].flatten()) / (torch.norm(k[0,:,:].flatten()) * torch.norm(k[2,:,:].flatten())))
+        cosine_sim = (torch.matmul(k[0,:,:].flatten(), k[7,:,:].flatten()) / (torch.norm(k[0,:,:].flatten()) * torch.norm(k[2,:,:].flatten())))
 
         print(cosine_sim)
 
@@ -492,7 +496,6 @@ class MultiheadAttention(nn.Module):
         print(cosine_sim)
 
 
-        exit()
 
         #####done temp######
 
@@ -565,16 +568,6 @@ class MultiheadAttention(nn.Module):
 
         a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
 
-        print(a[0,0,:,:])
-        print(a[1,0,:,:])
-        print(a[2, 0, :, :])
-        print(a[3, 0, :, :])
-        print(a[4, 0, :, :])
-        print(a[5, 0, :, :])
-        print(a[6, 0, :, :])
-        print(a[7, 0, :, :])
-
-        exit()
 
         ## computing confidence of all heads over bsz sentences
 
