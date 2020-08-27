@@ -417,6 +417,8 @@ class MultiheadAttention(nn.Module):
 
         c = torch.cdist(a.transpose(0,1),a.transpose(0,1))
 
+        c = c.sum(dim=0)/bsz
+
         #c = F.cosine_similarity(a[0,0,:])
 
         a = a.sum(dim=1)
@@ -428,9 +430,7 @@ class MultiheadAttention(nn.Module):
 
         print(a.shape)
 
-        print(c[0,:,:])
-
-        print(b)
+        print(c)
 
         exit()
 
