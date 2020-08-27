@@ -413,21 +413,27 @@ class MultiheadAttention(nn.Module):
 
         a = a.contiguous().view(self.num_heads,bsz,tgt_len*src_len)
 
-        b = F.pdist(a[:,0,:])
-
 
         c_2 = torch.cdist(a.transpose(0,1),a.transpose(0,1), p=2)
 
 
         c_2 = c_2.sum(dim=0)/bsz
 
-        print(c_2)
-
 
         c_2 = c_2.sum(dim=0)
 
 
-        print(torch.argsort(c_2))
+        print("distances = {0}".format(torch.argsort(c_2)))
+
+        b = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
+        b[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
+        heads = b[:, :, :, :].max(dim=2)
+        heads = heads[0].sum(dim=2) / (src_len - 1)
+        heads = heads.sum(dim=1) / bsz
+        heads = heads
+
+        print("confidence = {0}".format(torch.argsort(heads)))
+
 
 
 
