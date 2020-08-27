@@ -363,11 +363,13 @@ class MultiheadAttention(nn.Module):
 
         cosine_sim = (torch.matmul(k[0,:,0].flatten(), k[1,:,0].flatten()) / (torch.norm(k[0,:,0].flatten()) * torch.norm(k[1,:,0].flatten())))
 
-        cosine_sim = sp.distance.cdist(k[0,:,:].detach().cpu().numpy(), k[0,:,:].detach().cpu().numpy(), 'cosine')
+        cosine_sim = sp.distance.cdist(k[0,:,:].detach().cpu().numpy(), k[1,:,:].detach().cpu().numpy(), 'cosine')
 
         print("KEY0-1sim")
 
         print(cosine_sim)
+
+        print(cosine_sim.shape)
 
         print("KEY0-2sim")
 
