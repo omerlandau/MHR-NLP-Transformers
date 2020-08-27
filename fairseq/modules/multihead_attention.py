@@ -457,7 +457,7 @@ class MultiheadAttention(nn.Module):
 
         print("VALUE0-2sim")
 
-        cosine_sim = torch.nrom(v[0, :, :]- v[2, :, :])
+        cosine_sim = torch.norm(v[0, :, :]- v[2, :, :])
 
         print(cosine_sim)
 
