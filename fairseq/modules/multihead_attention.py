@@ -13,7 +13,7 @@ from torch.nn import Parameter
 from fairseq.incremental_decoding_utils import with_incremental_state
 import numpy as np
 import time
-
+import scipy.spatial as sp
 
 @with_incremental_state
 class MultiheadAttention(nn.Module):
@@ -359,7 +359,11 @@ class MultiheadAttention(nn.Module):
         print("QUERY3")
         print(q[3, :, :])
 
+
+
         cosine_sim = (torch.matmul(k[0,:,0].flatten(), k[1,:,0].flatten()) / (torch.norm(k[0,:,0].flatten()) * torch.norm(k[1,:,0].flatten())))
+
+        cosine_sim = sp.distance.cdist(np.array(k[0,:,:].to_cpu()), np.array(k[1,:,:].to_cpu()), 'cosine')
 
         print("KEY0-1sim")
 
