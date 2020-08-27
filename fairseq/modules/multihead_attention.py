@@ -415,11 +415,17 @@ class MultiheadAttention(nn.Module):
 
         b = F.pdist(a[:,0,:])
 
+        c = F.cosine_similarity(a[:,0,:])
+
         a = a.sum(dim=1)
 
         a = F.pdist(a)
 
+
+
         print(a)
+
+        print(a.shape)
 
         print(b)
 
