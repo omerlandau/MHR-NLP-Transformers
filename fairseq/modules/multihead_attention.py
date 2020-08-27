@@ -291,6 +291,27 @@ class MultiheadAttention(nn.Module):
 
             saved_state["prev_key"] = k.view(bsz, self.num_heads, -1, self.head_dim)
             saved_state["prev_value"] = v.view(bsz, self.num_heads, -1, self.head_dim)
+
+            ##########omertemp##########
+            print("KEY0")
+            print(saved_state["prev_key"][0,0,:,:])
+            print("VALUE0")
+            print(saved_state["prev_value"][0,0,:,:])
+            print("KEY1")
+            print(saved_state["prev_key"][0, 1, :, :])
+            print("VALUE1")
+            print(saved_state["prev_value"][0, 1, :, :])
+            print("KEY2")
+            print(saved_state["prev_key"][0, 2, :, :])
+            print("VALUE2")
+            print(saved_state["prev_value"][0, 2, :, :])
+            print("KEY3")
+            print(saved_state["prev_key"][0, 3, :, :])
+            print("VALUE3")
+            print(saved_state["prev_value"][0, 3, :, :])
+
+            exit()
+
             saved_state["prev_key_padding_mask"] = key_padding_mask
             # In this branch incremental_state is never None
             assert incremental_state is not None
@@ -364,14 +385,14 @@ class MultiheadAttention(nn.Module):
 
         a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
 
-        print(a[0,1,:,:])
-        print(a[1,1,:,:])
-        print(a[2, 1, :, :])
-        print(a[3, 1, :, :])
-        print(a[4, 1, :, :])
-        print(a[5, 1, :, :])
-        print(a[6, 1, :, :])
-        print(a[7, 1, :, :])
+        print(a[0,0,:,:])
+        print(a[1,0,:,:])
+        print(a[2, 0, :, :])
+        print(a[3, 0, :, :])
+        print(a[4, 0, :, :])
+        print(a[5, 0, :, :])
+        print(a[6, 0, :, :])
+        print(a[7, 0, :, :])
 
         exit()
 
