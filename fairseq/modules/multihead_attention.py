@@ -415,38 +415,21 @@ class MultiheadAttention(nn.Module):
 
         b = F.pdist(a[:,0,:])
 
-        c = torch.cdist(a.transpose(0,1),a.transpose(0,1), p=3)
 
         c_2 = torch.cdist(a.transpose(0,1),a.transpose(0,1), p=2)
 
-        c_5 = torch.cdist(a.transpose(0, 1), a.transpose(0, 1), p=5)
-
-        c = c.sum(dim=0)/bsz
 
         c_2 = c_2.sum(dim=0)/bsz
 
-        c_5 = c_5.sum(dim=0) / bsz
+        print(c_2)
 
-
-        c = c.sum(dim=0)
 
         c_2 = c_2.sum(dim=0)
 
-        c_5 = c_5.sum(dim=0)
-
-        #c = F.cosine_similarity(a[0,0,:])
-
-        a = a.sum(dim=1)
-
-        a = F.pdist(a)
-
-
-
-        print(torch.argsort(c))
 
         print(torch.argsort(c_2))
 
-        print(torch.argsort(c_5))
+
 
 
 
