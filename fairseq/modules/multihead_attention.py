@@ -415,7 +415,7 @@ class MultiheadAttention(nn.Module):
 
         b = F.pdist(a[:,0,:])
 
-        c = F.cdist(a[:,:,:], a[:,:,:])
+        c = torch.cdist(a.transpose(0,1),a.transpose(0,1))
 
         #c = F.cosine_similarity(a[0,0,:])
 
