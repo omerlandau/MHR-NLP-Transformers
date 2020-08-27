@@ -415,7 +415,7 @@ class MultiheadAttention(nn.Module):
 
         b = F.pdist(a[:,0,:])
 
-        c = torch.cdist(a.transpose(0,1),a.transpose(0,1), p=1)
+        c = torch.cdist(a.transpose(0,1),a.transpose(0,1), p=3)
 
         c = c.sum(dim=0)/bsz
 
