@@ -445,11 +445,11 @@ class MultiheadAttention(nn.Module):
 
         print(a.shape)
 
-        print(c)
+        print(c.argsort())
 
-        print(c_2)
+        print(c_2.argsort())
 
-        print(c_5)
+        print(c_5.argsort())
 
         exit()
 
