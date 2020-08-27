@@ -413,11 +413,15 @@ class MultiheadAttention(nn.Module):
 
         a = a.contiguous().view(self.num_heads,bsz,tgt_len*src_len)
 
+        b = F.pdist(a[:,0,:])
+
         a = a.sum(dim=1)
 
         a = F.pdist(a)
 
         print(a)
+
+        print(b)
 
         exit()
 
