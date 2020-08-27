@@ -75,7 +75,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         l_alpha_dec =0
         l_alpha_dec_e = 0
 
-        if(batch_num>0.2):
+        if(batch_num>1):
 
             for i in range(len(model.encoder.layers)):
                 model.encoder.layers[i].self_attn.alphas.requires_grad = False
