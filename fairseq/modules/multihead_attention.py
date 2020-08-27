@@ -424,10 +424,11 @@ class MultiheadAttention(nn.Module):
         a = F.pdist(a)
 
 
-
         print(a)
 
         print(a.shape)
+
+        print(c[0])
 
         print(b)
 
