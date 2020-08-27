@@ -697,6 +697,13 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 return swaps, current_epoch
 
             if d_type == 'S':
+
+
+
+
+
+
+
                 return swaps, current_epoch
 
             if d_type == 'R':

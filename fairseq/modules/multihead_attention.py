@@ -405,6 +405,22 @@ class MultiheadAttention(nn.Module):
 
         self.head_conf = conf
 
+
+
+
+        a = attn_weights.detach().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
+        a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
+
+        a = a.contiguous().view(self.num_heads,bsz,tgt_len*src_len)
+
+        a = F.pdist(a)
+
+        print(a)
+
+        exit()
+
+
+
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
             p=self.dropout,
