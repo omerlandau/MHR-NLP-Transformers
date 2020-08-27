@@ -359,7 +359,7 @@ class MultiheadAttention(nn.Module):
         print("QUERY3")
         print(q[3, :, :])
 
-        cosine_sim = (torch.matmul(k[0,:,:].flatten(), k[1,:,:].flatten()) / (torch.norm(k[0,:,:].flatten()) * torch.norm(k[1,:,:].flatten())))
+        cosine_sim = torch.matmul(k[0,:,:].flatten(), k[1,:,:].flatten())#  / (torch.norm(k[0,:,:].flatten()) * torch.norm(k[1,:,:].flatten())))
 
         print("KEY0-1sim")
 
