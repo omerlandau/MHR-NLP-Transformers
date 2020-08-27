@@ -291,31 +291,78 @@ class MultiheadAttention(nn.Module):
 
             saved_state["prev_key"] = k.view(bsz, self.num_heads, -1, self.head_dim)
             saved_state["prev_value"] = v.view(bsz, self.num_heads, -1, self.head_dim)
-
-            ##########omertemp##########
-            print("KEY0")
-            print(saved_state["prev_key"][0,0,:,:])
-            print("VALUE0")
-            print(saved_state["prev_value"][0,0,:,:])
-            print("KEY1")
-            print(saved_state["prev_key"][0, 1, :, :])
-            print("VALUE1")
-            print(saved_state["prev_value"][0, 1, :, :])
-            print("KEY2")
-            print(saved_state["prev_key"][0, 2, :, :])
-            print("VALUE2")
-            print(saved_state["prev_value"][0, 2, :, :])
-            print("KEY3")
-            print(saved_state["prev_key"][0, 3, :, :])
-            print("VALUE3")
-            print(saved_state["prev_value"][0, 3, :, :])
-
-            exit()
-
             saved_state["prev_key_padding_mask"] = key_padding_mask
             # In this branch incremental_state is never None
             assert incremental_state is not None
             incremental_state = self._set_input_buffer(incremental_state, saved_state)
+
+        ##########omertemp##########
+        t = k.view(bsz, self.num_heads, -1, self.head_dim)
+        g = v.view(bsz, self.num_heads, -1, self.head_dim)
+        f = q.view(bsz, self.num_heads, -1, self.head_dim)
+        print("KEY0")
+        print(t[0, 0, :, :])
+        print("VALUE0")
+        print(g[0, 0, :, :])
+        print("QUERY0")
+        print(f[0, 0, :, :])
+        print("KEY1")
+        print(t[0, 1, :, :])
+        print("VALUE1")
+        print(g[0, 1, :, :])
+        print("QUERY1")
+        print(f[0, 1, :, :])
+        print("KEY2")
+        print(t[0, 2, :, :])
+        print("VALUE2")
+        print(g[0, 2, :, :])
+        print("QUERY2")
+        print(f[0, 2, :, :])
+        print("KEY3")
+        print(t[0, 3, :, :])
+        print("VALUE3")
+        print(g[0, 3, :, :])
+        print("QUERY3")
+        print(f[0, 3, :, :])
+
+
+        print("Weights")
+
+        k = self.k_proj.view(self.num_heads,self.head_dim,embed_dim)
+
+        q = self.q_proj.view(self.num_heads, self.head_dim, embed_dim)
+
+        v = self.v_proj.view(self.num_heads,self.head_dim,embed_dim)
+
+        print("KEY0")
+        print(k[0, :, :])
+        print("VALUE0")
+        print(v[0, :, :])
+        print("QUERY0")
+        print(q[0,:, :])
+        print("KEY1")
+        print(k[1, :, :])
+        print("VALUE1")
+        print(v[1, :, :])
+        print("QUERY1")
+        print(q[1, :, :])
+        print("KEY2")
+        print(k[ 2, :, :])
+        print("VALUE2")
+        print(v[ 2, :, :])
+        print("QUERY2")
+        print(q[0, :, :])
+        print("KEY3")
+        print(k[3, :, :])
+        print("VALUE3")
+        print(v[3, :, :])
+        print("QUERY3")
+        print(q[3, :, :])
+
+        exit()
+
+        #####done temp######
+
         assert k is not None
         src_len = k.size(1)
 
