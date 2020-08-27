@@ -371,7 +371,7 @@ class MultiheadAttention(nn.Module):
         print("QUERY3")
         print(q[3, :, :])
         """
-
+        """
         k = self.k_proj.weight.view(self.num_heads, self.head_dim, embed_dim)
 
         q = self.q_proj.weight.view(self.num_heads, self.head_dim, embed_dim)
@@ -441,85 +441,67 @@ class MultiheadAttention(nn.Module):
 
         print(cosine_sim)
 
-        def pairwise_distances(x, y=None):
-            '''
-            Input: x is a Nxd matrix
-                   y is an optional Mxd matirx
-            Output: dist is a NxM matrix where dist[i,j] is the square norm between x[i,:] and y[j,:]
-                    if y is not given then use 'y=x'.
-            i.e. dist[i,j] = ||x[i,:]-y[j,:]||^2
-            '''
-            x_norm = (x ** 2).sum(1).view(-1, 1)
-            if y is not None:
-                y_norm = (y ** 2).sum(1).view(1, -1)
-            else:
-                y = x
-                y_norm = x_norm.view(1, -1)
-
-            dist = x_norm + y_norm - 2.0 * torch.mm(x, torch.transpose(y, 0, 1))
-            return dist
-
         print("KEY0-1Pairwisedist")
 
-        cosine_sim = torch.norm(k[0, :, :]-k[1, :, :])
+        cosine_sim = torch.norm(k[0, :, :] - k[1, :, :])
 
         print(cosine_sim)
 
         print("KEY0-2sim")
 
-        cosine_sim = torch.norm(k[0, :, :]- k[2, :, :])
+        cosine_sim = torch.norm(k[0, :, :] - k[2, :, :])
 
         print(cosine_sim)
 
         print("KEY0-3sim")
 
-        cosine_sim = torch.norm(k[0, :, :]- k[3, :, :])
+        cosine_sim = torch.norm(k[0, :, :] - k[3, :, :])
 
         print(cosine_sim)
 
         print("VALUE0-1sim")
 
-        cosine_sim = torch.norm(v[0, :, :]- v[1, :, :])
+        cosine_sim = torch.norm(v[0, :, :] - v[1, :, :])
 
         print(cosine_sim)
 
         print("VALUE0-2sim")
 
-        cosine_sim = torch.norm(v[0, :, :]- v[2, :, :])
+        cosine_sim = torch.norm(v[0, :, :] - v[2, :, :])
 
         print(cosine_sim)
 
         print("VALUE0-3sim")
 
-        cosine_sim = torch.norm(v[0, :, :]-v[3, :, :])
+        cosine_sim = torch.norm(v[0, :, :] - v[3, :, :])
 
         print(cosine_sim)
 
         print("QUERY0-1sim")
 
-        cosine_sim = torch.norm(q[0, :, :]-q[1, :, :])
+        cosine_sim = torch.norm(q[0, :, :] - q[1, :, :])
 
         print(cosine_sim)
 
         print("QUERY0-2sim")
 
-        cosine_sim = torch.norm(q[0, :, :]- q[2, :, :])
+        cosine_sim = torch.norm(q[0, :, :] - q[2, :, :])
 
         print(cosine_sim)
 
         print("QUERY5-3sim")
 
-        cosine_sim = torch.norm(q[5, :, :]-q[3, :, :])
+        cosine_sim = torch.norm(q[5, :, :] - q[3, :, :])
 
         print(cosine_sim)
-
 
         k= k0
 
         q = q0
 
         v= v0
-
+        
+        """
 
 
         #####done temp######
@@ -557,6 +539,8 @@ class MultiheadAttention(nn.Module):
                 )
 
         attn_weights = torch.bmm(q, k.transpose(1, 2))
+
+
         attn_weights = MultiheadAttention.apply_sparse_mask(attn_weights, tgt_len, src_len, bsz)
 
         assert list(attn_weights.size()) == [bsz * self.num_heads, tgt_len, src_len]
@@ -592,6 +576,51 @@ class MultiheadAttention(nn.Module):
         conf = None
 
         a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
+
+        cosine_sim = (torch.matmul(a[0,0,:,:].flatten(), a[1,0,:,:].flatten()) / (torch.norm(a[0,0,:,:].flatten()) * torch.norm(a[1,0,:,:].flatten())))
+
+        print("KEY0-1sim")
+
+        print(cosine_sim)
+
+        print(cosine_sim.shape)
+
+        print("KEY0-2sim")
+
+        cosine_sim = (torch.matmul(a[0,0,:,:].flatten(), a[2,0,:,:].flatten()) / (torch.norm(a[0,0,:,:].flatten()) * torch.norm(a[2,0,:,:].flatten())))
+
+        print(cosine_sim)
+
+        print("KEY0-3sim")
+
+        cosine_sim = (torch.matmul(a[0,0,:,:].flatten(), a[3,0,:,:].flatten()) / (torch.norm(a[0,0,:,:].flatten()) * torch.norm(a[3,0,:,:].flatten())))
+
+        print(cosine_sim)
+
+        print("KEY1-5sim")
+
+        cosine_sim = (torch.matmul(a[1,0,:,:].flatten(), a[5,0,:,:].flatten()) / (torch.norm(a[1,0,:,:].flatten()) * torch.norm(a[5,0,:,:].flatten())))
+
+        print(cosine_sim)
+
+        print("KEY0-1Pairwisedist")
+
+        cosine_sim = torch.norm(a[0,0,:,:]- a[1,0,:,:])
+
+        print(cosine_sim)
+
+        print("KEY0-2sim")
+
+        cosine_sim = torch.norm(a[0,0,:,:]- a[2,0,:,:])
+
+        print(cosine_sim)
+
+        print("KEY0-3sim")
+
+        cosine_sim = torch.norm(a[0,0,:,:]- a[3,0,:,:])
+
+        print(cosine_sim)
+
 
 
         ## computing confidence of all heads over bsz sentences
