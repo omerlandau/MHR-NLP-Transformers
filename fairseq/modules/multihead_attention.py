@@ -428,7 +428,7 @@ class MultiheadAttention(nn.Module):
 
         print(a.shape)
 
-        print(c[0])
+        print(c[0,:,:])
 
         print(b)
 
