@@ -191,9 +191,6 @@ class Trainer(object):
             )
         )
 
-        print(params)
-
-        exit()
 
         if self.args.fp16 or self.args.bf16:
             if self.cuda and torch.cuda.get_device_capability(0)[0] < 7:
