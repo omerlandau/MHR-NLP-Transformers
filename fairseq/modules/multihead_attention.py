@@ -433,55 +433,55 @@ class MultiheadAttention(nn.Module):
 
         print("KEY0-1Pairwisedist")
 
-        cosine_sim = pairwise_distances(k[0, :, :], k[1, :, :])
+        cosine_sim = torch.norm(k[0, :, :]-k[1, :, :])
 
         print(cosine_sim)
 
         print("KEY0-2sim")
 
-        cosine_sim = pairwise_distances(k[0, :, :], k[2, :, :])
+        cosine_sim = torch.norm(k[0, :, :]- k[2, :, :])
 
         print(cosine_sim)
 
         print("KEY0-3sim")
 
-        cosine_sim = pairwise_distances(k[0, :, :], k[3, :, :])
+        cosine_sim = torch.norm(k[0, :, :]- k[3, :, :])
 
         print(cosine_sim)
 
         print("VALUE0-1sim")
 
-        cosine_sim = pairwise_distances(v[0, :, :], v[1, :, :])
+        cosine_sim = torch.norm(v[0, :, :]- v[1, :, :])
 
         print(cosine_sim)
 
         print("VALUE0-2sim")
 
-        cosine_sim = pairwise_distances(v[0, :, :], v[2, :, :])
+        cosine_sim = torch.nrom(v[0, :, :]- v[2, :, :])
 
         print(cosine_sim)
 
         print("VALUE0-3sim")
 
-        cosine_sim = pairwise_distances(v[0, :, :], v[3, :, :])
+        cosine_sim = torch.norm(v[0, :, :]-v[3, :, :])
 
         print(cosine_sim)
 
         print("QUERY0-1sim")
 
-        cosine_sim = pairwise_distances(q[0, :, :], q[1, :, :])
+        cosine_sim = torch.norm(q[0, :, :]-q[1, :, :])
 
         print(cosine_sim)
 
         print("QUERY0-2sim")
 
-        cosine_sim = pairwise_distances(q[0, :, :], q[2, :, :])
+        cosine_sim = torch.norm(q[0, :, :]- q[2, :, :])
 
         print(cosine_sim)
 
         print("QUERY5-3sim")
 
-        cosine_sim = pairwise_distances(q[5, :, :], q[3, :, :])
+        cosine_sim = torch.norm(q[5, :, :]-q[3, :, :])
 
         print(cosine_sim)
 
