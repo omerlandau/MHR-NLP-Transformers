@@ -362,6 +362,19 @@ class MultiheadAttention(nn.Module):
         attn_weights = attn_weights_float.type_as(attn_weights)
         conf = None
 
+        a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
+
+        print(a[0,1,:,:])
+        print(a[1,1,:,:])
+        print(a[2, 1, :, :])
+        print(a[3, 1, :, :])
+        print(a[4, 1, :, :])
+        print(a[5, 1, :, :])
+        print(a[6, 1, :, :])
+        print(a[7, 1, :, :])
+
+        exit()
+
         ## computing confidence of all heads over bsz sentences
 
         ## heads is an np array of shape [head_nums+1] which contains confidence*bsz for each head and bsz:
@@ -407,7 +420,7 @@ class MultiheadAttention(nn.Module):
             training=self.training,
         )
 
-        print(self.alphas)
+        #print(self.alphas)
 
         assert v is not None
 
@@ -415,17 +428,18 @@ class MultiheadAttention(nn.Module):
         save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
         ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
-        z = ctx.contiguous().view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
+        #z = ctx.contiguous().view(bsz, self.num_heads,tgt_len,self.head_dim).transpose(0,1)
 
-        b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
+        #b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
-        self.alphas.requires_grad = True
+        #self.alphas.requires_grad = True
 
-        b = torch.mm(self.alphas,b)
+        #b = torch.mm(self.alphas,b)
 
-        ctx = b.contiguous().view(self.num_heads, bsz,tgt_len,self.head_dim).transpose(0,1)
+        #ctx = b.contiguous().view(self.num_heads, bsz,tgt_len,self.head_dim).transpose(0,1)
 
-        ctx = ctx.contiguous().view(bsz * self.num_heads, tgt_len, self.head_dim)
+        #ctx = ctx.contiguous().view(bsz * self.num_heads, tgt_len, self.head_dim)
+
 
 
 
