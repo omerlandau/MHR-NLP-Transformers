@@ -387,15 +387,21 @@ class MultiheadAttention(nn.Module):
 
         print(cosine_sim.shape)
 
-        print("KEY0-7sim")
+        print("KEY0-2sim")
 
-        cosine_sim = (torch.matmul(k[0,:,:].flatten(), k[7,:,:].flatten()) / (torch.norm(k[0,:,:].flatten()) * torch.norm(k[2,:,:].flatten())))
+        cosine_sim = (torch.matmul(k[0,:,:].flatten(), k[2,:,:].flatten()) / (torch.norm(k[0,:,:].flatten()) * torch.norm(k[2,:,:].flatten())))
 
         print(cosine_sim)
 
         print("KEY0-3sim")
 
         cosine_sim = (torch.matmul(k[0, :, :].flatten(), k[3, :, :].flatten()) / (torch.norm(k[0, :, :].flatten()) * torch.norm(k[3, :, :].flatten())))
+
+        print(cosine_sim)
+
+        print("KEY1-5sim")
+
+        cosine_sim = (torch.matmul(k[1, :, :].flatten(), k[5, :, :].flatten()) / (torch.norm(k[1, :, :].flatten()) * torch.norm(k[5, :, :].flatten())))
 
         print(cosine_sim)
 
