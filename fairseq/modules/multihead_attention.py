@@ -396,7 +396,7 @@ class MultiheadAttention(nn.Module):
                     c_2 = torch.cdist(a.transpose(0, 1).contiguous(), a.transpose(0, 1), p=2)
                     c_2 = c_2.sum(dim=0) / bsz
                     c_2 = c_2.sum(dim=0)
-                    heads = c_2.contiguous()
+                    heads = c_2
 
 
 
