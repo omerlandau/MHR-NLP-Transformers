@@ -650,8 +650,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
     print(transformer_type)
     print(end_epoch)
 
-    if max_switches > (num_heads * num_layers - max_switches):
-        raise NameError("must have an even number of swaps")
+
 
     if start_epoch > current_epoch:
         return None, 0
@@ -676,6 +675,12 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
         if not local_only:
             if d_type == 'H':
+
+                # Switch between strong heads to weak heads all across the net
+
+                if max_switches > (num_heads * num_layers - max_switches):
+                    raise NameError("In Hard mode max switches has to be less or equal to 50 percents of the heads")
+
                 conf_arg_sort = conf.flatten().argsort().astype(int)
                 heads = conf_arg_sort % num_heads  # heads positions
                 layers = conf_arg_sort // num_heads  # heads layers
@@ -698,15 +703,28 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
             if d_type == 'S':
 
+                if max_switches > (num_heads * num_layers - max_switches):
+                    raise NameError("In Soft mode max switches has to be less or equal to 50 percents of the layers")
 
+                # Switch between weak heads of different layers (first and remote layers are preferred first)
 
+                conf_arg_sort = np.argsort(conf)
 
+                for i in range(max_switches):
 
+                    for j in range(3):
 
+                        swap["s_layer"] = "{0}".format(i)
+                        swap["s_head"] = conf_arg_sort[i,j]
+                        swap["d_layer"] = "{0}".format(num_layers-1 -i)
+                        swap["d_head"] = conf_arg_sort[i,j]
+                        swaps["{0}".format(current_epoch)].append(swap.copy())
 
                 return swaps, current_epoch
 
             if d_type == 'R':
+
+                # Random Switching - Mainly for validation of other methods.
 
                 conf_arg_sort = conf.flatten().argsort().astype(int).copy()
                 np.random.shuffle(conf_arg_sort)
