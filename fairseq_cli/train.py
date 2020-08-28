@@ -743,6 +743,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                         swap["d_head"] = conf_arg_sort[i,j]
                         swaps["{0}".format(current_epoch)].append(swap.copy())
 
+                mhr(model, swaps, head_dim, num_heads, current_epoch)
+
                 return swaps, current_epoch
 
             if d_type == 'R':
