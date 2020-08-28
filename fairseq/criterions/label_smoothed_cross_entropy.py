@@ -36,10 +36,10 @@ def get_conf_inc_loss_self_driven(x):
 
     This function implements stepwise version of conf growth.
     """
-    radius = x.detach().contiguous()
+    radius = x.detach()
     assert radius.requires_grad == False
     radius = radius + 0.2
-    l = ((x.contiguous() - radius) ** 2).mean()
+    l = ((x - radius) ** 2).mean()
     return l
 
 
