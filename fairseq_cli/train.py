@@ -303,7 +303,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
     if args.dynamic_type is not None and args.head_confidence_method is not None:
 
-        conf = calc_conf_per_epoch(conf, args)
+        conf = calc_conf_per_epoch(val_conf, args)
 
         restore['enc_self_attn'], last_epoch_num['enc_self_attn'] = dynamic_mhr(model, int(args.start_dynamic_mhr[0]),
                                                                                 "encoder", "self_attn",
@@ -679,7 +679,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 # Switch between strong heads to weak heads all across the net
 
                 if max_switches > (num_heads * num_layers - max_switches):
-                    raise NameError("In Hard mode max switches has to be less or equal to 50 percents of the heads")
+                    raise NameError("In Hard mode max switches has to be less or equal to 50 percents of total Heads")
 
                 conf_arg_sort = conf.flatten().argsort().astype(int)
                 heads = conf_arg_sort % num_heads  # heads positions
@@ -703,8 +703,29 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
             if d_type == 'S':
 
-                if max_switches > (num_heads * num_layers - max_switches):
+                if max_switches > (num_layers - max_switches):
                     raise NameError("In Soft mode max switches has to be less or equal to 50 percents of the layers")
+
+                # Switch between weak heads of different layers (first and remote layers are preferred first)
+
+                conf_arg_sort = np.argsort(conf)
+
+                for i in range(max_switches):
+
+                    for j in range(3):
+
+                        swap["s_layer"] = "{0}".format(i)
+                        swap["s_head"] = conf_arg_sort[i,j]
+                        swap["d_layer"] = "{0}".format(num_layers-1 -i)
+                        swap["d_head"] = conf_arg_sort[i,j]
+                        swaps["{0}".format(current_epoch)].append(swap.copy())
+
+                return swaps, current_epoch
+
+            if d_type == 'L':
+
+                if max_switches > (num_heads - max_switches):
+                    raise NameError("In LOCAL mode max switches has to be less or equal to 50 percents of Heads per layer")
 
                 # Switch between weak heads of different layers (first and remote layers are preferred first)
 
@@ -749,33 +770,33 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
     return restore, last_epoch_used
 
-def calc_conf_per_epoch(val_conf, args):
+def calc_conf_per_epoch(conf, args):
 
     for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-        val_conf["encoder"][l_e]["self_attn"] = np.matmul(val_conf["encoder"][l_e]["self_attn"][:, -1],
-                                                          val_conf["encoder"][l_e]["self_attn"][:, :-1]) / np.sum(
-            val_conf["encoder"][l_e]["self_attn"][:, -1])
+        conf["encoder"][l_e]["self_attn"] = np.matmul(conf["encoder"][l_e]["self_attn"][:, -1],
+                                                          conf["encoder"][l_e]["self_attn"][:, :-1]) / np.sum(
+            conf["encoder"][l_e]["self_attn"][:, -1])
 
-        val_conf["decoder"][l_d]["self_attn"] = np.matmul(val_conf["decoder"][l_d]["self_attn"][:, -1],
-                                                          val_conf["decoder"][l_d]["self_attn"][:, :-1]) / np.sum(
-            val_conf["decoder"][l_d]["self_attn"][:, -1])
+        conf["decoder"][l_d]["self_attn"] = np.matmul(conf["decoder"][l_d]["self_attn"][:, -1],
+                                                          conf["decoder"][l_d]["self_attn"][:, :-1]) / np.sum(
+            conf["decoder"][l_d]["self_attn"][:, -1])
 
-        val_conf["decoder"][l_d]["enc_attn"] = np.matmul(val_conf["decoder"][l_d]["enc_attn"][:, -1],
-                                                         val_conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
-            val_conf["decoder"][l_d]["enc_attn"][:, -1])
+        conf["decoder"][l_d]["enc_attn"] = np.matmul(conf["decoder"][l_d]["enc_attn"][:, -1],
+                                                         conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
+            conf["decoder"][l_d]["enc_attn"][:, -1])
 
     enc_self_layers = []
     dec_self_layers = []
     dec_enc_layers = []
 
     for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
-        enc_self_layers.append(val_conf["encoder"][l_e]["self_attn"])
-        dec_self_layers.append(val_conf["decoder"][l_d]["self_attn"])
-        dec_enc_layers.append(val_conf["decoder"][l_d]["enc_attn"])
+        enc_self_layers.append(conf["encoder"][l_e]["self_attn"])
+        dec_self_layers.append(conf["decoder"][l_d]["self_attn"])
+        dec_enc_layers.append(conf["decoder"][l_d]["enc_attn"])
 
-    val_conf = (np.array(enc_self_layers), np.array(dec_self_layers), np.array(dec_enc_layers))
+    conf = (np.array(enc_self_layers), np.array(dec_self_layers), np.array(dec_enc_layers))
 
-    return val_conf
+    return conf
 
 
 def convert_confs(conf, args):
