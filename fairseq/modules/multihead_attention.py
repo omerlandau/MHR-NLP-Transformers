@@ -399,7 +399,7 @@ class MultiheadAttention(nn.Module):
                     c_2 = c_2.sum(dim=0)
                     heads = c_2
                 elif self.head_confidence_method == "wasserstein":
-                    a = attn_weights.clone().contiguous().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
+                    a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     uniform_heads = torch.zeros(self.num_heads, bsz, tgt_len, src_len)
                     uniform_heads[:, :, :-1, :-1] = 1 / src_len
                     distances = np.zeros(self.num_heads)
