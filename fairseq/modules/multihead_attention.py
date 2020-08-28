@@ -415,27 +415,6 @@ class MultiheadAttention(nn.Module):
         self.head_conf = conf
 
 
-
-
-
-
-
-        print("distances = {0}".format(torch.argsort(c_2)))
-
-        b = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
-        b[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
-        heads = b[:, :, :, :].max(dim=2)
-        heads = heads[0].sum(dim=2) / (src_len - 1)
-        heads = heads.sum(dim=1) / bsz
-        heads = heads
-
-        print("confidence = {0}".format(torch.argsort(heads)))
-
-
-
-
-
-
         attn_probs = F.dropout(
             attn_weights_float.type_as(attn_weights),
             p=self.dropout,
