@@ -720,6 +720,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                         swap["d_head"] = conf_arg_sort[i,j]
                         swaps["{0}".format(current_epoch)].append(swap.copy())
 
+                mhr(model, swaps, head_dim, num_heads, current_epoch)
+
                 return swaps, current_epoch
 
             if d_type == 'L':
@@ -727,13 +729,13 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 if max_switches > (num_heads - max_switches):
                     raise NameError("In LOCAL mode max switches has to be less or equal to 50 percents of Heads per layer")
 
-                # Switch between weak heads of different layers (first and remote layers are preferred first)
+                # Switch between weak heads and strong heads within the same layer. focusing on firsts and lasts layers.
 
                 conf_arg_sort = np.argsort(conf)
 
-                for i in range(max_switches):
+                for i in range(3):
 
-                    for j in range(3):
+                    for j in range(max_switches):
 
                         swap["s_layer"] = "{0}".format(i)
                         swap["s_head"] = conf_arg_sort[i,j]
