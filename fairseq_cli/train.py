@@ -303,7 +303,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
     if args.dynamic_type is not None and args.head_confidence_method is not None:
 
-        conf = calc_conf_per_epoch(val_conf, args)
+        conf = val_conf
 
         restore['enc_self_attn'], last_epoch_num['enc_self_attn'] = dynamic_mhr(model, int(args.start_dynamic_mhr[0]),
                                                                                 "encoder", "self_attn",
