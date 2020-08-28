@@ -712,7 +712,7 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
                 for i in range(max_switches):
 
-                    for j in range(8):
+                    for j in range(5):
 
                         swap["s_layer"] = "{0}".format(i)
                         swap["s_head"] = conf_arg_sort[i,j]
