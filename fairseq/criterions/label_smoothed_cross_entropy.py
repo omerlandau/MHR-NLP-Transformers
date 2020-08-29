@@ -141,9 +141,10 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             loss += (batch_num+0.3)*l_growth_enc + l_growth_dec*gamma_conf*(batch_num +0.3)\
                     + l_growth_dec_e*gamma_conf*(batch_num +0.3)
 
+        if gamma_conf is not None:
 
-        alpha_loss_nuc = gamma_conf*(l_alpha_enc + l_alpha_dec_e + l_alpha_dec)
-        loss += alpha_loss_nuc
+            alpha_loss_nuc = gamma_conf*(l_alpha_enc + l_alpha_dec_e + l_alpha_dec)
+            loss += alpha_loss_nuc
 
 
         logging_output = {
