@@ -71,31 +71,36 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
         net_output = model(**sample['net_input'])
 
+        for i in range(len(model.encoder.layers)):
+            model.encoder.layers[i].self_attn.alphas.requires_grad = False
+
+        for i in range(len(model.decoder.layers)):
+            model.decoder.layers[i].self_attn.alphas.requires_grad = False
+            model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
+
         l_alpha_enc = 0
         l_alpha_dec =0
         l_alpha_dec_e = 0
 
-        if(batch_num<0.60):
+        if(batch_num<0.9999):
 
             for i in range(len(model.encoder.layers)):
-                model.encoder.layers[i].self_attn.alphas.requires_grad = False
+                model.encoder.layers[i].self_attn.alphas.requires_grad = True
 
             for i in range(len(model.decoder.layers)):
-                model.decoder.layers[i].self_attn.alphas.requires_grad = False
-                model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
+                model.decoder.layers[i].self_attn.alphas.requires_grad = True
+                model.decoder.layers[i].encoder_attn.alphas.requires_grad = True
 
             for i in range(len(model.encoder.layers)):
-                    l_alpha_enc += 3*torch.norm(model.encoder.layers[i].self_attn.alphas)
+                    l_alpha_enc += 3*torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc')
 
             for i in range(len(model.decoder.layers)):
-                    l_alpha_dec += 1.5*torch.norm(model.decoder.layers[i].self_attn.alphas)
-                    l_alpha_dec_e += 2*torch.norm(model.decoder.layers[i].encoder_attn.alphas)
-
-            print(l_alpha_enc)
+                    l_alpha_dec += 1.5*torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc')
+                    l_alpha_dec_e += 2*torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc')
 
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.sentence_avg else sample['ntokens']
-        if gamma_conf is not None and (batch_num<0.65):
+        if gamma_conf is not None and (batch_num>1):
 
             l_conf_enc = 0
             l_conf_dec = 0
@@ -117,7 +122,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             loss += (batch_num+0.3)*l_growth_enc + l_growth_dec*gamma_conf*(batch_num +0.3)\
                     + l_growth_dec_e*gamma_conf*(batch_num +0.3)
 
-        #loss += l_alpha_enc + l_alpha_dec_e + l_alpha_dec
+        loss += (1-gamma_conf(l_alpha_enc + l_alpha_dec_e + l_alpha_dec))
 
         logging_output = {
             'loss': loss.data,
