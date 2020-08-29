@@ -253,7 +253,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
     conf = {"encoder": [{"self_attn": []} for i in range(args.encoder_layers)],
             "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
 
-    batch_regression = 1.0 - (total_samples / (160239 * 40))
+    batch_regression = 1.0 - (total_samples / (160239 * 50))
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
