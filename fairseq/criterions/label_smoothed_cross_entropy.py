@@ -127,7 +127,6 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         alpha_loss_nuc = gamma_conf*(l_alpha_enc + l_alpha_dec_e + l_alpha_dec)
         loss += alpha_loss_nuc
 
-        print(loss.data)
 
         logging_output = {
             'loss': loss.data,
