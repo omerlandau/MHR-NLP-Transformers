@@ -71,27 +71,27 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
         net_output = model(**sample['net_input'])
 
-        #l_alpha_enc = 0
-        #l_alpha_dec =0
-        #l_alpha_dec_e = 0
+        l_alpha_enc = 0
+        l_alpha_dec =0
+        l_alpha_dec_e = 0
 
-        #if(batch_num>1):
+        if(batch_num<0.60):
 
-        #    for i in range(len(model.encoder.layers)):
-        #        model.encoder.layers[i].self_attn.alphas.requires_grad = False
+            for i in range(len(model.encoder.layers)):
+                model.encoder.layers[i].self_attn.alphas.requires_grad = False
 
-        #    for i in range(len(model.decoder.layers)):
-        #        model.decoder.layers[i].self_attn.alphas.requires_grad = False
-        #        model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
+            for i in range(len(model.decoder.layers)):
+                model.decoder.layers[i].self_attn.alphas.requires_grad = False
+                model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
 
-        #    for i in range(len(model.encoder.layers)):
-        #            l_alpha_enc += 3*torch.norm(model.encoder.layers[i].self_attn.alphas)
+            for i in range(len(model.encoder.layers)):
+                    l_alpha_enc += 3*torch.norm(model.encoder.layers[i].self_attn.alphas)
 
-        #    for i in range(len(model.decoder.layers)):
-        #            l_alpha_dec += 1.5*torch.norm(model.decoder.layers[i].self_attn.alphas)
-        #            l_alpha_dec_e += 2*torch.norm(model.decoder.layers[i].encoder_attn.alphas)
+            for i in range(len(model.decoder.layers)):
+                    l_alpha_dec += 1.5*torch.norm(model.decoder.layers[i].self_attn.alphas)
+                    l_alpha_dec_e += 2*torch.norm(model.decoder.layers[i].encoder_attn.alphas)
 
-        #    print(l_alpha_enc)
+            print(l_alpha_enc)
 
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.sentence_avg else sample['ntokens']
