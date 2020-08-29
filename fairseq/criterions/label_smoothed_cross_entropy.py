@@ -94,11 +94,11 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             for i in range(len(model.encoder.layers)):
                 print(torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc'))
 
-                l_alpha_enc +=  3*(torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc').detach()*0 + 0*0.1 + torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc'))
+                l_alpha_enc +=  3*(torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc').detach()*0 + 0*0.1 + 0*torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc'))
 
             for i in range(len(model.decoder.layers)):
-                l_alpha_dec += 1.5*(torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc').detach()*0 + 0*0.1 + torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc'))
-                l_alpha_dec_e += 2*(torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc').detach()*0 + 0*0.1 + torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc'))
+                l_alpha_dec += 1.5*(torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc').detach()*0 + 0*0.1 + 0*torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc'))
+                l_alpha_dec_e += 2*(torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc').detach()*0 + 0*0.1 + 0*torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc'))
 
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.sentence_avg else sample['ntokens']
