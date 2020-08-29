@@ -83,7 +83,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         l_alpha_dec_e = 0
         sum = 8*6*3
 
-        if(batch_num is not None):
+        if(batch_num is not None and gamma_conf is not None):
 
             if(batch_num>1):
 
