@@ -102,7 +102,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                 l_alpha_dec += 1.5*(torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc').detach() + 0.001 - torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc'))
                 l_alpha_dec_e += 2*(torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc').detach() + 0.001 - torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc'))
 
-        t1 = time.time() - t0
+            t1 = time.time() - t0
 
         print(t1)
 
