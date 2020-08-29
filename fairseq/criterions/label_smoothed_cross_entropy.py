@@ -81,7 +81,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         l_alpha_enc = 0
         l_alpha_dec =0
         l_alpha_dec_e = 0
-        current = 0
+        sum = 0
 
         if(batch_num<0.999999999):
 
@@ -98,11 +98,21 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
                 current = torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc')
 
+                sum+=last
+
                 l_alpha_enc +=  3*( last + 0.001 -current)
 
             for i in range(len(model.decoder.layers)):
-                l_alpha_dec += 1.5*(torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc').detach() + 0.001 - torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc'))
-                l_alpha_dec_e += 2*(torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc').detach() + 0.001 - torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc'))
+
+                last = torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc').detach()
+                current = torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc')
+                sum+= last
+                l_alpha_dec += 1.5*( last + 0.001 - current)
+
+                current = torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc')
+                last = torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc').detach()
+                sum+=last
+                l_alpha_dec_e += 2*( last + 0.001 - current )
 
 
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
@@ -136,7 +146,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
         logging_output = {
             'loss': loss.data,
-            'nll_loss': current,
+            'nll_loss': sum,
             'ntokens': sample['ntokens'],
             'nsentences': sample['target'].size(0),
             'sample_size': sample_size,
