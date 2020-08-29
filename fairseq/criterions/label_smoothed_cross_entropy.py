@@ -91,9 +91,6 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                 model.decoder.layers[i].self_attn.alphas.requires_grad = True
                 model.decoder.layers[i].encoder_attn.alphas.requires_grad = True
 
-
-            t0 = time.time()
-
             for i in range(len(model.encoder.layers)):
 
                 l_alpha_enc +=  3*(torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc').detach() + 0.001 - torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc'))
@@ -102,9 +99,6 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                 l_alpha_dec += 1.5*(torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc').detach() + 0.001 - torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc'))
                 l_alpha_dec_e += 2*(torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc').detach() + 0.001 - torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc'))
 
-            t1 = time.time() - t0
-
-            print(t1)
 
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.sentence_avg else sample['ntokens']
@@ -137,8 +131,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
         logging_output = {
             'loss': loss.data,
-            'nll_loss': nll_loss.data,
-            'alphpa_nuc_loss': alpha_loss_nuc,
+            'nll_loss': alpha_loss_nuc,
             'ntokens': sample['ntokens'],
             'nsentences': sample['target'].size(0),
             'sample_size': sample_size,
