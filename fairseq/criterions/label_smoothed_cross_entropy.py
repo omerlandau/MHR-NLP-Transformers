@@ -83,36 +83,38 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         l_alpha_dec_e = 0
         sum = 8*6*3
 
-        if(batch_num<0.6):
+        if(batch_num is not None):
 
-            for i in range(len(model.encoder.layers)):
-                model.encoder.layers[i].self_attn.alphas.requires_grad = True
+            if(batch_num<0.6):
 
-            for i in range(len(model.decoder.layers)):
-                model.decoder.layers[i].self_attn.alphas.requires_grad = True
-                model.decoder.layers[i].encoder_attn.alphas.requires_grad = True
+                for i in range(len(model.encoder.layers)):
+                    model.encoder.layers[i].self_attn.alphas.requires_grad = True
 
-            for i in range(len(model.encoder.layers)):
+                for i in range(len(model.decoder.layers)):
+                    model.decoder.layers[i].self_attn.alphas.requires_grad = True
+                    model.decoder.layers[i].encoder_attn.alphas.requires_grad = True
 
-                last = torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc').detach()
+                for i in range(len(model.encoder.layers)):
 
-                current = torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc')
+                    last = torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc').detach()
 
-                sum+=last
+                    current = torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc')
 
-                l_alpha_enc +=  (last + 0.001 -current)
+                    sum+=last
 
-            for i in range(len(model.decoder.layers)):
+                    l_alpha_enc +=  (last + 0.001 -current)
 
-                last = torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc').detach()
-                current = torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc')
-                sum+= last
-                l_alpha_dec += (last + 0.001 - current)
+                for i in range(len(model.decoder.layers)):
 
-                current = torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc')
-                last = torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc').detach()
-                sum+=last
-                l_alpha_dec_e += (last + 0.001 - current)
+                    last = torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc').detach()
+                    current = torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc')
+                    sum+= last
+                    l_alpha_dec += (last + 0.001 - current)
+
+                    current = torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc')
+                    last = torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc').detach()
+                    sum+=last
+                    l_alpha_dec_e += (last + 0.001 - current)
 
 
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
