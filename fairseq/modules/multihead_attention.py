@@ -434,7 +434,7 @@ class MultiheadAttention(nn.Module):
             training=self.training,
         )
 
-        print(self.alphas)
+        #print(self.alphas)
 
         assert v is not None
 
