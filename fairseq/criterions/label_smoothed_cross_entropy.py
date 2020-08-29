@@ -125,8 +125,8 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                     + l_growth_dec_e*gamma_conf*(batch_num +0.3)
 
         print(loss.data)
-        print(-1000*gamma_conf*(l_alpha_enc + l_alpha_dec_e + l_alpha_dec))
-        loss += (-1000*gamma_conf*(l_alpha_enc + l_alpha_dec_e + l_alpha_dec))
+        print(1-gamma_conf*(l_alpha_enc + l_alpha_dec_e + l_alpha_dec))
+        loss += (-1*gamma_conf*(l_alpha_enc + l_alpha_dec_e + l_alpha_dec))
 
         print(loss.data)
 
