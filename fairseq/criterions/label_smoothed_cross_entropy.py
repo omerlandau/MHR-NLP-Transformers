@@ -92,7 +92,6 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                 model.decoder.layers[i].encoder_attn.alphas.requires_grad = True
 
             for i in range(len(model.encoder.layers)):
-                print(torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc'))
 
                 l_alpha_enc +=  3*(torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc').detach() + 0.001 - torch.norm(model.encoder.layers[i].self_attn.alphas, p='nuc'))
 
