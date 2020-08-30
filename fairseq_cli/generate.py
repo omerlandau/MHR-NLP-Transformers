@@ -143,8 +143,8 @@ def _main(args, output_file):
     '''
     TBD - add keep alphas_eval parameters
     '''
-    alphas = {"encoder": [{"self_attn"} for i in range(len(models[0].encoder.layers))],
-            "decoder": [{"self_attn", "enc_attn"} for i in range(len(models[0].decoder.layers))]}
+    alphas = {"encoder": [{"self_attn": ""} for i in range(len(models[0].encoder.layers))],
+            "decoder": [{"self_attn": "", "enc_attn":  ""} for i in range(len(models[0].decoder.layers))]}
 
     for sample in progress:
         sample = utils.move_to_cuda(sample) if use_cuda else sample
