@@ -270,6 +270,13 @@ def _main(args, output_file):
         progress.log({'wps': round(wps_meter.avg)})
         num_sentences += sample['nsentences']
 
+    '''
+    print alphas
+    '''
+    for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
+        print("decoder layer {} self_sttn alphas : {}".format(d, models[0].decoder.layers[d].self_attn.alphas))
+        print("decoder layer {} encoder_sttn alphas : {}".format(d, models[0].decoder.layers[d].encoder_attn.alphas))
+        print("encoder layer {} self_sttn alphas : {}".format(e, models[0].encoder.layers[e].self_attn.alphas))
 
     if args.head_confidence_method is not None:
         for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
