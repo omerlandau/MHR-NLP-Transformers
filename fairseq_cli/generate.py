@@ -168,10 +168,9 @@ def _main(args, output_file):
         TBD - add keep alphas_eval parameters
         '''
         for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
-            print(np.array(models[0].decoder.layers[d].self_attn.alphas.clone().detach().cpu()))
-            alphas["decoder"][d]["self_attn"].append(np.append(np.array(models[0].decoder.layers[d].self_attn.alphas.clone().detach().cpu())))
-            alphas["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.alphas.clone().detach().cpu())))
-            alphas["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.alphas.clone().detach().cpu())))
+            alphas["decoder"][d]["self_attn"].append(np.array(models[0].decoder.layers[d].self_attn.alphas.clone().detach().cpu()))
+            alphas["decoder"][d]["enc_attn"].append(np.array(models[0].decoder.layers[d].encoder_attn.alphas.clone().detach().cpu()))
+            alphas["encoder"][e]["self_attn"].append(np.array(models[0].encoder.layers[e].self_attn.alphas.clone().detach().cpu()))
 
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
