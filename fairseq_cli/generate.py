@@ -293,8 +293,8 @@ def _main(args, output_file):
     except:
         pass
 
-    with open(args.path.replace("checkpoints", "alphas_eval"), 'wb') as fd:
-        pickle.dump(alphas, fd, protocol=3)
+    with open(args.path.replace("checkpoints", "confs_eval").replace(".pt", ".pkl"), 'wb') as fd:
+        pickle.dump(conf, fd, protocol=3)
 
 
     if args.head_confidence_method is not None:
