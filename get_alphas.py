@@ -1,7 +1,7 @@
 import sys
 import torch
 
-checpoint_path = sys.argv[1]
+checpoint_path = sys.argv[0]
 print("checpoint_path is {}".format(checpoint_path))
 model = torch.load(checpoint_path)
 for i in range(len(model.decoder.layers)):
