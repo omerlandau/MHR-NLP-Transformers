@@ -71,7 +71,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
         net_output = model(**sample['net_input'])
 
-        """
+
 
         for i in range(len(model.encoder.layers)):
             model.encoder.layers[i].self_attn.alphas.requires_grad = False
@@ -118,7 +118,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                     sum+=last
                     l_alpha_dec_e += (last + 0.001 - current)
 
-        """
+
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)
         sample_size = sample['target'].size(0) if self.sentence_avg else sample['ntokens']
         if gamma_conf is not None and (batch_num>1) and False:
@@ -143,10 +143,10 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             loss += (batch_num+0.3)*l_growth_enc + l_growth_dec*gamma_conf*(batch_num +0.3)\
                     + l_growth_dec_e*gamma_conf*(batch_num +0.3)
 
-        #if gamma_conf is not None:
+        if gamma_conf is not None:
 
-        #    alpha_loss_nuc = gamma_conf*(l_alpha_enc + l_alpha_dec_e + l_alpha_dec)
-        #    loss += alpha_loss_nuc
+            alpha_loss_nuc = gamma_conf*(l_alpha_enc + l_alpha_dec_e + l_alpha_dec)
+            loss += alpha_loss_nuc
 
 
         logging_output = {
