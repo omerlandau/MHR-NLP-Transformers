@@ -140,6 +140,11 @@ def _main(args, output_file):
     if args.head_confidence_method is not None:
         conf = {"encoder": [{"self_attn": []} for i in range(len(models[0].encoder.layers))],
                 "decoder": [{"self_attn": [], "enc_attn": []} for i in range(len(models[0].decoder.layers))]}
+    '''
+    TBD - add keep alphas_eval parameters
+    '''
+    alphas = {"encoder": [{"self_attn": []} for i in range(len(models[0].encoder.layers))],
+            "decoder": [{"self_attn": [], "enc_attn": []} for i in range(len(models[0].decoder.layers))]}
 
     for sample in progress:
         sample = utils.move_to_cuda(sample) if use_cuda else sample
@@ -159,6 +164,13 @@ def _main(args, output_file):
                 conf["decoder"][d]["self_attn"].append(np.append(np.array(models[0].decoder.layers[d].self_attn.head_conf.clone().detach().cpu()),[models[0].decoder.layers[d].self_attn.bsz]))
                 conf["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.head_conf.clone().detach().cpu()), [models[0].decoder.layers[d].encoder_attn.bsz]))
                 conf["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.head_conf.clone().detach().cpu()),[models[0].encoder.layers[e].self_attn.bsz]))
+        '''
+        TBD - add keep alphas_eval parameters
+        '''
+        for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
+            alphas["decoder"][d]["self_attn"].append(np.append(np.array(models[0].decoder.layers[d].self_attn.alphas.clone().detach().cpu())))
+            alphas["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.alphas.clone().detach().cpu())))
+            alphas["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.alphas.clone().detach().cpu())))
 
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
@@ -215,9 +227,6 @@ def _main(args, output_file):
                         generator.eos,
                     }
                 )
-                # print("Guy comment - > hypo_tokens : {}".format(hypo_tokens))
-                # print("Guy comment - > hypo_str : {}".format(hypo_str))
-                # print("Guy comment - > alignment : {}".format(alignment))
                 detok_hypo_str = decode_fn(hypo_str)
                 if not args.quiet:
                     score = hypo['score'] / math.log(2)  # convert to base 2
@@ -271,12 +280,22 @@ def _main(args, output_file):
         num_sentences += sample['nsentences']
 
     '''
-    print alphas
+    TBD - add keep alphas_eval parameters
     '''
+
     for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
-        print("decoder layer {} self_sttn alphas : {}".format(d, models[0].decoder.layers[d].self_attn.alphas))
-        print("decoder layer {} encoder_sttn alphas : {}".format(d, models[0].decoder.layers[d].encoder_attn.alphas))
-        print("encoder layer {} self_sttn alphas : {}".format(e, models[0].encoder.layers[e].self_attn.alphas))
+        alphas["decoder"][d]["self_attn"] = np.array(alphas["decoder"][d]["self_attn"])
+        alphas["decoder"][d]["enc_attn"] = np.array(alphas["decoder"][d]["enc_attn"])
+        alphas["encoder"][e]["self_attn"] = np.array(alphas["encoder"][e]["self_attn"])
+    path = f'/'.join(args.path.split('/')[:-1]).replace("checkpoints", "alphas_eval")
+    try:
+        os.mkdir(path, 0o775)
+    except:
+        pass
+
+    with open(args.path.replace("checkpoints", "alphas_eval"), 'wb') as fd:
+        pickle.dump(alphas, fd, protocol=3)
+
 
     if args.head_confidence_method is not None:
         for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
