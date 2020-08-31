@@ -59,7 +59,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                             help='epsilon for label smoothing, 0 means no label smoothing')
         # fmt: on
 
-    def forward(self, model, sample, reduce=True, gamma_conf=None, batch_num=None):
+    def forward(self, model, sample, reduce=True, gamma_conf=None, batch_num=None, radius=None, start_after=None):
         """Compute the loss for the given sample.
 
         Returns a tuple with three elements:
@@ -86,8 +86,9 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         sum = 8*6*3
 
         if(batch_num is not None and gamma_conf is not None):
-
-            if(batch_num<0.69):
+            if start_after is None:
+                start_after = 1
+            if batch_num < (1-start_after):
 
                 for i in range(len(model.encoder.layers)):
                     model.encoder.layers[i].self_attn.alphas.requires_grad = True
@@ -104,19 +105,19 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
                     sum+=last
 
-                    l_alpha_enc +=  (last + 0.001 -current)
+                    l_alpha_enc += (last + radius -current)
 
                 for i in range(len(model.decoder.layers)):
 
                     last = torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc').detach()
                     current = torch.norm(model.decoder.layers[i].self_attn.alphas, p='nuc')
-                    sum+= last
-                    l_alpha_dec += (last + 0.001 - current)
+                    sum += last
+                    l_alpha_dec += (last + radius - current)
 
                     current = torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc')
                     last = torch.norm(model.decoder.layers[i].encoder_attn.alphas, p='nuc').detach()
-                    sum+=last
-                    l_alpha_dec_e += (last + 0.001 - current)
+                    sum += last
+                    l_alpha_dec_e += (last + radius - current)
 
 
         loss, nll_loss = self.compute_loss(model, net_output, sample, reduce=reduce)

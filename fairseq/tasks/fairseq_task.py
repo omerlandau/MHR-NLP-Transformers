@@ -341,7 +341,9 @@ class FairseqTask(object):
         with torch.autograd.profiler.record_function("forward"):
 
             if(str(criterion) == "LabelSmoothedCrossEntropyCriterion()"):
-                loss, sample_size, logging_output = criterion(model, sample, gamma_conf=self.args.gamma_conf, batch_num=batch_num)
+                loss, sample_size, logging_output = criterion(model, sample, gamma_conf=self.args.gamma_conf, batch_num=batch_num,
+                                                              radius=self.args.radius,
+                                                              start_after=self.args.loss_start_after)
             else:
                 loss, sample_size, logging_output = criterion(model, sample)
 

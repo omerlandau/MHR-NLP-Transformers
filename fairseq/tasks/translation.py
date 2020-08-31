@@ -212,6 +212,11 @@ class TranslationTask(FairseqTask):
         parser.add_argument('--dynamic-type', type=str, nargs="+", default=None, help="type of automatic swapping")
         parser.add_argument('--dynamic-rest', type=int, nargs="+", default=[1,1,1], help="type of automatic swapping")
         parser.add_argument('--dynamic-end-epoch', type=int, nargs="+", default=[0,0,0], help="epoch to end dynamic MHR")
+        parser.add_argument('--keep-alphas-eval', type=str, default=None, help="keep alphas_eval")
+        parser.add_argument('--radius', type=float, default=None, help="radius for increasing the alphas")
+        parser.add_argument('--loss-start-after', type=float, default=None,
+                            help="start using the loss only after particular percentage of epochs")
+
 
 
 
