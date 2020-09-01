@@ -216,6 +216,17 @@ class TranslationTask(FairseqTask):
         parser.add_argument('--radius', type=float, default=None, help="radius for increasing the alphas")
         parser.add_argument('--loss-start-after', type=float, default=None,
                             help="start using the loss only after particular percentage of epochs")
+        parser.add_argument('--enc-self-alpha-loss-ratio', type=float, default=0, help="how much weight to put on "
+                                                                                          "the alpha loss regards to"
+                                                                                          " encoder self attn")
+        parser.add_argument('--dec-self-alpha-loss-ratio', type=float, default=0, help="how much weight to put on "
+                                                                                          "the alpha loss regards to"
+                                                                                          " decoder self attn")
+        parser.add_argument('--dec-enc-alpha-loss-ratio', type=float, default=0, help="how much weight to put on "
+                                                                                          "the alpha loss regards to"
+                                                                                          " decoder encoder attn")
+
+
 
 
 
