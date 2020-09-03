@@ -4,7 +4,7 @@ import os
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+from matplotlib.colors import LinearSegmentedColormap
 
 def denorm_conf(epoch_data_to_denorm):
     return [epoch_data_to_denorm[i] * epoch_data_to_denorm[8] for i in range(8)]
@@ -128,6 +128,53 @@ def plot_heat_map_of_all_epochs(num_of_epochs, epochs_dir, number_of_layers, num
     title = '{} : {} - {}'.format(model_phase, module_type, attn_type)
     ax.set_title(title)
     plt.savefig("output_dir/{}.png".format(title))
+
+
+def plot_alphas(name, epoch_data, attn_tyep, module_type):
+    '''
+
+    :param name: Experiment name
+    :param epoch_data: A loaded pickle contained the alphas fata.
+    :param attn_tyep: Type of attention.
+    :param module_type: decoder\encoder
+    :return: plot the figure
+    '''
+    cdict1 = {'red': ((0.0, 0.0, 0.0),
+                      (0.5, 0.0, 0.1),
+                      (1.0, 1.0, 1.0)),
+
+              'green': ((0.0, 0.0, 0.0),
+                        (1.0, 0.0, 0.0)),
+
+              'blue': ((0.0, 0.0, 1.0),
+                       (0.5, 0.1, 0.0),
+                       (1.0, 0.0, 0.0))
+              }
+    fig, axs = plt.subplots(2, 3, figsize=(16, 19))
+    for ax in axs.flat:
+        ax.set(xlabel='heads', ylabel='heads')
+    fig.subplots_adjust(left=0.02, bottom=0.06, right=0.95, top=0.94, wspace=0.05)
+    blue_red1 = LinearSegmentedColormap('BlueRed1', cdict1)
+    fig.suptitle('{} - {} - {} '.format(name, module_type, attn_tyep), fontsize=16)
+    im1 = axs[0, 0].imshow(epoch_data[module_type][0][attn_tyep], interpolation='nearest', cmap=blue_red1)
+    axs[0, 0].set_title("Layer 0")
+    fig.colorbar(im1, ax=axs[0, 0])
+    im2 = axs[0, 1].imshow(epoch_data[module_type][1][attn_tyep], interpolation='nearest', cmap=blue_red1)
+    fig.colorbar(im2, ax=axs[0, 1])
+    axs[0, 1].set_title("Layer 1")
+    im3 = axs[0, 2].imshow(epoch_data[module_type][2][attn_tyep], interpolation='nearest', cmap=blue_red1)
+    fig.colorbar(im3, ax=axs[0, 2])
+    axs[0, 2].set_title("Layer 2")
+    im4 = axs[1, 0].imshow(epoch_data[module_type][3][attn_tyep], interpolation='nearest', cmap=blue_red1)
+    fig.colorbar(im4, ax=axs[1, 0])
+    axs[1, 0].set_title("Layer 3")
+    im5 = axs[1, 1].imshow(epoch_data[module_type][4][attn_tyep], interpolation='nearest', cmap=blue_red1)
+    fig.colorbar(im5, ax=axs[1, 1])
+    axs[1, 1].set_title("Layer 4")
+    im6 = axs[1, 2].imshow(epoch_data[module_type][5][attn_tyep], interpolation='nearest', cmap=blue_red1)
+    fig.colorbar(im6, ax=axs[1, 2])
+    axs[1, 2].set_title("Layer 5")
+    plt.show()
 
 
 epoch_dir = "/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/confs/exp-enc_dec-attn-swaps-layers_04_15-8-heads-6l_with_conf_work_monkey_gamma_20_enc_g_mm_dec_e_g_start_late_40p_nd_decay"
