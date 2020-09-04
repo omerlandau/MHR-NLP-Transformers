@@ -73,7 +73,7 @@ class MultiheadAttention(nn.Module):
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
         self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
-
+        self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
 
@@ -446,8 +446,8 @@ class MultiheadAttention(nn.Module):
         b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
         self.alphas.requires_grad = True
-
-        b = torch.mm(self.alphas,b)
+        self.alphas_bias.requires_grad = True
+        b = torch.mm(self.alphas, b) + self.alphas_bias
 
         ctx = b.contiguous().view(self.num_heads, bsz,tgt_len,self.head_dim).transpose(0,1)
 

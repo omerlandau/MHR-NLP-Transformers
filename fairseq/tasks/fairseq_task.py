@@ -346,7 +346,8 @@ class FairseqTask(object):
                                                               start_after=self.args.loss_start_after,
                                                               enc_self_alpha_loss_ratio=self.args.enc_self_alpha_loss_ratio,
                                                               dec_self_alpha_loss_ratio=self.args.dec_self_alpha_loss_ratio,
-                                                              dec_enc_alpha_loss_ratio=self.args.dec_enc_alpha_loss_ratio)
+                                                              dec_enc_alpha_loss_ratio=self.args.dec_enc_alpha_loss_ratio,
+                                                              use_alphas_bias=self.args.use_alphas_bias)
             else:
                 loss, sample_size, logging_output = criterion(model, sample)
 

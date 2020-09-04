@@ -225,6 +225,8 @@ class TranslationTask(FairseqTask):
         parser.add_argument('--dec-enc-alpha-loss-ratio', type=float, default=0, help="how much weight to put on "
                                                                                           "the alpha loss regards to"
                                                                                           " decoder encoder attn")
+        parser.add_argument('--use-alphas-bias', type=bool, default=False, help="use a bias after alphas multiplication ")
+
 
 
 

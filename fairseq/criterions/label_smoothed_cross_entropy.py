@@ -60,7 +60,8 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         # fmt: on
 
     def forward(self, model, sample, reduce=True, gamma_conf=None, batch_num=None, radius=None, start_after=None,
-                enc_self_alpha_loss_ratio=0, dec_self_alpha_loss_ratio=0, dec_enc_alpha_loss_ratio=0):
+                enc_self_alpha_loss_ratio=0, dec_self_alpha_loss_ratio=0, dec_enc_alpha_loss_ratio=0,
+                use_alphas_bias=False):
         """Compute the loss for the given sample.
 
         Returns a tuple with three elements:
@@ -76,10 +77,14 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
         for i in range(len(model.encoder.layers)):
             model.encoder.layers[i].self_attn.alphas.requires_grad = False
+            model.encoder.layers[i].self_attn.alphas_bias.requires_grad = False
 
         for i in range(len(model.decoder.layers)):
             model.decoder.layers[i].self_attn.alphas.requires_grad = False
+            model.decoder.layers[i].self_attn.alphas_bias.requires_grad = False
             model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
+            model.decoder.layers[i].encoder_attn.alphas_bias.requires_grad = False
+
 
         l_alpha_enc = 0
         l_alpha_dec =0
@@ -93,10 +98,15 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
                 for i in range(len(model.encoder.layers)):
                     model.encoder.layers[i].self_attn.alphas.requires_grad = True
+                    if use_alphas_bias:
+                        model.encoder.layers[i].self_attn.alphas_bias.requires_grad = True
 
                 for i in range(len(model.decoder.layers)):
                     model.decoder.layers[i].self_attn.alphas.requires_grad = True
                     model.decoder.layers[i].encoder_attn.alphas.requires_grad = True
+                    if use_alphas_bias:
+                        model.decoder.layers[i].self_attn.alphas_bias.requires_grad = True
+                        model.decoder.layers[i].encoder_attn.alphas_bias.requires_grad = True
 
                 for i in range(len(model.encoder.layers)):
 
