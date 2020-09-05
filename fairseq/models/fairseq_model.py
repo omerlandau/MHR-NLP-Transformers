@@ -88,6 +88,7 @@ class BaseFairseqModel(nn.Module):
         Overrides the method in :class:`nn.Module`. Compared with that method
         this additionally "upgrades" *state_dicts* from old checkpoints.
         """
+        print("Guy comment -> sate dict : {}".format(state_dict))
         self.upgrade_state_dict(state_dict)
         new_state_dict = prune_state_dict(state_dict, args)
         return super().load_state_dict(new_state_dict, strict)
