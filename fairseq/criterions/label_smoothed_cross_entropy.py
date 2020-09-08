@@ -76,13 +76,13 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
 
         for i in range(len(model.encoder.layers)):
-            model.encoder.layers[i].self_attn.alphas.requires_grad = False
+            #model.encoder.layers[i].self_attn.alphas.requires_grad = False
             model.encoder.layers[i].self_attn.alphas_bias.requires_grad = False
 
         for i in range(len(model.decoder.layers)):
-            model.decoder.layers[i].self_attn.alphas.requires_grad = False
+            #model.decoder.layers[i].self_attn.alphas.requires_grad = False
             model.decoder.layers[i].self_attn.alphas_bias.requires_grad = False
-            model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
+            #model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
             model.decoder.layers[i].encoder_attn.alphas_bias.requires_grad = False
 
 
