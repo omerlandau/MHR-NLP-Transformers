@@ -96,7 +96,6 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         # The next line counters on the facts that every enc\dec layer has the sane number of heads and that there
         # same number of layers in both enc and dec. 3 is the number of different attention types.
         num_heads = model.decoder.layers[0].self_attn.num_heads
-        print("Guy comment - > num heads :{}".format(num_heads))
         sum = num_heads*len(model.decoder.layers)*3
 
         if(batch_num is not None and gamma_conf is not None):
@@ -181,7 +180,10 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                 model.decoder.layers[i].encoder_attn.cosine_similarity_matrix.requires_grad = True
             for i in range(len(model.encoder.layers)):
                 last = (torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
+                print("Guy comment -> last : {}".format(last))
                 current = torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)
+                print("Guy comment -> current : {}".format(current))
+                print("Guy comment -> radius : {}".format(radius))
                 l_sim_enc += (last + radius - current)
             for i in range(len(model.decoder.layers)):
                 last = (torch.sum(model.decoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
