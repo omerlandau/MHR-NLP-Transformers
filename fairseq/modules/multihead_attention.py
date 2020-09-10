@@ -75,7 +75,7 @@ class MultiheadAttention(nn.Module):
         self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
         self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        self.cosine_similarity_matrix = Parameter(torch.zeros(num_heads, num_heads))
+        self.cosine_similarity_matrix = Parameter(torch.zeros(num_heads, num_heads)).to('cuda')
 
         if add_bias_kv:
             self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
@@ -446,12 +446,13 @@ class MultiheadAttention(nn.Module):
 
         b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
+        self.cosine_similarity_matrix.requires_grad = True
         # Test cosine sim
         x1 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         x2 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         self.cosine_similarity_matrix = torch.matmul(x1, x2.transpose(0, 1))
         # End test cosine sim
-        self.cosine_similarity_matrix.requires_grad = False
+
 
         self.alphas.requires_grad = True
         #self.alphas_bias.requires_grad = True
