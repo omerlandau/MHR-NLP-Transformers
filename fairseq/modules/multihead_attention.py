@@ -449,9 +449,9 @@ class MultiheadAttention(nn.Module):
         # Test cosine sim
         x1 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         x2 = b / torch.norm(b, p=2, dim=1, keepdim=True)
-        cosine_similarity_matrix = torch.matmul(x1, x2.transpose(0, 1))
-        print(cosine_similarity_matrix.shape)
-        print(-cosine_similarity_matrix)
+        self.cosine_similarity_matrix = torch.matmul(x1, x2.transpose(0, 1))
+        print(self.cosine_similarity_matrix.shape)
+        print(self.cosine_similarity_matrix)
         # End test cosine sim
         self.cosine_similarity_matrix.requires_grad = False
 
