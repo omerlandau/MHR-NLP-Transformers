@@ -451,7 +451,7 @@ class MultiheadAttention(nn.Module):
         x2 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         cosine_similarity_matrix = torch.matmul(x1, x2.transpose(0, 1))
         print(cosine_similarity_matrix.shape)
-        print(cosine_similarity_matrix)
+        print(1 - cosine_similarity_matrix)
         # End test cosine sim
 
         self.alphas.requires_grad = True
