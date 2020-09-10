@@ -441,9 +441,9 @@ class MultiheadAttention(nn.Module):
         save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
 
         # Test cosine sim
-        x1 = save_ctx / torch.norm(save_ctx, dim=1, keepdim=True)
+        x1 = save_ctx / torch.norm(save_ctx, p=2, dim=1, keepdim=True)
         x2 = save_ctx / torch.norm(save_ctx, p=2, dim=1, keepdim=True)
-        cosine_similarity_matrix = torch.matmul(x1, x2.t())
+        cosine_similarity_matrix = torch.matmul(x1, x2.transpose(2, 3))
         print(cosine_similarity_matrix.shape)
         print(cosine_similarity_matrix)
         # End test cosine sim
