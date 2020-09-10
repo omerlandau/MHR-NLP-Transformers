@@ -180,10 +180,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                 model.decoder.layers[i].encoder_attn.cosine_similarity_matrix.requires_grad = True
             for i in range(len(model.encoder.layers)):
                 last = (torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
-                print("Guy comment -> last : {}".format(last))
                 current = torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)
-                print("Guy comment -> current : {}".format(current))
-                print("Guy comment -> radius : {}".format(radius))
                 l_sim_enc += (last + radius - current)
             for i in range(len(model.decoder.layers)):
                 last = (torch.sum(model.decoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
