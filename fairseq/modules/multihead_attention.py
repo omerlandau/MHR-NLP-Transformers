@@ -447,8 +447,8 @@ class MultiheadAttention(nn.Module):
         b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
         # Test cosine sim
-        x1 = b / torch.norm(b, p=2, dim=0, keepdim=True)
-        x2 = b / torch.norm(b, p=2, dim=0, keepdim=True)
+        x1 = b / torch.norm(b, p=2, dim=1, keepdim=True)
+        x2 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         cosine_similarity_matrix = torch.matmul(x1, x2.transpose(0, 1))
         print(cosine_similarity_matrix.shape)
         print(cosine_similarity_matrix)
