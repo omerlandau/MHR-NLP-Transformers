@@ -440,19 +440,19 @@ class MultiheadAttention(nn.Module):
         ctx = torch.bmm(attn_probs, v)  # Thats what I called 'Z' in my summary.
         save_ctx = ctx.view(bsz, self.num_heads, tgt_len, self.head_dim)
 
-        # Test cosine sim
-        x1 = save_ctx / torch.norm(save_ctx, p=2, dim=1, keepdim=True)
-        x2 = save_ctx / torch.norm(save_ctx, p=2, dim=1, keepdim=True)
-        cosine_similarity_matrix = torch.matmul(x1, x2.transpose(2, 3))
-        print(cosine_similarity_matrix.shape)
-        print(cosine_similarity_matrix)
-        # End test cosine sim
-
         ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
         z = ctx.contiguous().view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
 
         b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
+
+        # Test cosine sim
+        x1 = save_ctx / torch.norm(b, p=2, dim=1, keepdim=True)
+        x2 = save_ctx / torch.norm(b, p=2, dim=1, keepdim=True)
+        cosine_similarity_matrix = torch.matmul(x1, x2.transpose(2, 3))
+        print(cosine_similarity_matrix.shape)
+        print(cosine_similarity_matrix)
+        # End test cosine sim
 
         self.alphas.requires_grad = True
         self.alphas_bias.requires_grad = True
