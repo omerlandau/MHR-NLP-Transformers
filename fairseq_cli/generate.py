@@ -143,6 +143,9 @@ def _main(args, output_file):
     if args.keep_alphas_eval is not None:
         alphas = {"encoder": [{"self_attn": []} for i in range(len(models[0].encoder.layers))],
                   "decoder": [{"self_attn": [], "enc_attn":  []} for i in range(len(models[0].decoder.layers))]}
+    if args.save_heads_cos_sim is not None:
+        cosine_similarities = {"encoder": [{"self_attn": []} for i in range(len(models[0].encoder.layers))],
+                  "decoder": [{"self_attn": [], "enc_attn":  []} for i in range(len(models[0].decoder.layers))]}
 
     for sample in progress:
         sample = utils.move_to_cuda(sample) if use_cuda else sample
@@ -167,6 +170,17 @@ def _main(args, output_file):
                 alphas["decoder"][d]["self_attn"] = np.array(models[0].decoder.layers[d].self_attn.alphas.clone().detach().cpu())
                 alphas["decoder"][d]["enc_attn"] = np.array(models[0].decoder.layers[d].encoder_attn.alphas.clone().detach().cpu())
                 alphas["encoder"][e]["self_attn"] = np.array(models[0].encoder.layers[e].self_attn.alphas.clone().detach().cpu())
+        if args.save_heads_cos_sim is not None:
+            for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
+                cosine_similarities["decoder"][d]["self_attn"] = np.array(
+                    models[0].decoder.layers[d].self_attn.cosine_similarity_matrix.clone().detach().cpu())
+                cosine_similarities["decoder"][d]["enc_attn"] = np.array(
+                    models[0].decoder.layers[d].encoder_attn.cosine_similarity_matrix.clone().detach().cpu())
+                cosine_similarities["encoder"][e]["self_attn"] = np.array(
+                    models[0].encoder.layers[e].self_attn.cosine_similarity_matrix.clone().detach().cpu())
+
+
+
 
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
@@ -288,6 +302,20 @@ def _main(args, output_file):
 
         with open(args.path.replace("checkpoints", "alphas_eval").replace(".pt", ".pkl"), 'wb') as fd:
             pickle.dump(alphas, fd, protocol=3)
+
+    if args.save_heads_cos_sim is not None:
+        for e, d in zip(range(len(models[0].encoder.layers)), range(len(models[0].decoder.layers))):
+            cosine_similarities["decoder"][d]["self_attn"] = np.array(cosine_similarities["decoder"][d]["self_attn"])
+            cosine_similarities["decoder"][d]["enc_attn"] = np.array(cosine_similarities["decoder"][d]["enc_attn"])
+            cosine_similarities["encoder"][e]["self_attn"] = np.array(cosine_similarities["encoder"][e]["self_attn"])
+        path = f'/'.join(args.path.split('/')[:-1]).replace("checkpoints", "cosine_similarities_eval")
+        try:
+            os.mkdir(path, 0o775)
+        except:
+            pass
+
+        with open(args.path.replace("checkpoints", "cosine_similarities_eval").replace(".pt", ".pkl"), 'wb') as fd:
+            pickle.dump(cosine_similarities, fd, protocol=3)
 
 
     if args.head_confidence_method is not None:
