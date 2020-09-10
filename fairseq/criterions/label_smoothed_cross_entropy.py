@@ -179,17 +179,11 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                 model.decoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = True
                 model.decoder.layers[i].encoder_attn.cosine_similarity_matrix.requires_grad = True
             for i in range(len(model.encoder.layers)):
-                last = (torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
-                current = torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)
-                l_sim_enc += (last + radius - current)
+                l_sim_enc += torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)
             for i in range(len(model.decoder.layers)):
-                last = (torch.sum(model.decoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
-                current = torch.sum(model.decoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)
-                l_sim_dec += (last + radius - current)
+                l_sim_dec += torch.sum(model.decoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)
 
-                last = (torch.sum(model.decoder.layers[i].encoder_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
-                current = torch.sum(model.decoder.layers[i].encoder_attn.cosine_similarity_matrix)/(num_heads*num_heads)
-                l_sim_dec_e += (last + radius - current)
+                l_sim_dec_e += torch.sum(model.decoder.layers[i].encoder_attn.cosine_similarity_matrix)/(num_heads*num_heads)
 
             cos_sim_loss_nuc = l_sim_enc + l_sim_dec + l_sim_dec_e
             loss += cos_sim_loss_nuc
