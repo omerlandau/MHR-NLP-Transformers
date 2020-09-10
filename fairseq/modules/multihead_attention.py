@@ -446,7 +446,6 @@ class MultiheadAttention(nn.Module):
 
         b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
-        self.cosine_similarity_matrix.requires_grad = False
         # Test cosine sim
         x1 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         x2 = b / torch.norm(b, p=2, dim=1, keepdim=True)
@@ -454,6 +453,7 @@ class MultiheadAttention(nn.Module):
         print(cosine_similarity_matrix.shape)
         print(-cosine_similarity_matrix)
         # End test cosine sim
+        self.cosine_similarity_matrix.requires_grad = False
 
         self.alphas.requires_grad = True
         self.alphas_bias.requires_grad = True
