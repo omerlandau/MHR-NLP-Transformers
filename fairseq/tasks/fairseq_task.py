@@ -347,7 +347,8 @@ class FairseqTask(object):
                                                               enc_self_alpha_loss_ratio=self.args.enc_self_alpha_loss_ratio,
                                                               dec_self_alpha_loss_ratio=self.args.dec_self_alpha_loss_ratio,
                                                               dec_enc_alpha_loss_ratio=self.args.dec_enc_alpha_loss_ratio,
-                                                              use_alphas_bias=self.args.use_alphas_bias)
+                                                              use_alphas_bias=self.args.use_alphas_bias,
+                                                              cosine_sim_loss=self.args.cosine_sim_loss)
             else:
                 loss, sample_size, logging_output = criterion(model, sample)
 

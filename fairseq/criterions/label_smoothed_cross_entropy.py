@@ -61,7 +61,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
 
     def forward(self, model, sample, reduce=True, gamma_conf=None, batch_num=None, radius=None, start_after=None,
                 enc_self_alpha_loss_ratio=0, dec_self_alpha_loss_ratio=0, dec_enc_alpha_loss_ratio=0,
-                use_alphas_bias=0):
+                use_alphas_bias=0, cosine_sim_loss=None):
         """Compute the loss for the given sample.
 
         Returns a tuple with three elements:
@@ -78,18 +78,26 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         for i in range(len(model.encoder.layers)):
             model.encoder.layers[i].self_attn.alphas.requires_grad = False
             model.encoder.layers[i].self_attn.alphas_bias.requires_grad = False
+            model.encoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = False
 
         for i in range(len(model.decoder.layers)):
             model.decoder.layers[i].self_attn.alphas.requires_grad = False
             model.decoder.layers[i].self_attn.alphas_bias.requires_grad = False
+            model.decoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = False
             model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
             model.decoder.layers[i].encoder_attn.alphas_bias.requires_grad = False
+            model.decoder.layers[i].encoder_attn.cosine_similarity_matrix.requires_grad = False
+
 
 
         l_alpha_enc = 0
         l_alpha_dec =0
         l_alpha_dec_e = 0
-        sum = 8*6*3
+        # The next line counters on the facts that every enc\dec layer has the sane number of heads and that there
+        # same number of layers in both enc and dec. 3 is the number of different attention types.
+        num_heads = model.decoder.layers[0].self_attn.num_heads
+        print("Guy comment - > num heads :{}".format(num_heads))
+        sum = num_heads*len(model.decoder.layers)*3
 
         if(batch_num is not None and gamma_conf is not None):
             if start_after is None:
@@ -160,6 +168,32 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             alpha_loss_nuc = gamma_conf*(enc_self_alpha_loss_ratio*l_alpha_enc +
                                          dec_enc_alpha_loss_ratio*l_alpha_dec_e + dec_self_alpha_loss_ratio*l_alpha_dec)
             loss += alpha_loss_nuc
+
+        l_sim_enc = 0
+        l_sim_dec = 0
+        l_sim_dec_e = 0
+        # Cosine similarity loss
+        if cosine_sim_loss is not None:
+            for i in range(len(model.encoder.layers)):
+                model.encoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = True
+            for i in range(len(model.decoder.layers)):
+                model.decoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = True
+                model.decoder.layers[i].encoder_attn.cosine_similarity_matrix.requires_grad = True
+            for i in range(len(model.encoder.layers)):
+                last = (torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
+                current = torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)
+                l_sim_enc += (last + radius - current)
+            for i in range(len(model.decoder.layers)):
+                last = (torch.sum(model.decoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
+                current = torch.sum(model.decoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads)
+                l_sim_dec += (last + radius - current)
+
+                last = (torch.sum(model.decoder.layers[i].encoder_attn.cosine_similarity_matrix)/(num_heads*num_heads)).detach()
+                current = torch.sum(model.decoder.layers[i].encoder_attn.cosine_similarity_matrix)/(num_heads*num_heads)
+                l_sim_dec_e += (last + radius - current)
+
+            cos_sim_loss_nuc = l_sim_enc + l_sim_dec + l_sim_dec_e
+            loss += cos_sim_loss_nuc
 
 
         logging_output = {

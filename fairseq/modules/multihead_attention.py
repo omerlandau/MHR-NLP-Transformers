@@ -75,7 +75,7 @@ class MultiheadAttention(nn.Module):
         self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
         self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        self.cosine_similarity_matrix = None
+        self.cosine_similarity_matrix = Parameter(torch.zeros(num_heads, num_heads))
 
         if add_bias_kv:
             self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
