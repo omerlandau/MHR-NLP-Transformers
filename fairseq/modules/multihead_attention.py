@@ -72,10 +72,10 @@ class MultiheadAttention(nn.Module):
         self.v_proj = nn.Linear(self.vdim, embed_dim, bias=bias)
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
-        self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
-        self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
+        ##########self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
+        ##########self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        self.cosine_similarity_matrix = Parameter(torch.zeros(num_heads, num_heads))
+        ##########self.cosine_similarity_matrix = Parameter(torch.zeros(num_heads, num_heads))
 
         if add_bias_kv:
             self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
@@ -105,12 +105,12 @@ class MultiheadAttention(nn.Module):
             nn.init.xavier_uniform_(self.k_proj.weight, gain=1 / math.sqrt(2))
             nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
             nn.init.xavier_uniform_(self.q_proj.weight, gain=1 / math.sqrt(2))
-            self.alphas.data.fill_diagonal_(1)
+            ##########self.alphas.data.fill_diagonal_(1)
         else:
             nn.init.xavier_uniform_(self.k_proj.weight)
             nn.init.xavier_uniform_(self.v_proj.weight)
             nn.init.xavier_uniform_(self.q_proj.weight)
-            self.alphas.data.fill_diagonal_(1)
+            ##########self.alphas.data.fill_diagonal_(1)
 
         nn.init.xavier_uniform_(self.out_proj.weight)
         if self.out_proj.bias is not None:
@@ -455,11 +455,11 @@ class MultiheadAttention(nn.Module):
         x2 = torch.unsqueeze(test_cos, 3)
         cos_diff = torch.sum(torch.mul(x1, x2), dim=-1)
         cos_diff = torch.mean(cos_diff, dim=(0, 1)) + 1.0
-        self.cosine_similarity_matrix = Parameter(cos_diff)
+        ##########self.cosine_similarity_matrix = Parameter(cos_diff)
         # End test cosine sim
 
 
-        self.alphas.requires_grad = True
+        ##########self.alphas.requires_grad = True
         #self.alphas_bias.requires_grad = True
         #b = torch.mm(self.alphas, b) + self.alphas_bias
         b = torch.mm(self.alphas, b)
