@@ -447,16 +447,16 @@ class MultiheadAttention(nn.Module):
         b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
         self.cosine_similarity_matrix.requires_grad = True
+
         # Test cosine sim
         test_cos = save_ctx.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(1, 2)
         test_cos = F.normalize(test_cos, p=2, dim=-1) # l2 norm last dim
         x1 = torch.unsqueeze(test_cos, 2)
         x2 = torch.unsqueeze(test_cos, 3)
-        test1 = torch.mul(x1, x2)
-        print("Guy comment - > test1 shpae : {}".format(test1.shape))
-        test2 = torch.sum(test1, dim=-1)
-        print("Guy comment - > test2 shpae : {}".format(test2.shape))
-        print("Guy comment - > test2 : {}".format(test2))
+        cos_diff = torch.sum(torch.mul(x1, x2), dim=-1)
+        cos_diff = torch.mean(cos_diff, dim=(-2, -1)) + 1.0
+        print("Guy comment - > cos_diff shape : {}".format(cos_diff.shape))
+        print("Guy comment - > cos_diff  : {}".format(cos_diff))
         #x1 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         #x2 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         self.cosine_similarity_matrix = Parameter(torch.matmul(x1, x2.transpose(0, 1)))
