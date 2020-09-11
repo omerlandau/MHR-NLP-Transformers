@@ -359,7 +359,7 @@ class TransformerDecoderLayer(nn.Module):
             y = torch.cat((encoder_out, x), dim=0)
         else:
             y = x
-        print("Guy comment - > Decoder layer")
+        print("Guy comment - > Decoder layer (self)")
         x, attn, context = self.self_attn(
             query=x,
             key=y,
@@ -393,7 +393,7 @@ class TransformerDecoderLayer(nn.Module):
                     saved_state["prev_key_padding_mask"] = prev_attn_state[2]
                 assert incremental_state is not None
                 self.encoder_attn._set_input_buffer(incremental_state, saved_state)
-            print("Guy comment - > Decoder layer")
+            print("Guy comment - > Decoder layer (enc)")
             x, attn, context = self.encoder_attn(
                 query=x,
                 key=encoder_out,
