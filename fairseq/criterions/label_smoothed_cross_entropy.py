@@ -172,6 +172,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         l_sim_dec_e = 0
         # Cosine similarity loss
         if cosine_sim_loss is not None:
+            print("Guy comment -> inside cosine_sim_loss")
             for i in range(len(model.encoder.layers)):
                 model.encoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = True
             for i in range(len(model.decoder.layers)):
