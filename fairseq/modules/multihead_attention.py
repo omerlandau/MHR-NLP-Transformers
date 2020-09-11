@@ -450,13 +450,11 @@ class MultiheadAttention(nn.Module):
 
         # Test cosine sim
         test_cos = save_ctx.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(1, 2)
-        test_cos = F.normalize(test_cos, p=2, dim=-1) # l2 norm last dim
+        test_cos = F.normalize(test_cos, p=2, dim=-1)
         x1 = torch.unsqueeze(test_cos, 2)
         x2 = torch.unsqueeze(test_cos, 3)
         cos_diff = torch.sum(torch.mul(x1, x2), dim=-1)
         cos_diff = torch.mean(cos_diff, dim=(0, 1)) + 1.0
-        #x1 = b / torch.norm(b, p=2, dim=1, keepdim=True)
-        #x2 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         self.cosine_similarity_matrix = Parameter(cos_diff)
         # End test cosine sim
 
