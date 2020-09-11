@@ -454,8 +454,8 @@ class MultiheadAttention(nn.Module):
         x1 = torch.unsqueeze(test_cos, 2)
         x2 = torch.unsqueeze(test_cos, 3)
         cos_diff = torch.sum(torch.mul(x1, x2), dim=-1)
-        cos_diff = torch.mean(cos_diff, dim=(-2, -1)) + 1.0
-        print("Guy comment - > tgt_len is : {}".format(tgt_len))
+        cos_diff = torch.mean(cos_diff, dim=(0, 1)) + 1.0
+
         print("Guy comment - > cos_diff shape : {}".format(cos_diff.shape))
         #x1 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         #x2 = b / torch.norm(b, p=2, dim=1, keepdim=True)
