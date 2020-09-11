@@ -72,8 +72,8 @@ class MultiheadAttention(nn.Module):
         self.v_proj = nn.Linear(self.vdim, embed_dim, bias=bias)
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
-        ##########self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
-        ##########self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
+        self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
+        self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         ##########self.cosine_similarity_matrix = Parameter(torch.zeros(num_heads, num_heads))
 
@@ -442,9 +442,9 @@ class MultiheadAttention(nn.Module):
 
         ctx = save_ctx.view(bsz * self.num_heads, tgt_len, self.head_dim)
 
-        ##########z = ctx.contiguous().view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
+        z = ctx.contiguous().view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(0, 1)
 
-        ##########b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
+        b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
         ##########self.cosine_similarity_matrix.requires_grad = True
 
@@ -459,14 +459,14 @@ class MultiheadAttention(nn.Module):
         # End test cosine sim
 
 
-        ##########self.alphas.requires_grad = True
+        self.alphas.requires_grad = True
         #self.alphas_bias.requires_grad = True
         #b = torch.mm(self.alphas, b) + self.alphas_bias
-        ##########b = torch.mm(self.alphas, b)
+        b = torch.mm(self.alphas, b)
 
-        ##########ctx = b.contiguous().view(self.num_heads, bsz, tgt_len, self.head_dim).transpose(0, 1)
+        ctx = b.contiguous().view(self.num_heads, bsz, tgt_len, self.head_dim).transpose(0, 1)
 
-        ##########ctx = ctx.contiguous().view(bsz * self.num_heads, tgt_len, self.head_dim)
+        ctx = ctx.contiguous().view(bsz * self.num_heads, tgt_len, self.head_dim)
 
 
 
