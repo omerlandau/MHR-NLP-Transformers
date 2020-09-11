@@ -454,7 +454,6 @@ class MultiheadAttention(nn.Module):
         x2 = torch.unsqueeze(test_cos, 3)
         test1 = torch.mul(x1, x2)
         print("Guy comment - > test1 shpae : {}".format(test1.shape))
-        print("Guy comment - > test1 : {}".format(test1))
         test2 = torch.sum(test1)
         print("Guy comment - > test2 shpae : {}".format(test2.shape))
         print("Guy comment - > test2 : {}".format(test2))
