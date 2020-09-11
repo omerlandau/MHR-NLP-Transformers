@@ -446,7 +446,7 @@ class MultiheadAttention(nn.Module):
 
         b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
-        self.cosine_similarity_matrix.requires_grad = True
+        ##########self.cosine_similarity_matrix.requires_grad = True
 
         # Test cosine sim
         test_cos = save_ctx.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(1, 2)
