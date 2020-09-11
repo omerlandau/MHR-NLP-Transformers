@@ -455,8 +455,6 @@ class MultiheadAttention(nn.Module):
         x2 = torch.unsqueeze(test_cos, 3)
         cos_diff = torch.sum(torch.mul(x1, x2), dim=-1)
         cos_diff = torch.mean(cos_diff, dim=(0, 1)) + 1.0
-        print("bsz is : {}".format(bsz))
-        print("Guy comment - > cos_diff shape : {}".format(cos_diff.shape))
         #x1 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         #x2 = b / torch.norm(b, p=2, dim=1, keepdim=True)
         self.cosine_similarity_matrix = Parameter(cos_diff)
