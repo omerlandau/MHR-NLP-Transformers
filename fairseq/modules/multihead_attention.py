@@ -452,7 +452,7 @@ class MultiheadAttention(nn.Module):
         test_cos = F.normalize(test_cos, p=2, dim=-1) # l2 norm last dim
         x1 = torch.unsqueeze(test_cos, 2)
         x2 = torch.unsqueeze(test_cos, 3)
-        test = torch.sum(torch.mul(x1, x2))
+        test = torch.sum(torch.matmul(x1, x2))
         print("Guy comment - > test shpae : {}".format(test.shape))
         print("Guy comment - > test : {}".format(test))
         #x1 = b / torch.norm(b, p=2, dim=1, keepdim=True)
