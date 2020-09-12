@@ -15,18 +15,18 @@ CLEAN=$SCRIPTS/training/clean-corpus-n.perl
 BPEROOT=subword-nmt/subword_nmt
 BPE_TOKENS=10000
 
-URL="https://wit3.fbk.eu/archive/2014-01/texts/de/en/de-en.tgz"
-GZ=de-en.tgz
+URL="https://wit3.fbk.eu/archive/2014-01/texts/es/en/es-en.tgz"
+GZ=es-en.tgz
 
 if [ ! -d "$SCRIPTS" ]; then
     echo "Please set SCRIPTS variable correctly to point to Moses scripts."
     exit
 fi
 
-src=de
+src=es
 tgt=en
-lang=de-en
-prep=iwslt14.tokenized.de-en
+lang=es-en
+prep=iwslt14.tokenized.es-en
 tmp=$prep/tmp
 orig=orig
 
@@ -86,18 +86,18 @@ done
 
 echo "creating train, valid, test..."
 for l in $src $tgt; do
-    awk '{if (NR%23 == 0)  print $0; }' $tmp/train.tags.de-en.$l > $tmp/valid.$l
-    awk '{if (NR%23 != 0)  print $0; }' $tmp/train.tags.de-en.$l > $tmp/train.$l
+    awk '{if (NR%23 == 0)  print $0; }' $tmp/train.tags.es-en.$l > $tmp/valid.$l
+    awk '{if (NR%23 != 0)  print $0; }' $tmp/train.tags.es-en.$l > $tmp/train.$l
 
-    cat $tmp/IWSLT14.TED.dev2010.de-en.$l \
-        $tmp/IWSLT14.TEDX.dev2012.de-en.$l \
-        $tmp/IWSLT14.TED.tst2010.de-en.$l \
-        $tmp/IWSLT14.TED.tst2011.de-en.$l \
-        $tmp/IWSLT14.TED.tst2012.de-en.$l \
+    cat $tmp/IWSLT14.TED.dev2010.es-en.$l \
+        $tmp/IWSLT14.TEDX.dev2012.es-en.$l \
+        $tmp/IWSLT14.TED.tst2010.es-en.$l \
+        $tmp/IWSLT14.TED.tst2011.es-en.$l \
+        $tmp/IWSLT14.TED.tst2012.es-en.$l \
         > $tmp/test.$l
 done
 
-TRAIN=$tmp/train.en-de
+TRAIN=$tmp/train.en-es
 BPE_CODE=$prep/code
 rm -f $TRAIN
 for l in $src $tgt; do
