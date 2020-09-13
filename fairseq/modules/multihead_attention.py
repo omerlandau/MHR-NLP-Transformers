@@ -471,10 +471,6 @@ class MultiheadAttention(nn.Module):
 
         pairwise_l2 = torch.cdist(test_l2.contiguous(), test_l2.contiguous(), p=2)
 
-        print(pairwise_l2)
-
-        exit()
-
         self.l2_pdist_mat = pairwise_l2
 
         # alphas
