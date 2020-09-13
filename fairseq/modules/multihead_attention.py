@@ -459,6 +459,10 @@ class MultiheadAttention(nn.Module):
 
         cos_sim_pairwise = torch.sum(cos_sim_pairwise, axis=0)/bsz
 
+        print(cos_sim_pairwise)
+
+        exit()
+
         cos_sim_pairwise = torch.flatten(cos_sim_pairwise)
 
         cos_sim_sum = (torch.sum(cos_sim_pairwise))/(self.num_heads^2)
