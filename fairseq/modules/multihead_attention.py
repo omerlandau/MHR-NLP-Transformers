@@ -455,19 +455,11 @@ class MultiheadAttention(nn.Module):
         cos_sim_pairwise = F.cosine_similarity(test_cos, test_cos.unsqueeze(1), dim=-2)
         cos_sim_pairwise = cos_sim_pairwise.permute((2, 0, 1))
 
-        print(cos_sim_pairwise)
-
         cos_sim_pairwise +=1.0
 
         self.cosine_similarity_matrix = cos_sim_pairwise
 
-        print(self.cosine_similarity_matrix)
-
-        cos_sim_pairwise = torch.sum(cos_sim_pairwise, axis=0)/bsz
-
-        print(cos_sim_pairwise)
-
-        exit()
+        #cos_sim_pairwise = torch.sum(cos_sim_pairwise, axis=0)/bsz #used for mean on bsz
 
         cos_sim_pairwise = torch.flatten(cos_sim_pairwise)
 
