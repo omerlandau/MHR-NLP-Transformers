@@ -227,7 +227,7 @@ class TranslationTask(FairseqTask):
                                                                                           "the alpha loss regards to"
                                                                                           " decoder encoder attn")
         parser.add_argument('--use-alphas-bias', type=int, default=0, help="use a bias after alphas multiplication ")
-        parser.add_argument('--cosine-sim-loss', type=str, default=None, help="use cosine similarity loss")
+        parser.add_argument('--cosine-sim-loss', type=float, default=None, help="use cosine similarity loss")
 
 
 
