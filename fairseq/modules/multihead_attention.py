@@ -75,6 +75,8 @@ class MultiheadAttention(nn.Module):
         self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
         self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+        self.cosine_similarity_matrix = None
+
         self.cosine_similarity_total = 0
 
         if add_bias_kv:
@@ -454,7 +456,9 @@ class MultiheadAttention(nn.Module):
         cos_sim_pairwise = F.cosine_similarity(test_cos, test_cos.unsqueeze(1), dim=-2)
         cos_sim_pairwise = cos_sim_pairwise.permute((2, 0, 1))
 
-        print(cos_sim_pairwise)
+        self.cosine_similarity_matrix = cos_sim_pairwise
+
+        print(self.cosine_similarity_matrix)
 
         exit()
 
