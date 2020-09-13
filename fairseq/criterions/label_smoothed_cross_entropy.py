@@ -176,7 +176,6 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
                 l_sim_dec_e += model.decoder.layers[i].encoder_attn.cosine_similarity_total/(len(model.decoder.layers))
 
             cos_sim_loss_nuc = l_sim_enc + l_sim_dec + l_sim_dec_e
-            print(cosine_sim_loss * cos_sim_loss_nuc)
             loss += cosine_sim_loss*cos_sim_loss_nuc
 
 
