@@ -75,7 +75,8 @@ class MultiheadAttention(nn.Module):
         self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
         self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        self.cosine_similarity_matrix = None
+        self.cosine_similarity_matrix = None #shape: [bsz,heads_num,heads_num]
+        self.l2_pdist_mat = None #shape: [bsz,heads_num,heads_num]
 
         self.cosine_similarity_total = 0
 
@@ -448,7 +449,7 @@ class MultiheadAttention(nn.Module):
 
         b = z.contiguous().view(self.num_heads, tgt_len*bsz*self.head_dim)
 
-        # Test cosine sim
+        # pdist cosine sim
         test_cos = save_ctx.contiguous().view(bsz, self.num_heads, tgt_len*self.head_dim)
         test_cos = test_cos.permute((1, 2, 0))
         cos_sim_pairwise = F.cosine_similarity(test_cos, test_cos.unsqueeze(1), dim=-2)
@@ -456,13 +457,27 @@ class MultiheadAttention(nn.Module):
 
         self.cosine_similarity_matrix = cos_sim_pairwise + 1.0
 
+        cos_sim_pairwise = torch.sum(cos_sim_pairwise, axis=0)/bsz
+
         cos_sim_pairwise = torch.flatten(cos_sim_pairwise)
 
         cos_sim_sum = (torch.sum(cos_sim_pairwise))/(self.num_heads^2)
 
         self.cosine_similarity_total = cos_sim_sum
 
+        # pdist l2
 
+        test_l2 = save_ctx.contiguous().view(bsz, self.num_heads, tgt_len*self.head_dim)
+
+        pairwise_l2 = torch.cdist(test_l2.contiguous(), test_l2.contiguous(), p=2)
+
+        print(pairwise_l2)
+
+        exit()
+
+        self.l2_pdist_mat = pairwise_l2
+
+        # alphas
 
         self.alphas.requires_grad = True
         #self.alphas_bias.requires_grad = True
@@ -472,9 +487,6 @@ class MultiheadAttention(nn.Module):
         ctx = b.contiguous().view(self.num_heads, bsz, tgt_len, self.head_dim).transpose(0, 1)
 
         ctx = ctx.contiguous().view(bsz * self.num_heads, tgt_len, self.head_dim)
-
-
-
 
 
 
