@@ -459,7 +459,7 @@ class MultiheadAttention(nn.Module):
 
         self.cosine_similarity_matrix = cos_sim_pairwise
 
-        #cos_sim_pairwise = torch.sum(cos_sim_pairwise, axis=0)/bsz #used for mean on bsz
+        cos_sim_pairwise = torch.sum(cos_sim_pairwise, axis=0)/bsz #used for mean on bsz
 
         cos_sim_pairwise = torch.flatten(cos_sim_pairwise)
 
