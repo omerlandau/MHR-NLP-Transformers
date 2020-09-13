@@ -460,7 +460,7 @@ class MultiheadAttention(nn.Module):
 
         cos_sim_sum = torch.sum(cos_sim_pairwise)/(self.num_heads^2)
 
-        self.cosine_similarity_total = cos_sim_sum -16
+        self.cosine_similarity_total = cos_sim_sum - 16
 
 
 
