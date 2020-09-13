@@ -75,7 +75,7 @@ class MultiheadAttention(nn.Module):
         self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
         self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
-        self.cosine_similarity_matrix = Parameter(torch.zeros(num_heads, num_heads))
+        self.cosine_similarity_total = 0
 
         if add_bias_kv:
             self.bias_k = Parameter(torch.Tensor(1, 1, embed_dim))
@@ -449,13 +449,33 @@ class MultiheadAttention(nn.Module):
         self.cosine_similarity_matrix.requires_grad = True
 
         # Test cosine sim
-        test_cos = save_ctx.view(bsz, self.num_heads, tgt_len, self.head_dim).transpose(1, 2)
-        test_cos = F.normalize(test_cos, p=2, dim=-1)
-        x1 = torch.unsqueeze(test_cos, 2)
-        x2 = torch.unsqueeze(test_cos, 3)
-        cos_diff = torch.sum(torch.mul(x1, x2), dim=-1)
-        cos_diff = torch.mean(cos_diff, dim=(0, 1)) + 1.0
-        self.cosine_similarity_matrix = Parameter(cos_diff)
+        test_cos = save_ctx.contiguous().view(bsz, self.num_heads, tgt_len*self.head_dim)
+        test_cos = test_cos.permute((1, 2, 0))
+        cos_sim_pairwise = F.cosine_similarity(test_cos, test_cos.unsqueeze(1), dim=-2)
+        cos_sim_pairwise = cos_sim_pairwise.permute((2, 0, 1))
+
+        print(cos_sim_pairwise)
+
+        exit()
+
+        cos_sim_pairwise = torch.flatten(cos_sim_pairwise)
+
+        cos_sim_sum = torch.sum(cos_sim_pairwise)/(self.num_heads^2)
+
+        self.cosine_similarity_total = cos_sim_sum
+
+
+
+
+
+
+
+        #test_cos = F.normalize(test_cos, p=2, dim=-1)
+        #x1 = torch.unsqueeze(test_cos, 2)
+        #x2 = torch.unsqueeze(test_cos, 3)
+        #cos_diff = torch.sum(torch.mul(x1, x2), dim=-1)
+        #cos_diff = torch.mean(cos_diff, dim=(0, 1)) + 1.0
+        #self.cosine_similarity_matrix = cos_diff
         # End test cosine sim
 
 
