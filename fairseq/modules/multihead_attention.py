@@ -462,21 +462,8 @@ class MultiheadAttention(nn.Module):
 
         cos_sim_sum = torch.sum(cos_sim_pairwise)/(self.num_heads^2)
 
-        self.cosine_similarity_total = cos_sim_sum
+        self.cosine_similarity_total = cos_sim_sum + 1.0
 
-
-
-
-
-
-
-        #test_cos = F.normalize(test_cos, p=2, dim=-1)
-        #x1 = torch.unsqueeze(test_cos, 2)
-        #x2 = torch.unsqueeze(test_cos, 3)
-        #cos_diff = torch.sum(torch.mul(x1, x2), dim=-1)
-        #cos_diff = torch.mean(cos_diff, dim=(0, 1)) + 1.0
-        #self.cosine_similarity_matrix = cos_diff
-        # End test cosine sim
 
 
         self.alphas.requires_grad = True

@@ -78,15 +78,12 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         for i in range(len(model.encoder.layers)):
             model.encoder.layers[i].self_attn.alphas.requires_grad = False
             model.encoder.layers[i].self_attn.alphas_bias.requires_grad = False
-            model.encoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = False
 
         for i in range(len(model.decoder.layers)):
             model.decoder.layers[i].self_attn.alphas.requires_grad = False
             model.decoder.layers[i].self_attn.alphas_bias.requires_grad = False
-            model.decoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = False
             model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
             model.decoder.layers[i].encoder_attn.alphas_bias.requires_grad = False
-            model.decoder.layers[i].encoder_attn.cosine_similarity_matrix.requires_grad = False
 
 
         l_alpha_enc = 0
@@ -173,15 +170,10 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         # Cosine similarity loss
         if cosine_sim_loss is not None:
             for i in range(len(model.encoder.layers)):
-                model.encoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = True
+                l_sim_enc += model.encoder.layers[i].self_attn.cosine_similarity_total/(len(model.encoder.layers))
             for i in range(len(model.decoder.layers)):
-                model.decoder.layers[i].self_attn.cosine_similarity_matrix.requires_grad = True
-                model.decoder.layers[i].encoder_attn.cosine_similarity_matrix.requires_grad = True
-            for i in range(len(model.encoder.layers)):
-                l_sim_enc += torch.sum(model.encoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads*len(model.encoder.layers))
-            for i in range(len(model.decoder.layers)):
-                l_sim_dec += torch.sum(model.decoder.layers[i].self_attn.cosine_similarity_matrix)/(num_heads*num_heads*len(model.decoder.layers))
-                l_sim_dec_e += torch.sum(model.decoder.layers[i].encoder_attn.cosine_similarity_matrix)/(num_heads*num_heads*len(model.decoder.layers))
+                l_sim_dec += model.decoder.layers[i].self_attn.cosine_similarity_total/(len(model.decoder.layers))
+                l_sim_dec_e += model.decoder.layers[i].encoder_attn.cosine_similarity_total/(len(model.decoder.layers))
 
             cos_sim_loss_nuc = l_sim_enc + l_sim_dec + l_sim_dec_e
             loss += cos_sim_loss_nuc
