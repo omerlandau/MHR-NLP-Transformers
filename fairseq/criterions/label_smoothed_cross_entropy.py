@@ -74,7 +74,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
         net_output = model(**sample['net_input'])
 
 
-
+        '''
         for i in range(len(model.encoder.layers)):
             model.encoder.layers[i].self_attn.alphas.requires_grad = False
             model.encoder.layers[i].self_attn.alphas_bias.requires_grad = False
@@ -84,7 +84,7 @@ class LabelSmoothedCrossEntropyCriterion(FairseqCriterion):
             model.decoder.layers[i].self_attn.alphas_bias.requires_grad = False
             model.decoder.layers[i].encoder_attn.alphas.requires_grad = False
             model.decoder.layers[i].encoder_attn.alphas_bias.requires_grad = False
-
+        '''
 
         l_alpha_enc = 0
         l_alpha_dec =0
