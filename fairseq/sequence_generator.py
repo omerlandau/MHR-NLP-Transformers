@@ -830,9 +830,7 @@ class SequenceGeneratorWithAlignment(SequenceGenerator):
                 finalized[i // beam_size][i % beam_size]["attention"].transpose(1, 0)
                 for i in range(bsz * beam_size)
             ]
-        print("Guy comment - > attn[0] : {}".format(attn[0]))
-        print("Guy comment - > attn[0] size: {}".format(attn[0].shape))
-        print("Guy comment - > len of attn : {}".format(len(attn)))
+
         if src_tokens.device != "cpu":
             src_tokens = src_tokens.to('cpu')
             tgt_tokens = tgt_tokens.to('cpu')
