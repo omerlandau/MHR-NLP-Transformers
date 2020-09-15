@@ -814,7 +814,6 @@ class SequenceGeneratorWithAlignment(SequenceGenerator):
 
     @torch.no_grad()
     def generate(self, models, sample, **kwargs):
-        print("Guy comment inside seq gen")
         finalized = super()._generate(sample, **kwargs)
 
         src_tokens = sample["net_input"]["src_tokens"]
@@ -830,7 +829,8 @@ class SequenceGeneratorWithAlignment(SequenceGenerator):
                 finalized[i // beam_size][i % beam_size]["attention"].transpose(1, 0)
                 for i in range(bsz * beam_size)
             ]
-
+        print("Guy comment - > attn : {}".format(attn))
+        print("Guy comment - > attn size: {}".format(attn.shape))
         if src_tokens.device != "cpu":
             src_tokens = src_tokens.to('cpu')
             tgt_tokens = tgt_tokens.to('cpu')
