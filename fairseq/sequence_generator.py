@@ -814,6 +814,7 @@ class SequenceGeneratorWithAlignment(SequenceGenerator):
 
     @torch.no_grad()
     def generate(self, models, sample, **kwargs):
+        print("Guy comment inside seq gen")
         finalized = super()._generate(sample, **kwargs)
 
         src_tokens = sample["net_input"]["src_tokens"]
