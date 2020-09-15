@@ -530,8 +530,6 @@ def extract_hard_alignment(attn, src_sent, tgt_sent, pad, eos):
     if len(tgt_valid) != 0 and len(src_invalid) < len(src_sent):
         attn_valid = attn[tgt_valid]
         attn_valid[:, src_invalid] = float("-inf")
-        print("Guy comment - > attn_valid : {}".format(attn_valid))
-        print("Guy comment - > attn_valid size: {}".format(attn_valid.shape))
         _, src_indices = attn_valid.max(dim=1)
         for tgt_idx, src_idx in zip(tgt_valid, src_indices):
             alignment.append(

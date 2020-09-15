@@ -818,7 +818,6 @@ class SequenceGeneratorWithAlignment(SequenceGenerator):
 
         src_tokens = sample["net_input"]["src_tokens"]
         bsz = src_tokens.shape[0]
-        print("Guy comment - > bsz : {}".format(bsz))
         beam_size = self.beam_size
         src_tokens, src_lengths, prev_output_tokens, tgt_tokens = self._prepare_batch_for_alignment(
             sample, finalized
