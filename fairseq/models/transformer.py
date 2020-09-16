@@ -831,6 +831,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
             attn = attn.mean(dim=0)
             print("Guy comment -> decoder attn :{}".format(attn))
+            print("Guy comment -> decoder attn shape:{}".format(attn.shape))
+
         if self.layer_norm is not None:
             x = self.layer_norm(x)
 
