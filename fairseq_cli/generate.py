@@ -196,6 +196,7 @@ def _main(args, output_file):
             has_target = sample['target'] is not None
 
             # Remove padding
+            print("Guy comment -> {}".format(sample['net_input']['src_tokens'][i, :]))
             print("Guy comment -> {}".format(task.dataset(args.gen_subset).src.get_original_text(sample_id)))
             src_tokens = utils.strip_pad(sample['net_input']['src_tokens'][i, :], tgt_dict.pad())
             target_tokens = None
