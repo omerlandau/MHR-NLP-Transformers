@@ -185,9 +185,9 @@ def _main(args, output_file):
             print(sample['id'].tolist())
             print(sample['net_input']['src_tokens'][25])
 
-            print("Guy comment -> attn head 0  : {}".format(models[0].decoder.layers[0].self_attn_variables["context"][25,0,:,:]))
-            print("Guy comment -> attn head 1  : {}".format(models[0].decoder.layers[0].self_attn_variables["context"][25,1,:,:]))
-            print("Guy comment -> attn head 2  : {}".format(models[0].decoder.layers[0].self_attn_variables["context"][25,2,:,:]))
+            print("Guy comment -> attn head 0  : {}".format(models[0].decoder.layers[0].self_attn_variables["context"].shape))
+            print("Guy comment -> attn head 1  : {}".format(models[0].decoder.layers[0].self_attn_variables["context"].shape))
+            print("Guy comment -> attn head 2  : {}".format(models[0].decoder.layers[0].self_attn_variables["context"].shape))
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
