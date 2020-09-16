@@ -368,7 +368,7 @@ class MultiheadAttention(nn.Module):
             attn_weights_float = attn_weights_float.view(bsz * self.num_heads, tgt_len, src_len)
         attn_weights = attn_weights_float.type_as(attn_weights)
 
-        save_attn_for_guy = attn_weights.clone().detach().continigous().view(bsz, self.num_heads, tgt_len, src_len)
+        save_attn_for_guy = attn_weights.clone().detach().contiguous().view(bsz, self.num_heads, tgt_len, src_len)
 
 
 
