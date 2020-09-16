@@ -197,7 +197,6 @@ def _main(args, output_file):
 
             # Remove padding
             print("Guy comment -> {}".format(sample['net_input']['src_tokens'][i, :]))
-            print("Guy comment -> {}".format(task.dataset(args.gen_subset).src.get_original_text(sample_id)))
             src_tokens = utils.strip_pad(sample['net_input']['src_tokens'][i, :], tgt_dict.pad())
             target_tokens = None
             if has_target:
@@ -221,8 +220,9 @@ def _main(args, output_file):
                             generator.eos,
                         }
                     )
-
+            print("Guy comment -> src before decoding : {}".format(src_str))
             src_str = decode_fn(src_str)
+
             if has_target:
                 target_str = decode_fn(target_str)
 
