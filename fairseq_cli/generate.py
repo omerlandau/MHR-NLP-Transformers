@@ -180,14 +180,15 @@ def _main(args, output_file):
                 l2_pairwise_distances["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.l2_pdist_mat.clone().detach().cpu()), [models[0].decoder.layers[d].encoder_attn.bsz]))
                 l2_pairwise_distances["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.l2_pdist_mat.clone().detach().cpu()),[models[0].encoder.layers[e].self_attn.bsz]))
 
-
+        '''
         if 12 in sample['net_input']['src_lengths']:
             print(sample['id'].tolist())
             print(sample['net_input']['src_tokens'][7])
-            print(sample['net_input']['src_tokens'][10])
+
             print("Guy comment -> attn head 0  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,0,:,:]))
             print("Guy comment -> attn head 1  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,1,:,:]))
             print("Guy comment -> attn head 2  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,2,:,:]))
+        '''
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
 
@@ -228,7 +229,7 @@ def _main(args, output_file):
                     print('S-{}\t{}'.format(sample_id, src_str), file=output_file)
                 if has_target:
                     print('T-{}\t{}'.format(sample_id, target_str), file=output_file)
-
+                print("Guy comment -> ".format(sample['net_input']['src_tokens'][i]))
             # Process top predictions
             for j, hypo in enumerate(hypos[i][:args.nbest]):
                 #print("Guy comment -> first hypo attention :{}".format(hypo['attention']))
