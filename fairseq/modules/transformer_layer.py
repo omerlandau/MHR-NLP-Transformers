@@ -134,7 +134,7 @@ class TransformerEncoderLayer(nn.Module):
             value=x,
             key_padding_mask=encoder_padding_mask,
             attn_mask=attn_mask,
-            calc_head_importance=calc_head_importance
+            calc_head_importance=True
         )
         self.self_attn_variables["weights"] = layer_attn
         self.self_attn_variables["context"] = context
