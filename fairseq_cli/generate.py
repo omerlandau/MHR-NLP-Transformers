@@ -183,7 +183,7 @@ def _main(args, output_file):
 
         if 12 in sample['net_input']['src_lengths']:
             print(sample['id'].tolist())
-            print(sample)
+            print(sample['net_input']['src_tokens'][7])
             print(sample['net_input']['src_tokens'][10])
             print("Guy comment -> attn head 0  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,0,:,:]))
             print("Guy comment -> attn head 1  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,1,:,:]))
