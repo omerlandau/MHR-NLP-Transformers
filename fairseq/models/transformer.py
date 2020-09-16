@@ -830,6 +830,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             # average probabilities over heads
 
             attn = attn.mean(dim=0)
+            print("Guy comment -> decoder attn :{}".format(attn))
         if self.layer_norm is not None:
             x = self.layer_norm(x)
 
