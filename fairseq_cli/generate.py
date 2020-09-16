@@ -182,7 +182,7 @@ def _main(args, output_file):
 
 
 
-
+        print("Guy comment -> test : {}".format(models[0].decoder.layers[5].self_attn_variables["weights"][0]))
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
 
