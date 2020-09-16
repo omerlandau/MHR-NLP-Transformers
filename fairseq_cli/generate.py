@@ -197,6 +197,7 @@ def _main(args, output_file):
 
             # Remove padding
             print("Guy comment -> {}".format(sample['net_input']['src_tokens'][i, :]))
+            print("Guy comment pad is -> {}".format(tgt_dict.pad()))
             src_tokens = utils.strip_pad(sample['net_input']['src_tokens'][i, :], tgt_dict.pad())
             target_tokens = None
             if has_target:
