@@ -228,7 +228,7 @@ def _main(args, output_file):
 
             # Process top predictions
             for j, hypo in enumerate(hypos[i][:args.nbest]):
-                print("Guy comment -> first hypo attention :{}".format(hypo['attention']))
+                #print("Guy comment -> first hypo attention :{}".format(hypo['attention']))
                 hypo_tokens, hypo_str, alignment = utils.post_process_prediction(
                     hypo_tokens=hypo['tokens'].int().cpu(),
                     src_str=src_str,
