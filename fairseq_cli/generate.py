@@ -183,9 +183,9 @@ def _main(args, output_file):
 
         if 12 in sample['net_input']['src_lengths']:
             print(sample['id'].tolist())
-            print("Guy comment -> attn head 0  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][2,0,:,:]))
-            print("Guy comment -> attn head 1  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][2,1,:,:]))
-            print("Guy comment -> attn head 2  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][2,2,:,:]))
+            print("Guy comment -> attn head 0  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,0,:,:]))
+            print("Guy comment -> attn head 1  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,1,:,:]))
+            print("Guy comment -> attn head 2  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,2,:,:]))
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
 
