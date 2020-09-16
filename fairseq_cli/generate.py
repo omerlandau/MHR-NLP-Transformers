@@ -182,8 +182,8 @@ def _main(args, output_file):
 
 
 
-        print("Guy comment -> test : {}".format(models[0].decoder.layers[5].encoder_attn_variables["context"][0]))
-        print("Guy comment -> test shape: {}".format(models[0].decoder.layers[5].encoder_attn_variables["context"].shape))
+        print("Guy comment -> test shape: {}".format(models[0].encoder.layers[2].self_attn_variables["context"].shape))
+        print("Guy comment -> test shape: {}".format(models[0].encoder.layers[2].self_attn_variables["context"]))
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
 
