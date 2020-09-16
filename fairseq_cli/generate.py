@@ -160,7 +160,9 @@ def _main(args, output_file):
 
         gen_timer.start()
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
-        print("Guy comment -> first hypos:{}".format(hypos[0][:args.nbest]))
+        print("Guy comment -> nbest is :{}".format(args.nbest))
+        print("Guy comment -> first hypo:{}".format(hypos[0][:args.nbest]))
+        print("Guy comment -> first hypo attention :{}".format(hypos[0][:args.nbest]['attention']))
         print("Guy comment -> first id :{}".format(sample['id'][0]))
         print("Guy comment -> first src :{}".format(sample['net_input']['src_tokens'][0]))
         print("Guy comment -> first target :{}".format(sample['target'][0]))
