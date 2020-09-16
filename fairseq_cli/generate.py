@@ -196,8 +196,8 @@ def _main(args, output_file):
             has_target = sample['target'] is not None
 
             # Remove padding
-            print("Guy comment -> ".format(sample['net_input']['src_tokens'][i, :]))
-            src_tokens = utils.strip_pad(sample['net_input']['src_tokens'][i, :], tgt_dict.pad())
+            print("Guy comment -> ".format(sample['net_input']['src_tokens']))
+            src_tokens = utils.strip_pad(sample['net_input']['src_tokens'][7:12], tgt_dict.pad())
             target_tokens = None
             if has_target:
                 target_tokens = utils.strip_pad(sample['target'][i, :], tgt_dict.pad()).int().cpu()
