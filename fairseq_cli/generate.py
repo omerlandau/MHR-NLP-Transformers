@@ -160,12 +160,6 @@ def _main(args, output_file):
 
         gen_timer.start()
         hypos = task.inference_step(generator, models, sample, prefix_tokens)
-        print("Guy comment -> nbest is :{}".format(args.nbest))
-        print("Guy comment -> first hypo:{}".format(hypos[0][:args.nbest]))
-        print("Guy comment -> first hypo attention :{}".format(hypos[0][:args.nbest][0]['attention']))
-        print("Guy comment -> first id :{}".format(sample['id'][0]))
-        print("Guy comment -> first src :{}".format(sample['net_input']['src_tokens'][0]))
-        print("Guy comment -> first target :{}".format(sample['target'][0]))
         #exit()
 
         if args.head_confidence_method is not None:
@@ -233,6 +227,7 @@ def _main(args, output_file):
 
             # Process top predictions
             for j, hypo in enumerate(hypos[i][:args.nbest]):
+                print("Guy comment -> first hypo attention :{}".format(hypo[0]['attention']))
                 hypo_tokens, hypo_str, alignment = utils.post_process_prediction(
                     hypo_tokens=hypo['tokens'].int().cpu(),
                     src_str=src_str,
