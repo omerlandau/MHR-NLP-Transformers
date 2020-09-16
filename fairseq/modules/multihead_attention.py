@@ -335,7 +335,7 @@ class MultiheadAttention(nn.Module):
                 )
 
         attn_weights = torch.bmm(q, k.transpose(1, 2))
-
+        save_attn_for_guy = attn_weights.detach()
         attn_weights = MultiheadAttention.apply_sparse_mask(attn_weights, tgt_len, src_len, bsz)
 
         assert list(attn_weights.size()) == [bsz * self.num_heads, tgt_len, src_len]
@@ -507,7 +507,7 @@ class MultiheadAttention(nn.Module):
                 if not need_head_weights:
                     # average attention weights over heads
                     attn_weights = attn_weights.mean(dim=0)
-        return attn, attn_weights, save_ctx
+        return attn, attn_weights, save_attn_for_guy
 
     @staticmethod
     def _append_prev_key_padding_mask(
