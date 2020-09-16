@@ -186,13 +186,13 @@ def _main(args, output_file):
         gen_timer.stop(num_generated_tokens)
 
         for i, sample_id in enumerate(sample['id'].tolist()):
-            if sample_id is 6403:
+            if sample_id is "6403" or sample_id is 6403:
                 print(sample['id'].tolist())
-                print("Guy comment -> attn head 0  : {}".format(
+                print("Guy comment2 -> attn head 0  : {}".format(
                     models[0].encoder.layers[0].self_attn_variables["context"][10, 0, :, :]))
-                print("Guy comment -> attn head 1  : {}".format(
+                print("Guy comment2 -> attn head 1  : {}".format(
                     models[0].encoder.layers[0].self_attn_variables["context"][10, 1, :, :]))
-                print("Guy comment -> attn head 2  : {}".format(
+                print("Guy comment2 -> attn head 2  : {}".format(
                     models[0].encoder.layers[0].self_attn_variables["context"][10, 2, :, :]))
 
             has_target = sample['target'] is not None
