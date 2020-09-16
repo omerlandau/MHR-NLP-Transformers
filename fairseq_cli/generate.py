@@ -229,7 +229,7 @@ def _main(args, output_file):
                     print('S-{}\t{}'.format(sample_id, src_str), file=output_file)
                 if has_target:
                     print('T-{}\t{}'.format(sample_id, target_str), file=output_file)
-                print("Guy comment -> ".format(sample['net_input']['src_tokens'][i]))
+            print("Guy comment -> ".format(sample['net_input']['src_tokens'][i, :]))
             # Process top predictions
             for j, hypo in enumerate(hypos[i][:args.nbest]):
                 #print("Guy comment -> first hypo attention :{}".format(hypo['attention']))
