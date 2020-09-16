@@ -181,8 +181,8 @@ def _main(args, output_file):
                 l2_pairwise_distances["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.l2_pdist_mat.clone().detach().cpu()),[models[0].encoder.layers[e].self_attn.bsz]))
 
 
-        print("Guy comment -> test shape: {}".format(models[0].decoder.layers[5].encoder_attn_variables["context"].shape))
-        print("Guy comment -> test : {}".format(models[0].decoder.layers[5].encoder_attn_variables["context"][0,:,:,:]))
+        print("Guy comment -> test shape: {}".format(models[0].encoder.layers[5].encoder_attn_variables["context"].shape))
+        print("Guy comment -> test : {}".format(models[0].encoder.layers[5].encoder_attn_variables["context"][0,:,:,:]))
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
 
