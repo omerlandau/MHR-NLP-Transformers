@@ -197,7 +197,6 @@ def _main(args, output_file):
 
             # Remove padding
             print("Guy comment src -> {}".format(sample['net_input']['src_tokens'][i, :]))
-            print("Guy comment tgt -> {}".format(sample['target'][i, :]))
             src_tokens = utils.strip_pad(sample['net_input']['src_tokens'][i, :], tgt_dict.pad())
             target_tokens = None
             if has_target:
@@ -246,6 +245,8 @@ def _main(args, output_file):
                         generator.eos,
                     }
                 )
+                print("Guy comment hypo -> {}".format(hypo_tokens))
+
                 detok_hypo_str = decode_fn(hypo_str)
                 if not args.quiet:
                     score = hypo['score'] / math.log(2)  # convert to base 2
