@@ -180,19 +180,21 @@ def _main(args, output_file):
                 l2_pairwise_distances["decoder"][d]["enc_attn"].append(np.append(np.array(models[0].decoder.layers[d].encoder_attn.l2_pdist_mat.clone().detach().cpu()), [models[0].decoder.layers[d].encoder_attn.bsz]))
                 l2_pairwise_distances["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.l2_pdist_mat.clone().detach().cpu()),[models[0].encoder.layers[e].self_attn.bsz]))
 
-        '''
-        if 12 in sample['net_input']['src_lengths']:
-            print(sample['id'].tolist())
-            print(sample['net_input']['src_tokens'][7])
 
-            print("Guy comment -> attn head 0  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,0,:,:]))
-            print("Guy comment -> attn head 1  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,1,:,:]))
-            print("Guy comment -> attn head 2  : {}".format(models[0].encoder.layers[0].self_attn_variables["context"][10,2,:,:]))
-        '''
+
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
 
         for i, sample_id in enumerate(sample['id'].tolist()):
+            if sample_id is 6403:
+                print(sample['id'].tolist())
+                print("Guy comment -> attn head 0  : {}".format(
+                    models[0].encoder.layers[0].self_attn_variables["context"][10, 0, :, :]))
+                print("Guy comment -> attn head 1  : {}".format(
+                    models[0].encoder.layers[0].self_attn_variables["context"][10, 1, :, :]))
+                print("Guy comment -> attn head 2  : {}".format(
+                    models[0].encoder.layers[0].self_attn_variables["context"][10, 2, :, :]))
+
             has_target = sample['target'] is not None
 
             # Remove padding
@@ -220,7 +222,7 @@ def _main(args, output_file):
                             generator.eos,
                         }
                     )
-            print("Guy comment -> src before decoding : {}".format(src_str))
+
             src_str = decode_fn(src_str)
 
             if has_target:
