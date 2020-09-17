@@ -260,7 +260,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             tgt_dict = task.target_dictionary
             src_dict = getattr(task, 'source_dictionary', None)
             print("Guy comment - > samples is : {}".format(samples))
-            print("Guy comment - > samples['net_input']['src_tokens'][i, :] is : {}".format(samples['net_input']['src_tokens'][i, :]))
+            print("Guy comment - > samples['net_input']['src_tokens'][i, :] is : {}".format(samples['net_input']['src_tokens'][0]))
             src_tokens = utils.strip_pad(samples['net_input']['src_tokens'][i, :], tgt_dict.pad())
             src_str = src_dict.string(src_tokens, args.remove_bpe)
             print("Guy comment - > src_str is : {}".format(src_str))
