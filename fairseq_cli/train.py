@@ -259,13 +259,14 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
 
-            #tgt_dict = task.target_dictionary
+            tgt_dict = task.target_dictionary
             #print("Guy comment - > samples[0]['target'][i, :] is : {}".format(samples[0]['target'][i, :]))
-            #tgt_tokens = samples[0]['target'][i, :]
-            #tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
+            tgt_tokens = samples[0]['target'][i, :]
+            tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
             #print("Guy comment - > tgt_str is : {}".format(tgt_str))
             #print("Guy comment - > number sent is : {}".format(i))
             if i == 23:
+                print("Guy comment - > tgt_str is : {}".format(tgt_str))
                 for l in range(6):
                     for h in range(8):
                         attentions["decoder"][l]["self_attn"].\
