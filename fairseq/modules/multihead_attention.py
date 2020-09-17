@@ -384,7 +384,8 @@ class MultiheadAttention(nn.Module):
         if self.head_confidence_method is not None:
 
             if attn_weights is not None:
-                if self.head_confidence_method == "base":
+                #if self.head_confidence_method == "base":
+                if False:
                     a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
                     heads = a[:, :, :, :].max(dim=3)
@@ -398,7 +399,8 @@ class MultiheadAttention(nn.Module):
                     heads = heads[0].sum(dim=2) / (src_len - 1)
                     heads = heads.sum(dim=1) / bsz
                     heads = heads
-                elif self.head_confidence_method == "pairwise":
+                #elif self.head_confidence_method == "pairwise":
+                if False:
                     a = attn_weights.clone().contiguous().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
                     a = a.contiguous().view(self.num_heads, bsz, tgt_len * src_len)
@@ -406,7 +408,8 @@ class MultiheadAttention(nn.Module):
                     c_2 = c_2.sum(dim=0) / bsz
                     c_2 = c_2.sum(dim=0)
                     heads = c_2
-                elif self.head_confidence_method == "wasserstein":
+                #elif self.head_confidence_method == "wasserstein":
+                if False:
                     a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     uniform_heads = torch.zeros(self.num_heads, bsz, tgt_len, src_len)
                     uniform_heads[:, :, :-1, :-1] = 1 / src_len
