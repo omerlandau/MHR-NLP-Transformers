@@ -264,7 +264,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             tgt_tokens = samples[0]['target'][i, :]
             tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
             print("Guy comment - > tgt_str is : {}".format(tgt_str))
-            print(model.decoder.layers[0].selfattn_variables["context"][i,0,:,:])
+            print(model.decoder.layers[0].self_attn_variables["context"][i,0,:,:])
 
 
             if log_output is None:  # OOM, overflow, ...
