@@ -259,17 +259,17 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
 
-            tgt_dict = task.target_dictionary
-            print("Guy comment - > samples[0]['target'][i, :] is : {}".format(samples[0]['target'][i, :]))
-            tgt_tokens = samples[0]['target'][i, :]
-            tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
-            print("Guy comment - > tgt_str is : {}".format(tgt_str))
-            print("Guy comment - > number sent is : {}".format(i))
+            #tgt_dict = task.target_dictionary
+            #print("Guy comment - > samples[0]['target'][i, :] is : {}".format(samples[0]['target'][i, :]))
+            #tgt_tokens = samples[0]['target'][i, :]
+            #tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
+            #print("Guy comment - > tgt_str is : {}".format(tgt_str))
+            #print("Guy comment - > number sent is : {}".format(i))
             if i == 23:
                 for l in range(6):
                     for h in range(8):
-                        attentions["decoder"][l]["self_attn"] = \
-                            np.array(model.decoder.layers[l].self_attn_variables["context"][i, h, :, :].clone().detach().cpu())
+                        attentions["decoder"][l]["self_attn"].\
+                            append(np.array(model.decoder.layers[l].self_attn_variables["context"][i, h, :, :].clone().detach().cpu()))
 
             path = args.save_dir.replace("checkpoints", "attn_weights")
             try:
