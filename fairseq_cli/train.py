@@ -264,9 +264,12 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
             print("Guy comment - > tgt_str is : {}".format(tgt_str))
             print("Guy comment - > number sent is : {}".format(i))
-            #print(model.decoder.layers[0].self_attn_variables["context"][i, 0, :, :])
-            #print(model.decoder.layers[0].self_attn_variables["context"][i, 1, :, :])
-            #print(model.decoder.layers[0].self_attn_variables["context"][i, 2, :, :])
+            if i == 23:
+                for l in range(6):
+                    for h in range(8):
+                    print(model.decoder.layers[l].self_attn_variables["context"][i, h, :, :])
+
+
 
             if log_output is None:  # OOM, overflow, ...
                 continue
