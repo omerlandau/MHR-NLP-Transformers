@@ -260,7 +260,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             log_output = trainer.train_step(samples, batch_num=batch_regression)
 
             tgt_dict = task.target_dictionary
-            print("Guy comment - > samples[0] is : {}".format(samples[0]))
+            #print("Guy comment - > samples[0] is : {}".format(samples[0]))
             #print("Guy comment - > samples[0]['target'][i, :] is : {}".format(samples[0]['target'][i, :]))
             tgt_tokens = samples[0]['target'][i, :]
             tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
