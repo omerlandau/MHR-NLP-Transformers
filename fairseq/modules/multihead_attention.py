@@ -381,27 +381,23 @@ class MultiheadAttention(nn.Module):
         # Viota's confidence is based on:
         # Word attn confidence is an upgraded more delicate version of conf,
         # where
-        #if self.head_confidence_method is not None:
-        if True:
+        if self.head_confidence_method is not None:
 
             if attn_weights is not None:
-                #if self.head_confidence_method == "base":
-                if False:
+                if self.head_confidence_method == "base":
                     a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1) / bsz
-                #elif self.head_confidence_method == "advanced":
-                elif True:
+                elif self.head_confidence_method == "advanced":
                     a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
                     heads = a[:, :, :, :].max(dim=2)
                     heads = heads[0].sum(dim=2) / (src_len - 1)
                     heads = heads.sum(dim=1) / bsz
                     heads = heads
-                #elif self.head_confidence_method == "pairwise":
-                if False:
+                elif self.head_confidence_method == "pairwise":
                     a = attn_weights.clone().contiguous().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
                     a = a.contiguous().view(self.num_heads, bsz, tgt_len * src_len)
@@ -409,8 +405,7 @@ class MultiheadAttention(nn.Module):
                     c_2 = c_2.sum(dim=0) / bsz
                     c_2 = c_2.sum(dim=0)
                     heads = c_2
-                #elif self.head_confidence_method == "wasserstein":
-                if False:
+                elif self.head_confidence_method == "wasserstein":
                     a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     uniform_heads = torch.zeros(self.num_heads, bsz, tgt_len, src_len)
                     uniform_heads[:, :, :-1, :-1] = 1 / src_len
