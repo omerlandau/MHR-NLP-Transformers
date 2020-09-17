@@ -381,7 +381,8 @@ class MultiheadAttention(nn.Module):
         # Viota's confidence is based on:
         # Word attn confidence is an upgraded more delicate version of conf,
         # where
-        if self.head_confidence_method is not None:
+        #if self.head_confidence_method is not None:
+        if True:
 
             if attn_weights is not None:
                 #if self.head_confidence_method == "base":
