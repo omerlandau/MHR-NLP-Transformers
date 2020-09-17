@@ -268,7 +268,8 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             if i == 23:
                 for l in range(6):
                     for h in range(8):
-                        attentions["decoder"][l]["self_attn"] = np.array(model.decoder.layers[l].self_attn_variables["context"][i, h, :, :])
+                        attentions["decoder"][l]["self_attn"] = \
+                            np.array(model.decoder.layers[l].self_attn_variables["context"][i, h, :, :].clone().detach().cpu())
 
             path = args.save_dir.replace("checkpoints", "attn_weights")
             try:
