@@ -259,6 +259,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             log_output = trainer.train_step(samples, batch_num=batch_regression)
             tgt_dict = task.target_dictionary
             src_dict = getattr(task, 'source_dictionary', None)
+            print("Guy comment - > samples is : {}".format(samples))
             src_tokens = utils.strip_pad(samples['net_input']['src_tokens'][i, :], tgt_dict.pad())
             src_str = src_dict.string(src_tokens, args.remove_bpe)
             print("Guy comment - > src_str is : {}".format(src_str))
