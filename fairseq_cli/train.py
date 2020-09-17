@@ -257,7 +257,11 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
-            print("Guy comment - > {}".format(samples))
+            tgt_dict = task.target_dictionary
+            src_dict = getattr(task, 'source_dictionary', None)
+            src_tokens = utils.strip_pad(samples['net_input']['src_tokens'][i, :], tgt_dict.pad())
+            src_str = src_dict.string(src_tokens, args.remove_bpe)
+            print("Guy comment - > src_str is : {}".format(src_str))
             if log_output is None:  # OOM, overflow, ...
                 continue
         total_samples += model.decoder.layers[0].self_attn.bsz
