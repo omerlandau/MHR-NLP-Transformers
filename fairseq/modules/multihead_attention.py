@@ -72,8 +72,8 @@ class MultiheadAttention(nn.Module):
         self.v_proj = nn.Linear(self.vdim, embed_dim, bias=bias)
         self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
 
-        self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
-        self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
+        #self.alphas = Parameter(torch.zeros((num_heads, num_heads)))
+        #self.alphas_bias = Parameter(torch.zeros(num_heads, 1))
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
         self.cosine_similarity_matrix = None #shape: [bsz,heads_num,heads_num]
         self.l2_pdist_mat = None #shape: [bsz,heads_num,heads_num]
@@ -108,12 +108,12 @@ class MultiheadAttention(nn.Module):
             nn.init.xavier_uniform_(self.k_proj.weight, gain=1 / math.sqrt(2))
             nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
             nn.init.xavier_uniform_(self.q_proj.weight, gain=1 / math.sqrt(2))
-            self.alphas.data.fill_diagonal_(1)
+            #self.alphas.data.fill_diagonal_(1)
         else:
             nn.init.xavier_uniform_(self.k_proj.weight)
             nn.init.xavier_uniform_(self.v_proj.weight)
             nn.init.xavier_uniform_(self.q_proj.weight)
-            self.alphas.data.fill_diagonal_(1)
+            #self.alphas.data.fill_diagonal_(1)
 
         nn.init.xavier_uniform_(self.out_proj.weight)
         if self.out_proj.bias is not None:
@@ -481,14 +481,14 @@ class MultiheadAttention(nn.Module):
 
         # alphas
 
-        self.alphas.requires_grad = True
+        #self.alphas.requires_grad = True
         #self.alphas_bias.requires_grad = True
         #b = torch.mm(self.alphas, b) + self.alphas_bias
-        b = torch.mm(self.alphas, b)
+        #b = torch.mm(self.alphas, b)
 
-        ctx = b.contiguous().view(self.num_heads, bsz, tgt_len, self.head_dim).transpose(0, 1)
+        #ctx = b.contiguous().view(self.num_heads, bsz, tgt_len, self.head_dim).transpose(0, 1)
 
-        ctx = ctx.contiguous().view(bsz * self.num_heads, tgt_len, self.head_dim)
+        #ctx = ctx.contiguous().view(bsz * self.num_heads, tgt_len, self.head_dim)
 
 
 
