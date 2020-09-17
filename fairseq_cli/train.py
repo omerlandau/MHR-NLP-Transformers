@@ -257,17 +257,16 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
     for i, samples in enumerate(progress):
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
+
+
             tgt_dict = task.target_dictionary
-            src_dict = getattr(task, 'source_dictionary', None)
-            #print("Guy comment - > samples is : {}".format(samples[0]))
-            #print("Guy comment - > samples['net_input'] is : {}".format(samples[0]['net_input']))
-            #print("Guy comment - > samples['net_input']['src_tokens'] is : {}".format(samples[0]['net_input']['src_tokens']))
             print("Guy comment - > samples[0]['target'][i, :] is : {}".format(samples[0]['target'][i, :]))
             tgt_tokens = samples[0]['target'][i, :]
-            #src_tokens = utils.strip_pad(samples[0]['net_input']['src_tokens'][i, :], tgt_dict.pad())
-            #src_str = src_dict.string(src_tokens)
             tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
             print("Guy comment - > tgt_str is : {}".format(tgt_str))
+            print(model.decoder.layers[0].selfattn_variables["context"][i,0,:,:])
+
+
             if log_output is None:  # OOM, overflow, ...
                 continue
         total_samples += model.decoder.layers[0].self_attn.bsz
