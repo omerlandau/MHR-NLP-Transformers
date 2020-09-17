@@ -252,6 +252,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
     conf = {"encoder": [{"self_attn": []} for i in range(args.encoder_layers)],
             "decoder": [{"self_attn": [], "enc_attn": []} for i in range(args.decoder_layers)]}
+    attentions = {"decoder": [{"self_attn": []} for i in range(args.decoder_layers)]}
 
     batch_regression = 1.0 - (total_samples / (160239 * 50))
     for i, samples in enumerate(progress):
@@ -267,9 +268,15 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             if i == 23:
                 for l in range(6):
                     for h in range(8):
-                    print(model.decoder.layers[l].self_attn_variables["context"][i, h, :, :])
+                        attentions["decoder"][l]["self_attn"] = np.array(model.decoder.layers[l].self_attn_variables["context"][i, h, :, :])
 
-
+            path = args.save_dir.replace("checkpoints", "attn_weights")
+            try:
+                os.mkdir(path, 0o775)
+            except:
+                pass
+            with open(args.save_dir.replace("checkpoints", "attn_weights") + "/epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
+                pickle.dump(attentions, fd, protocol=3)
 
             if log_output is None:  # OOM, overflow, ...
                 continue
