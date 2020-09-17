@@ -258,14 +258,14 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
 
-
             tgt_dict = task.target_dictionary
             print("Guy comment - > samples[0]['target'][i, :] is : {}".format(samples[0]['target'][i, :]))
             tgt_tokens = samples[0]['target'][i, :]
             tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
             print("Guy comment - > tgt_str is : {}".format(tgt_str))
-            print(model.decoder.layers[0].self_attn_variables["context"][i,0,:,:])
-
+            print(model.decoder.layers[0].self_attn_variables["context"][i, 0, :, :])
+            print(model.decoder.layers[0].self_attn_variables["context"][i, 1, :, :])
+            print(model.decoder.layers[0].self_attn_variables["context"][i, 2, :, :])
 
             if log_output is None:  # OOM, overflow, ...
                 continue
@@ -299,7 +299,6 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
 
         conf = convert_confs(conf, args)
 
-
         path = args.save_dir.replace("checkpoints", "confs") + "-method={0}".format(args.head_confidence_method)
         try:
             os.mkdir(path, 0o775)
@@ -309,9 +308,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                 args.head_confidence_method) + "/epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
             pickle.dump(conf, fd, protocol=3)
 
-
     if args.dynamic_type is not None and args.head_confidence_method is not None:
-
         conf = val_conf
 
         restore['enc_self_attn'], last_epoch_num['enc_self_attn'] = dynamic_mhr(model, int(args.start_dynamic_mhr[0]),
@@ -320,12 +317,14 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                                                                                 int(args.dynamic_swap_frequency[0]),
                                                                                 last_epoch_num['enc_self_attn'],
                                                                                 epoch_itr.epoch + 1,
-                                                                                int(args.dynamic_max_switches[0]), conf[0],
+                                                                                int(args.dynamic_max_switches[0]),
+                                                                                conf[0],
                                                                                 num_heads, head_dim,
                                                                                 args.encoder_layers, local_only=False,
                                                                                 d_type=args.dynamic_type[0],
                                                                                 rest=int(args.dynamic_rest[0]),
-                                                                                end_epoch=int(args.dynamic_end_epoch[0]))
+                                                                                end_epoch=int(
+                                                                                    args.dynamic_end_epoch[0]))
 
         restore['dec_self_attn'], last_epoch_num['dec_self_attn'] = dynamic_mhr(model, int(args.start_dynamic_mhr[1]),
                                                                                 "decoder", "self_attn",
@@ -333,19 +332,22 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
                                                                                 int(args.dynamic_swap_frequency[1]),
                                                                                 last_epoch_num['dec_self_attn'],
                                                                                 epoch_itr.epoch + 1,
-                                                                                int(args.dynamic_max_switches[1]), conf[1],
+                                                                                int(args.dynamic_max_switches[1]),
+                                                                                conf[1],
                                                                                 num_heads, head_dim,
                                                                                 args.encoder_layers, local_only=False,
                                                                                 d_type=args.dynamic_type[1],
                                                                                 rest=int(args.dynamic_rest[1]),
-                                                                                end_epoch=int(args.dynamic_end_epoch[1]))
+                                                                                end_epoch=int(
+                                                                                    args.dynamic_end_epoch[1]))
         restore['dec_enc_attn'], last_epoch_num['dec_enc_attn'] = dynamic_mhr(model, int(args.start_dynamic_mhr[2]),
                                                                               "decoder", "encoder_attn",
                                                                               restore['dec_enc_attn'],
                                                                               int(args.dynamic_swap_frequency[2]),
                                                                               last_epoch_num['dec_enc_attn'],
                                                                               epoch_itr.epoch + 1,
-                                                                              int(args.dynamic_max_switches[2]), conf[2],
+                                                                              int(args.dynamic_max_switches[2]),
+                                                                              conf[2],
                                                                               num_heads, head_dim,
                                                                               args.encoder_layers, local_only=False,
                                                                               d_type=args.dynamic_type[2],
@@ -446,12 +448,9 @@ def validate(args, trainer, task, epoch_itr, subsets):
         valid_losses.append(stats[args.best_checkpoint_metric])
 
     if args.head_confidence_method is not None:
-
         val_conf = convert_confs(val_conf, args)
 
-        val_conf = calc_conf_per_epoch(val_conf,args)
-
-
+        val_conf = calc_conf_per_epoch(val_conf, args)
 
     return valid_losses, val_conf
 
@@ -659,8 +658,6 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
     print(transformer_type)
     print(end_epoch)
 
-
-
     if start_epoch > current_epoch:
         return None, 0
 
@@ -722,11 +719,10 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 for i in range(max_switches):
 
                     for j in range(4):
-
                         swap["s_layer"] = "{0}".format(i)
-                        swap["s_head"] = conf_arg_sort[i,j]
-                        swap["d_layer"] = "{0}".format(num_layers-1 -i)
-                        swap["d_head"] = conf_arg_sort[i,j]
+                        swap["s_head"] = conf_arg_sort[i, j]
+                        swap["d_layer"] = "{0}".format(num_layers - 1 - i)
+                        swap["d_head"] = conf_arg_sort[i, j]
                         swaps["{0}".format(current_epoch)].append(swap.copy())
 
                 mhr(model, swaps, head_dim, num_heads, current_epoch)
@@ -736,7 +732,8 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
             if d_type == 'L':
 
                 if max_switches > (num_heads - max_switches):
-                    raise NameError("In LOCAL mode max switches has to be less or equal to 50 percents of Heads per layer")
+                    raise NameError(
+                        "In LOCAL mode max switches has to be less or equal to 50 percents of Heads per layer")
 
                 # Switch between weak heads and strong heads within the same layer. focusing on firsts and lasts layers.
 
@@ -745,11 +742,10 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
                 for i in range(3):
 
                     for j in range(max_switches):
-
                         swap["s_layer"] = "{0}".format(i)
-                        swap["s_head"] = conf_arg_sort[i,j]
-                        swap["d_layer"] = "{0}".format(num_layers-1 -i)
-                        swap["d_head"] = conf_arg_sort[i,j]
+                        swap["s_head"] = conf_arg_sort[i, j]
+                        swap["d_layer"] = "{0}".format(num_layers - 1 - i)
+                        swap["d_head"] = conf_arg_sort[i, j]
                         swaps["{0}".format(current_epoch)].append(swap.copy())
 
                 mhr(model, swaps, head_dim, num_heads, current_epoch)
@@ -783,19 +779,19 @@ def dynamic_mhr(model, start_epoch, transformer_type, attention_type, restore, f
 
     return restore, last_epoch_used
 
-def calc_conf_per_epoch(conf, args):
 
+def calc_conf_per_epoch(conf, args):
     for l_e, l_d in zip(range(args.encoder_layers), range(args.decoder_layers)):
         conf["encoder"][l_e]["self_attn"] = np.matmul(conf["encoder"][l_e]["self_attn"][:, -1],
-                                                          conf["encoder"][l_e]["self_attn"][:, :-1]) / np.sum(
+                                                      conf["encoder"][l_e]["self_attn"][:, :-1]) / np.sum(
             conf["encoder"][l_e]["self_attn"][:, -1])
 
         conf["decoder"][l_d]["self_attn"] = np.matmul(conf["decoder"][l_d]["self_attn"][:, -1],
-                                                          conf["decoder"][l_d]["self_attn"][:, :-1]) / np.sum(
+                                                      conf["decoder"][l_d]["self_attn"][:, :-1]) / np.sum(
             conf["decoder"][l_d]["self_attn"][:, -1])
 
         conf["decoder"][l_d]["enc_attn"] = np.matmul(conf["decoder"][l_d]["enc_attn"][:, -1],
-                                                         conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
+                                                     conf["decoder"][l_d]["enc_attn"][:, :-1]) / np.sum(
             conf["decoder"][l_d]["enc_attn"][:, -1])
 
     enc_self_layers = []
