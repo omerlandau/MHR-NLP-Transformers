@@ -390,7 +390,8 @@ class MultiheadAttention(nn.Module):
                     heads = a[:, :, :, :].max(dim=3)
                     heads = heads[0].max(dim=2)
                     heads = heads[0].sum(dim=1) / bsz
-                elif self.head_confidence_method == "advanced":
+                #elif self.head_confidence_method == "advanced":
+                elif True:
                     a = attn_weights.clone().view(bsz, self.num_heads, tgt_len, src_len).transpose(1, 0)
                     a[:, :, -1, -1] = torch.zeros((self.num_heads, bsz))
                     heads = a[:, :, :, :].max(dim=2)
