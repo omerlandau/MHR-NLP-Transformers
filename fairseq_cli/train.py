@@ -266,7 +266,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             tgt_tokens = samples[0]['target'][i, :]
             #src_tokens = utils.strip_pad(samples[0]['net_input']['src_tokens'][i, :], tgt_dict.pad())
             #src_str = src_dict.string(src_tokens)
-            tgt_str = tgt_dict.string(tgt_tokens)
+            tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
             print("Guy comment - > tgt_str is : {}".format(tgt_str))
             if log_output is None:  # OOM, overflow, ...
                 continue
