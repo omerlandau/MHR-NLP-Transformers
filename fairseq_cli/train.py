@@ -266,7 +266,7 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
             #print("Guy comment - > tgt_str is : {}".format(tgt_str))
             #print("Guy comment - > number sent is : {}".format(i))
             if i == 23:
-                print("Guy comment - > tgt_str is : {}".format(tgt_str))
+                #print("Guy comment - > tgt_str is : {}".format(tgt_str))
                 for l in range(6):
                     for h in range(8):
                         attentions["decoder"][l]["self_attn"].\
