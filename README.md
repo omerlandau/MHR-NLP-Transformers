@@ -20,6 +20,9 @@ We provide here our code and the steps needed in order to reproduce our experime
 git clone https://github.com/omerlandau/MHR-NLP-Transformers
 ```
 
+## Parameter Swapping
+[Contribution guidelines for this project](Multi-Head-Rotation.png)
+
 
 <details><summary>List of implemented papers</summary><p>
 
