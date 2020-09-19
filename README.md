@@ -21,7 +21,7 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
 ```
 
 ## Parameter Swapping
-[Contribution guidelines for this project](Multi-Head-Rotation.png)
+![Parameter Swapping](Multi-Head-Rotation.png)
 
 
 <details><summary>List of implemented papers</summary><p>
