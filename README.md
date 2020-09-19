@@ -9,6 +9,19 @@ In this work we :
 
 We provide here our code and the steps needed in order to reproduce our experiments. 
 
+
+## Prerequisite
+
+- [PyTorch](http://pytorch.org/) version >= 1.4.0
+- Python version >= 3.6
+- For training new models, you'll also need an NVIDIA GPU and [NCCL](https://github.com/NVIDIA/nccl)
+```bash
+git clone https://github.com/omerlandau/MHR-NLP-Transformers
+cd fairseq
+pip install --editable ./
+```
+
+
 <details><summary>List of implemented papers</summary><p>
 
 - **Convolutional Neural Networks (CNN)**
