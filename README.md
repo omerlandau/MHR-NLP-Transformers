@@ -1,7 +1,12 @@
 # Multi-Head Rotation - a Multi-Head Attention Utilisation Using Parameters Rotation and Linear Mixing
 
 ## Introduction
-test
+In this work we :
+
+* Propose some manual dynamic methods for parameter swappings during the training of the Tranformer model.
+* Suggest a new component added to the Multi-head Attention mechanism, we called the Alpha Matrix. This component is in charge of heads mixing in the MHA mechanism.
+* Examine the effect of such parameter swapping and heads mixing on two transltion task's datasets.
+
 
 
 <details><summary>List of implemented papers</summary><p>
