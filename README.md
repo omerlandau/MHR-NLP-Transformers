@@ -1,7 +1,8 @@
-airseq(-py) is a sequence modeling toolkit that allows researchers and
-developers to train custom models for translation, summarization, language
-modeling and other text generation tasks.
-We provide reference implementations of various sequence modeling papers:
+# Multi-Head Rotation - a Multi-Head Attention Utilisation Using Parameters Rotation and Linear Mixing
+
+## Introduction
+test
+
 
 <details><summary>List of implemented papers</summary><p>
 
