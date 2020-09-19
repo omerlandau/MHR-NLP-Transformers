@@ -1,19 +1,25 @@
-<p align="center">
-  <img src="docs/fairseq_logo.png" width="150">
-  <br />
-  <br />
-  <a href="https://github.com/pytorch/fairseq/blob/master/LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-  <a href="https://github.com/pytorch/fairseq/releases"><img alt="Latest Release" src="https://img.shields.io/github/release/pytorch/fairseq.svg" /></a>
-  <a href="https://github.com/pytorch/fairseq/actions?query=workflow:build"><img alt="Build Status" src="https://github.com/pytorch/fairseq/workflows/build/badge.svg" /></a>
-  <a href="https://fairseq.readthedocs.io/en/latest/?badge=latest"><img alt="Documentation Status" src="https://readthedocs.org/projects/fairseq/badge/?version=latest" /></a>
-</p>
+# Multi-Head Rotation - a Multi-Head Attention Utilisation Using Parameters Rotation and Linear Mixing
 
---------------------------------------------------------------------------------
+## Introduction
+In this work we :
 
-airseq(-py) is a sequence modeling toolkit that allows researchers and
-developers to train custom models for translation, summarization, language
-modeling and other text generation tasks.
-We provide reference implementations of various sequence modeling papers:
+* Propose some manual and dynamic methods for parameter swappings during the training of the Tranformer model.
+* Suggest a new component added to the Multi-head Attention mechanism, we called the Alpha Matrix. It is in charge of heads mixing in the MHA mechanism.
+* Examine the effect of such parameter swapping and heads mixing on two transltion task's datasets.
+
+We provide here our code and the steps needed in order to reproduce our experiments. 
+
+
+## Prerequisite
+
+- [PyTorch](http://pytorch.org/) version >= 1.4.0
+- Python version >= 3.6
+- For training new models, you'll also need an NVIDIA GPU and [NCCL](https://github.com/NVIDIA/nccl)
+- Then, clone our repo :
+```bash
+git clone https://github.com/omerlandau/MHR-NLP-Transformers
+```
+
 
 <details><summary>List of implemented papers</summary><p>
 
