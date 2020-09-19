@@ -26,6 +26,9 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
 ![Parameter Swapping](Multi-Head-Rotation.png)
 
 
+### Linear Mixing
+![Alpha Matrix](Architecture_image.png)
+
 <details><summary>List of implemented papers</summary><p>
 
 - **Convolutional Neural Networks (CNN)**
