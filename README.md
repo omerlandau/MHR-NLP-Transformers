@@ -15,10 +15,9 @@ We provide here our code and the steps needed in order to reproduce our experime
 - [PyTorch](http://pytorch.org/) version >= 1.4.0
 - Python version >= 3.6
 - For training new models, you'll also need an NVIDIA GPU and [NCCL](https://github.com/NVIDIA/nccl)
+- Then, clone our repo :
 ```bash
 git clone https://github.com/omerlandau/MHR-NLP-Transformers
-cd fairseq
-pip install --editable ./
 ```
 
 
