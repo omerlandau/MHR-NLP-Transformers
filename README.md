@@ -74,3 +74,10 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
    --radius 0.0001 --loss-start-after 0.31 --dec-enc-alpha-loss-ratio 1 
    --dec-self-alpha-loss-ratio 1 --enc-self-alpha-loss-ratio 1
    ```
+   
+   
+## Analysis
+
+### Heads Importance Distribution
+![conf compare](conf compare .001.jpeg)
+
