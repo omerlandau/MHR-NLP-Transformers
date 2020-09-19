@@ -47,10 +47,22 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
    --mhr-experiment  "fairseq_cli/config_mhr_swap.json" ```
 
 
-
+**Dynamic**
 
 ### Linear Mixing
 ![Alpha Matrix](Architecture_image.png)
+As mentioned in tha paper, several hyper-parameters can be explored in this section : Gamma, the statring point of using the Nuc-norm,controling the Multi Head Attention elements in which the Nuc-norm applies e.g. only applies it to decoder-encoder attention.
+
+
+
+
+
+
+
+
+
+
+
 
 <details><summary>List of implemented papers</summary><p>
 
