@@ -29,7 +29,23 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
 1. Edit the fairseq_cli\config_mhr_swap.json file.
    * Control the epochs which the swappings will be done.
    * Control the transformer module(encoder\decoder) and the attention type (self attention\encoder attention) of the swapped elements.
-2.
+2. '''
+CUDA_VISIBLE_DEVICES=1 PYTHONIOENCODING=utf-8 nohup fairseq-train \
+    data-bin/iwslt14.tokenized.de-en \
+    --save-dir "/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/checkpoints/iwslt14_de_2_en/swaps-only/exp-self-attn-swaps-layers_3_5-8-heads-6l" \
+    --max-epoch 50 \
+    --arch transformer_iwslt_de_en --share-decoder-input-output-embed \
+    --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0  \
+    --lr 5e-4 --lr-scheduler inverse_sqrt --warmup-updates 4000 --warmup-init-lr '1e-07' \
+    --min-lr '1e-09' --dropout 0.3 --weight-decay 0.0001 \
+    --criterion label_smoothed_cross_entropy --label-smoothing 0.1 \
+    --max-tokens 4096     --eval-bleu \
+    --eval-bleu-args '{"beam": 5, "max_len_a": 1.2, "max_len_b": 10}' \
+    --eval-bleu-detok moses     --eval-bleu-remove-bpe \
+    --eval-bleu-print-samples     --decoder-attention-heads 8 --encoder-attention-heads 8 \
+    --best-checkpoint-metric bleu --maximize-best-checkpoint-metric --head-confidence-method "advanced" \
+   --mhr-experiment  "fairseq_cli/config_mhr_swap.json" &> /specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/logs/iwslt14_de_2_en/swaps-only/exp-self-attn-swaps-layers_3_5-8-heads-6l.out &
+'''
 
 ### Linear Mixing
 ![Alpha Matrix](Architecture_image.png)
