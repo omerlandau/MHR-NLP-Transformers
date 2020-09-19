@@ -25,7 +25,11 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
 ### Parameter Swapping
 ![Parameter Swapping](Multi-Head-Rotation.png)
 
-####Manual
+**Manual**
+1. Edit the fairseq_cli\config_mhr_swap.json file.
+  1.1 Control the epochs which the swappings will be done.
+  1.2 Control the transformer module(encoder\decoder) and the attention type (self attention\encoder attention) of the swapped elements.
+2.
 
 ### Linear Mixing
 ![Alpha Matrix](Architecture_image.png)
