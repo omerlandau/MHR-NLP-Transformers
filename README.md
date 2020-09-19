@@ -29,10 +29,12 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
 1. Edit the fairseq_cli\config_mhr_swap.json file.
    * Control the epochs which the swappings will be done.
    * Control the transformer module(encoder\decoder) and the attention type (self attention\encoder attention) of the swapped elements.
-2.```CUDA_VISIBLE_DEVICES=1 PYTHONIOENCODING=utf-8 nohup fairseq-train \
+   
+2. In oreder to train a transformer model(with 8 heads in both encoder and decoder) on the IWSLT14 DE-EN dataset ,with our hyperparameters, run: :
+```CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
     data-bin/iwslt14.tokenized.de-en \
-    --save-dir "/specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/checkpoints/iwslt14_de_2_en/swaps-only/exp-self-attn-swaps-layers_3_5-8-heads-6l" \
     --max-epoch 50 \
+    --save-dir "checkpoints-folder" \
     --arch transformer_iwslt_de_en --share-decoder-input-output-embed \
     --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0  \
     --lr 5e-4 --lr-scheduler inverse_sqrt --warmup-updates 4000 --warmup-init-lr '1e-07' \
@@ -42,8 +44,8 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
     --eval-bleu-args '{"beam": 5, "max_len_a": 1.2, "max_len_b": 10}' \
     --eval-bleu-detok moses     --eval-bleu-remove-bpe \
     --eval-bleu-print-samples     --decoder-attention-heads 8 --encoder-attention-heads 8 \
-    --best-checkpoint-metric bleu --maximize-best-checkpoint-metric --head-confidence-method "advanced" \
-   --mhr-experiment  "fairseq_cli/config_mhr_swap.json" &> /specific/netapp5_2/gamir/edocohen/guy_and_brian/guy/omer_temp/MHR-runs/logs/iwslt14_de_2_en/swaps-only/exp-self-attn-swaps-layers_3_5-8-heads-6l.out &```
+    --best-checkpoint-metric bleu --maximize-best-checkpoint-metric \
+   --mhr-experiment  "fairseq_cli/config_mhr_swap.json" ```
 
 
 
