@@ -30,7 +30,8 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
    * Control the epochs which the swappings will be done.
    * Control the transformer module(encoder\decoder) and the attention type (self attention\encoder attention) of the swapped elements.
    
-2. In oreder to train a transformer model(with 8 heads in both encoder and decoder) on the IWSLT14 DE-EN dataset ,with our hyperparameters, run: ```CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
+2. In oreder to train a transformer model(with 8 heads in both encoder and decoder) on the IWSLT14 DE-EN dataset ,with our hyperparameters, run: 
+```CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
     data-bin/iwslt14.tokenized.de-en
     --max-epoch 50
     --save-dir "checkpoints-folder"
@@ -44,15 +45,16 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
     --eval-bleu-detok moses     --eval-bleu-remove-bpe
     --eval-bleu-print-samples     --decoder-attention-heads 8 --encoder-attention-heads 8
     --best-checkpoint-metric bleu --maximize-best-checkpoint-metric
-   --mhr-experiment  "fairseq_cli/config_mhr_swap.json" ```
-
+   --mhr-experiment  "fairseq_cli/config_mhr_swap.json"
+  ```
 
 **Dynamic**
 
 ### Linear Mixing
 ![Alpha Matrix](Architecture_image.png)
 As mentioned in tha paper, several hyper-parameters had been explored in this section : gamma, the statring point of using the Nuc-norm,controling the Multi Head Attention elements in which the Nuc-norm applies e.g. only applies it to decoder-encoder attention and the growth radius (indicated as delta_r in the paper).
-In order to run an experiment of mixing with growth raidus of 0.0001, gamma 40, start using the Nuc-norm loss only after training 31% of the epochs, on all MHA components :```CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
+In order to run an experiment of mixing with growth raidus of 0.0001, gamma 40, start using the Nuc-norm loss only after training 31% of the epochs, on all MHA components : 
+```CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
     data-bin/iwslt14.tokenized.de-en
     --max-epoch 50
     --save-dir "checkpoints-folder"
@@ -68,7 +70,8 @@ In order to run an experiment of mixing with growth raidus of 0.0001, gamma 40, 
     --best-checkpoint-metric bleu --maximize-best-checkpoint-metric
    --mhr-experiment  "fairseq_cli/config_mhr_swap.json" --gamma-conf 40
    --radius 0.0001 --loss-start-after 0.31 --dec-enc-alpha-loss-ratio 1 
-   --dec-self-alpha-loss-ratio 1 --enc-self-alpha-loss-ratio 1```
+   --dec-self-alpha-loss-ratio 1 --enc-self-alpha-loss-ratio 1
+   ```
 
 
 
