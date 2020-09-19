@@ -25,6 +25,7 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
 ### Parameter Swapping
 ![Parameter Swapping](Multi-Head-Rotation.png)
 
+####Manual
 
 ### Linear Mixing
 ![Alpha Matrix](Architecture_image.png)
