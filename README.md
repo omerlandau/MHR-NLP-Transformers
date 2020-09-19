@@ -3,11 +3,11 @@
 ## Introduction
 In this work we :
 
-* Propose some manual dynamic methods for parameter swappings during the training of the Tranformer model.
-* Suggest a new component added to the Multi-head Attention mechanism, we called the Alpha Matrix. This component is in charge of heads mixing in the MHA mechanism.
+* Propose some manual and dynamic methods for parameter swappings during the training of the Tranformer model.
+* Suggest a new component added to the Multi-head Attention mechanism, we called the Alpha Matrix. It is in charge of heads mixing in the MHA mechanism.
 * Examine the effect of such parameter swapping and heads mixing on two transltion task's datasets.
 
-
+We provide here our code and the steps needed in order to reproduce our experiments. 
 
 <details><summary>List of implemented papers</summary><p>
 
