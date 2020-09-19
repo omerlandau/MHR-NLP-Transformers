@@ -30,8 +30,7 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
    * Control the epochs which the swappings will be done.
    * Control the transformer module(encoder\decoder) and the attention type (self attention\encoder attention) of the swapped elements.
    
-2. In oreder to train a transformer model(with 8 heads in both encoder and decoder) on the IWSLT14 DE-EN dataset ,with our hyperparameters, run: :
-```CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
+2. In oreder to train a transformer model(with 8 heads in both encoder and decoder) on the IWSLT14 DE-EN dataset ,with our hyperparameters, run: ```CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
     data-bin/iwslt14.tokenized.de-en \
     --max-epoch 50 \
     --save-dir "checkpoints-folder" \
