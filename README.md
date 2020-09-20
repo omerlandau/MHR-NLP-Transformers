@@ -98,10 +98,18 @@ CUDA_VISIBLE_DEVICES=0 fairseq-generate data-bin/iwslt14.tokenized.de-en
  
  ## Results
  
+ ### BLEU Scores of Alphas models
 | Layers  | Heads | DE-EN | #Params | ES-EN | #Params | 
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
-| 6  | 8  | 35.04 | 39470352 | 41.21 | 39388432 | 
-| 6  | 16  | 34.41 | 39469056 | 40.93 | 39473952 | 
+| 6  | 8  | **35.04** | 39470352 | **41.21** | 39388432 | 
+| 6  | 16  | **34.41** | 39469056 | **40.93** | 39473952 | 
+ 
+ 
+  ### BLEU Score of Manual Swapping Layers 1 and 5 Experiment, 8 Heads Configuration
+| -  | DE-EN | ES-EN | 
+| ------------- | ------------- | ------------- |
+| Baseline  | 34.51  | 40.97 | 
+| After Swapping | **34.74** | **41.35** | 
  
  
 ## Analysis
