@@ -26,6 +26,7 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
 ![Parameter Swapping](Multi-Head-Rotation.png)
 
 **Manual**
+
 1. Edit the fairseq_cli/config_mhr_swap.json file.
    * Control the epochs which the swappings will be done.
    * Control the transformer module(encoder\decoder) and the attention type (self attention\encoder attention) of the swapped elements.
@@ -51,6 +52,7 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train
 
 **Dynamic**
 
+
 ### Linear Mixing
 ![Alpha Matrix](Architecture_image.png)
 As mentioned in tha paper, several hyper-parameters had been explored in this section : gamma, the statring point of using the Nuc-norm,controling the Multi Head Attention elements in which the Nuc-norm applies e.g. only applies it to decoder-encoder attention and the growth radius (indicated as delta_r in the paper).
@@ -75,7 +77,7 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train
    --dec-self-alpha-loss-ratio 1 --enc-self-alpha-loss-ratio 1
    ```
    
-### How to generate resuls?
+### How to generate results?
 In order to evaluate a trained model one should excecute the following command. We expose several evaluation options:
 
 * It is possible to save the alphas matrix to a .pkl, in a similar path of the checkpoint, but with 'alphas_eval' root folder name instead of the checkpoints folder name. In order to do so, one should use the "--keep-alphas-eval "yes"" flag. The .pkl file contains a data structure of :
