@@ -85,7 +85,7 @@ In order to evaluate a trained model one should excecute the following command. 
         "decoder": [{"self_attn": [], "enc_attn": []} for i in range(num_of_decoder_layers)]}
 So, for example, in order to get the alpha matrix of encoder's layer 4 self attention heads one can get: data_loaded_from_pkl['encoder'][4]['self_sttn'].
 
-* Same goes for the heads cosine similarity with the flag --save-heads-cos_sim "yes" and the folder name "cosine_similarities_eval".
+* Same goes for the heads cosine similarity and l2_pairwise_distances with the flag --save-heads-cos_sim "yes" and the folder name "cosine_similarities_eval" and "l2_pairwise_distances_eval".
 
 * 
 
