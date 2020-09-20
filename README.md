@@ -95,6 +95,15 @@ CUDA_VISIBLE_DEVICES=0 fairseq-generate data-bin/iwslt14.tokenized.de-en
     --batch-size 128 --beam 5 --remove-bpe --keep-alphas-eval "yes" --save-heads-cos_sim "yes" --head-confidence-method "advanced"
  ```
  
+ 
+ ## Results
+ 
+| Layers  | Heads | DE-EN | #Params | ES-EN | #Params | 
+| ------------- | ------------- |
+| 6  | 8  | 35.04 | 39470352 | 41.21 | 39388432 | 
+| 6  | 16  | 34.41 | 39469056 | 40.93 | 39473952 | 
+ 
+ 
 ## Analysis
 
 ### Heads Importance Distribution
