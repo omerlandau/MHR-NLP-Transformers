@@ -80,4 +80,5 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
 
 ### Heads Importance Distribution
 ![conf compare](conf_compare.png)
-
+Taking our Alphas model’s Decoder Self-Attention for instance, it is clearly seen that attention head’s confidence is generally lower, but also much more balanced between different heads comparing to baseline. Same goes
+with the Encoder-Attention of the Swap model.
