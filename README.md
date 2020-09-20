@@ -32,7 +32,7 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
    
 2. In oreder to train a transformer model(with 8 heads in both encoder and decoder) on the IWSLT14 DE-EN dataset ,with our hyperparameters, run: 
 ```bash
-CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
+CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train
     data-bin/iwslt14.tokenized.de-en
     --max-epoch 50
     --save-dir "checkpoints-folder"
@@ -56,7 +56,7 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
 As mentioned in tha paper, several hyper-parameters had been explored in this section : gamma, the statring point of using the Nuc-norm,controling the Multi Head Attention elements in which the Nuc-norm applies e.g. only applies it to decoder-encoder attention and the growth radius (indicated as delta_r in the paper).
 In order to run an experiment of mixing with growth raidus of 0.0001, gamma 40, start using the Nuc-norm loss only after training 31% of the epochs, on all MHA components and with ours other hyper-parameters: 
 ```bash 
-CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
+CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train
     data-bin/iwslt14.tokenized.de-en
     --max-epoch 50
     --save-dir "checkpoints-folder"
@@ -103,4 +103,4 @@ with the Encoder-Attention of the Swap model(where we swapped the decoder-encode
 ### Alpha Matrix With Nuc Loss
 ![DE_with_nuc_loss_dec_self](DE_with_nuc_loss_dec_self.png)
 
-In this decoder self attention example, the heads composed from a linear combination of other heads. A nice observation is that the matrix is almost skew-symmetric neglecting the non zeroed diagonal and up to some values differences.
+In this decoder self attention example, the heads composed from a linear combination of other heads. A nice observation is that the matrix is almost skew-symmetric neglecting the non-zeroed diagonal and up to some values differences.
