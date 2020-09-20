@@ -181,13 +181,6 @@ def _main(args, output_file):
                 l2_pairwise_distances["encoder"][e]["self_attn"].append(np.append(np.array(models[0].encoder.layers[e].self_attn.l2_pdist_mat.clone().detach().cpu()),[models[0].encoder.layers[e].self_attn.bsz]))
 
 
-        #if 12 in sample['net_input']['src_lengths']:
-        #    print(sample['id'].tolist())
-        #    print(sample['net_input']['src_tokens'][25])
-
-        #    print("Guy comment -> attn head 0  : {}".format(models[0].decoder.layers[0].encoder_attn_variables["context"].shape))
-        #    print("Guy comment -> attn head 1  : {}".format(models[0].decoder.layers[0].encoder_attn_variables["context"].shape))
-        #    print("Guy comment -> attn head 2  : {}".format(models[0].decoder.layers[0].encoder_attn_variables["context"].shape))
 
         num_generated_tokens = sum(len(h[0]['tokens']) for h in hypos)
         gen_timer.stop(num_generated_tokens)
@@ -196,7 +189,6 @@ def _main(args, output_file):
             has_target = sample['target'] is not None
 
             # Remove padding
-            #print("Guy comment src -> {}".format(sample['net_input']['src_tokens'][i, :]))
             src_tokens = utils.strip_pad(sample['net_input']['src_tokens'][i, :], tgt_dict.pad())
             target_tokens = None
             if has_target:
@@ -233,7 +225,6 @@ def _main(args, output_file):
                     print('T-{}\t{}'.format(sample_id, target_str), file=output_file)
             # Process top predictions
             for j, hypo in enumerate(hypos[i][:args.nbest]):
-                #print("Guy comment -> first hypo attention :{}".format(hypo['attention']))
                 hypo_tokens, hypo_str, alignment = utils.post_process_prediction(
                     hypo_tokens=hypo['tokens'].int().cpu(),
                     src_str=src_str,
@@ -245,8 +236,6 @@ def _main(args, output_file):
                         generator.eos,
                     }
                 )
-                #print("Guy comment hypo -> {}".format(hypo_tokens))
-
                 detok_hypo_str = decode_fn(hypo_str)
                 if not args.quiet:
                     score = hypo['score'] / math.log(2)  # convert to base 2

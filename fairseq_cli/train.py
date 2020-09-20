@@ -259,27 +259,6 @@ def train(args, trainer, task, epoch_itr, model, experiment_path, total_samples=
         with metrics.aggregate("train_inner"), torch.autograd.profiler.record_function("train_step-%d" % i):
             log_output = trainer.train_step(samples, batch_num=batch_regression)
 
-            #alphtgt_dict = task.target_dictionary
-            #print("Guy comment - > samples[0] is : {}".format(samples[0]))
-            #print("Guy comment - > samples[0]['target'][i, :] is : {}".format(samples[0]['target'][i, :]))
-            #tgt_tokens = samples[0]['target'][i, :]
-            #tgt_str = tgt_dict.string(tgt_tokens, escape_unk=True)
-            #print("Guy comment - > tgt_str is : {}".format(tgt_str))
-            #print("Guy comment - > number sent is : {}".format(i))
-            if i == 17:
-                #print("Guy comment - > tgt_str is : {}".format(tgt_str))
-                for l in range(6):
-                    for h in range(8):
-                        attentions["decoder"][l]["self_attn"].\
-                            append(np.array(model.decoder.layers[l].self_attn_variables["context"][i, h, :, :].clone().detach().cpu()))
-
-            path = args.save_dir.replace("checkpoints", "attn_weights")
-            try:
-                os.mkdir(path, 0o775)
-            except:
-                pass
-            with open(args.save_dir.replace("checkpoints", "attn_weights") + "/epoch-{0}.pkl".format(epoch_itr.epoch), 'wb') as fd:
-                pickle.dump(attentions, fd, protocol=3)
 
             if log_output is None:  # OOM, overflow, ...
                 continue
