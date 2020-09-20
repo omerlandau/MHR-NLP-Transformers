@@ -99,3 +99,6 @@ CUDA_VISIBLE_DEVICES=0 fairseq-generate data-bin/iwslt14.tokenized.de-en
 ![conf compare](conf_compare.png)
 Taking our Alphas model’s Decoder Self-Attention for instance, it is clearly seen that attention head’s confidence is generally lower, but also much more balanced between different heads comparing to baseline. Same goes
 with the Encoder-Attention of the Swap model(where we swapped the decoder-encoder attention heads of layers 1 and 5).
+
+### Alpha Matrix With Nuc Loss
+![DE_with_nuc_loss_dec_self](DE_with_nuc_loss_dec_self.png)
