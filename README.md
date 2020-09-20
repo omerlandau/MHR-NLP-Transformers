@@ -75,10 +75,25 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
    --dec-self-alpha-loss-ratio 1 --enc-self-alpha-loss-ratio 1
    ```
    
-   
+### How to generate resuls?
+In order to evaluate a trained model one should excecute the following command. We expose several evaluation options:
+
+* It is possible to save the alphas matrix to a .pkl, in a similar path of the checkpoint, but with 'alphas_eval' root folder name instead of the checkpoints folder name. The .pkl file contains a data structure of :
+        {"encoder": [{"self_attn": []} for i in range(num_of_encoder_layers)],
+        "decoder": [{"self_attn": [], "enc_attn": []} for i in range(num_of_decoder_layers)]}
+So, for example, in order to get the alpha matrix of encoder's layer 4 self attention heads one can get data_loaded_from_pkl['encoder'][4]['self_sttn'].
+
+* Same goes for the heads cosine similarity
+
+```bash 
+CUDA_VISIBLE_DEVICES=0 fairseq-generate data-bin/iwslt14.tokenized.de-en
+    --path CHECKPOINT_PATH
+    --batch-size 128 --beam 5 --remove-bpe --keep-alphas-eval "yes" --save-heads-cos_sim "yes" --head-confidence-method "advanced"
+ ```
+ 
 ## Analysis
 
 ### Heads Importance Distribution
 ![conf compare](conf_compare.png)
 Taking our Alphas model’s Decoder Self-Attention for instance, it is clearly seen that attention head’s confidence is generally lower, but also much more balanced between different heads comparing to baseline. Same goes
-with the Encoder-Attention of the Swap model.
+with the Encoder-Attention of the Swap model(where we swapped the decoder-encoder attention heads of layers 1 and 5).
