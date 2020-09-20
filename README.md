@@ -103,4 +103,4 @@ with the Encoder-Attention of the Swap model(where we swapped the decoder-encode
 ### Alpha Matrix With Nuc Loss
 ![DE_with_nuc_loss_dec_self](DE_with_nuc_loss_dec_self.png)
 
-The heads composed from a linear combination of other heads. A nice observation is that the matrix is almost skew-symmetric neglecting the non zeroed diagonal and up to some values differences.
+In this decoder self attention example, the heads composed from a linear combination of other heads. A nice observation is that the matrix is almost skew-symmetric neglecting the non zeroed diagonal and up to some values differences.
