@@ -79,5 +79,5 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
 ## Analysis
 
 ### Heads Importance Distribution
-![conf compare](conf compare.png)
+![conf compare](conf_compare.png)
 
