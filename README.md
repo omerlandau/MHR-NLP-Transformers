@@ -22,17 +22,18 @@ git clone https://github.com/omerlandau/MHR-NLP-Transformers
 
 ## Experiments
 
-### Parameter Swapping
+### 1. Parameter Swapping
 ![Parameter Swapping](Multi-Head-Rotation.png)
 
 **Manual**
+
 1. Edit the fairseq_cli/config_mhr_swap.json file.
    * Control the epochs which the swappings will be done.
    * Control the transformer module(encoder\decoder) and the attention type (self attention\encoder attention) of the swapped elements.
    
 2. In oreder to train a transformer model(with 8 heads in both encoder and decoder) on the IWSLT14 DE-EN dataset ,with our hyperparameters, run: 
 ```bash
-CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
+CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train
     data-bin/iwslt14.tokenized.de-en
     --max-epoch 50
     --save-dir "checkpoints-folder"
@@ -51,12 +52,13 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
 
 **Dynamic**
 
-### Linear Mixing
+
+### 2. Linear Mixing
 ![Alpha Matrix](Architecture_image.png)
 As mentioned in tha paper, several hyper-parameters had been explored in this section : gamma, the statring point of using the Nuc-norm,controling the Multi Head Attention elements in which the Nuc-norm applies e.g. only applies it to decoder-encoder attention and the growth radius (indicated as delta_r in the paper).
 In order to run an experiment of mixing with growth raidus of 0.0001, gamma 40, start using the Nuc-norm loss only after training 31% of the epochs, on all MHA components and with ours other hyper-parameters: 
 ```bash 
-CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
+CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train
     data-bin/iwslt14.tokenized.de-en
     --max-epoch 50
     --save-dir "checkpoints-folder"
@@ -75,7 +77,7 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train \
    --dec-self-alpha-loss-ratio 1 --enc-self-alpha-loss-ratio 1
    ```
    
-### How to generate resuls?
+### How to generate results?
 In order to evaluate a trained model one should excecute the following command. We expose several evaluation options:
 
 * It is possible to save the alphas matrix to a .pkl, in a similar path of the checkpoint, but with 'alphas_eval' root folder name instead of the checkpoints folder name. In order to do so, one should use the "--keep-alphas-eval "yes"" flag. The .pkl file contains a data structure of :
@@ -83,7 +85,7 @@ In order to evaluate a trained model one should excecute the following command. 
         "decoder": [{"self_attn": [], "enc_attn": []} for i in range(num_of_decoder_layers)]}
 So, for example, in order to get the alpha matrix of encoder's layer 4 self attention heads one can get: data_loaded_from_pkl['encoder'][4]['self_sttn'].
 
-* Same goes for the heads cosine similarity with the flag --save-heads-cos_sim "yes" and the folder name "cosine_similarities_eval".
+* Same goes for the heads cosine similarity and l2_pairwise_distances with the flag --save-heads-cos_sim "yes" and the folder name "cosine_similarities_eval" and "l2_pairwise_distances_eval".
 
 * 
 
@@ -99,3 +101,8 @@ CUDA_VISIBLE_DEVICES=0 fairseq-generate data-bin/iwslt14.tokenized.de-en
 ![conf compare](conf_compare.png)
 Taking our Alphas model’s Decoder Self-Attention for instance, it is clearly seen that attention head’s confidence is generally lower, but also much more balanced between different heads comparing to baseline. Same goes
 with the Encoder-Attention of the Swap model(where we swapped the decoder-encoder attention heads of layers 1 and 5).
+
+### Alpha Matrix With Nuc Loss
+![DE_with_nuc_loss_dec_self](DE_with_nuc_loss_dec_self.png)
+
+In this decoder self attention example, the heads composed from a linear combination of other heads. A nice observation is that the matrix is almost skew-symmetric neglecting the non-zeroed diagonal and up to some values differences.
