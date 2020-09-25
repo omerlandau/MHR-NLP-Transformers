@@ -377,21 +377,6 @@ class TranslationTask(FairseqTask):
         """Return the max sentence length allowed by the task."""
         return (self.args.max_source_positions, self.args.max_target_positions)
 
-    def prune_step(self, sample, model, criterion):
-        """Like train_step but we retain_grad for some variables"""
-        model.eval()
-        # Forward pass
-        loss, sample_size, logging_output = criterion(model, sample, calc_head_importance=True)
-        # Retain grads wrt. attn context (for computing the importance score)
-        for layer in model.encoder.layers:
-            layer.self_attn_variables["context"].retain_grad()
-        for layer in model.decoder.layers:
-            layer.self_attn_variables["context"].retain_grad()
-            layer.encoder_attn_variables["context"].retain_grad()
-        # Get those gradients
-        loss.backward()
-        return sample_size, logging_output
-
     @property
     def source_dictionary(self):
         """Return the source :class:`~fairseq.data.Dictionary`."""
