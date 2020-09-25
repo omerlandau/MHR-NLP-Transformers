@@ -4,7 +4,7 @@
 In this work we :
 
 * Propose some manual and dynamic methods for parameter swappings during the training of the Tranformer model.
-* Suggest a new component added to the Multi-head Attention mechanism, we called the Alpha Matrix. It is in charge of heads mixing in the MHA mechanism.
+* Suggest a new component added to the Multi-head Attention mechanism, we call Alphas matrix, which is used for linear mixing heads of different MHAs.
 * Examine the effect of such parameter swapping and heads mixing on two transltion task's datasets.
 
 We provide here our code and the steps needed in order to reproduce our experiments. 
@@ -94,6 +94,23 @@ CUDA_VISIBLE_DEVICES=0 fairseq-generate data-bin/iwslt14.tokenized.de-en
     --path CHECKPOINT_PATH
     --batch-size 128 --beam 5 --remove-bpe --keep-alphas-eval "yes" --save-heads-cos_sim "yes" --head-confidence-method "advanced"
  ```
+ 
+ 
+ ## Results
+ 
+**BLEU Scores of Alphas models**
+| Layers  | Heads | DE-EN | #Params | ES-EN | #Params | 
+| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
+| 6  | 8  | **35.04** | 39470352 | **41.21** | 39388432 | 
+| 6  | 16  | **34.41** | 39469056 | **40.93** | 39473952 | 
+ 
+ 
+ **BLEU Score of Manual Swapping Layers 1 and 5 Experiment, 8 Heads Configuration**
+| -  | DE-EN | ES-EN | 
+| ------------- | ------------- | ------------- |
+| Baseline  | 34.51  | 40.97 | 
+| After Swapping | **34.74** | **41.35** | 
+ 
  
 ## Analysis
 
