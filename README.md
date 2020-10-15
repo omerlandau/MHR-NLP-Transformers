@@ -52,7 +52,36 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train
 
 **Dynamic**
 
-
+As described in the paper, we conducted some dynamic swapping experiments. Three types of algorithms had been used - Hard,Soft and Random.
+Every hyper-parameter which relates to the dynamic experiments has three entries - for enc-self-attn, dec-self-attn and enc-dec-attn.
+For instance, the following command line will perform a dynamic experiment where (all attention types hold the same hyper-parameters) :
+* The head confidence method is the **avarage l2 distance**.
+* The type of algorithm is **Soft**.
+* The dynamic swapping begins at the **second** epoch.
+* The dynamic swapping begins at the **twentieth** epoch and then training continues 'regularly'.
+* The maximum amount of switches every time there are some, is **Three**.
+* Train for **four** epochs before swapping the parameters back.
+* After swapping back, rest (do not swap) for **one** epoch.
+```bash
+CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train
+    data-bin/iwslt14.tokenized.de-en
+    --max-epoch 50
+    --save-dir "checkpoints-folder"
+    --arch transformer_iwslt_de_en --share-decoder-input-output-embed
+    --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 
+    --lr 5e-4 --lr-scheduler inverse_sqrt --warmup-updates 4000 --warmup-init-lr '1e-07'
+    --min-lr '1e-09' --dropout 0.3 --weight-decay 0.0001
+    --criterion label_smoothed_cross_entropy --label-smoothing 0.1
+    --max-tokens 4096     --eval-bleu
+    --eval-bleu-args '{"beam": 5, "max_len_a": 1.2, "max_len_b": 10}'
+    --eval-bleu-detok moses     --eval-bleu-remove-bpe
+    --eval-bleu-print-samples     --decoder-attention-heads 8 --encoder-attention-heads 8
+    --best-checkpoint-metric bleu --maximize-best-checkpoint-metric
+    --head-confidence-method "pairwise"
+    --dynamic-swap-frequency 4 4 4 --start-dynamic-mhr 2 2 2
+    --dynamic-max-switches 3 3 3 --dynamic-type S S S
+    --dynamic-rest 1 1 1 --dynamic-end-epoch 20 20 20
+  ```
 ### 2. Linear Mixing
 ![Alpha Matrix](Architecture_image.png)
 As mentioned in tha paper, several hyper-parameters had been explored in this section : gamma, the statring point of using the Nuc-norm,controling the Multi Head Attention elements in which the Nuc-norm applies e.g. only applies it to decoder-encoder attention and the growth radius (indicated as delta_r in the paper).
@@ -86,8 +115,6 @@ In order to evaluate a trained model one should excecute the following command. 
 So, for example, in order to get the alpha matrix of encoder's layer 4 self attention heads one can get: data_loaded_from_pkl['encoder'][4]['self_sttn'].
 
 * Same goes for the heads cosine similarity and l2_pairwise_distances with the flag --save-heads-cos_sim "yes" and the folder name "cosine_similarities_eval" and "l2_pairwise_distances_eval".
-
-* 
 
 ```bash 
 CUDA_VISIBLE_DEVICES=0 fairseq-generate data-bin/iwslt14.tokenized.de-en
