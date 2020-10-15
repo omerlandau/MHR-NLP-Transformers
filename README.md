@@ -55,7 +55,7 @@ CUDA_VISIBLE_DEVICES=0 PYTHONIOENCODING=utf-8 fairseq-train
 As described in the paper, we conducted some dynamic swapping experiments. Three types of algorithms had been used - Hard,Soft and Random.
 Every hyper-parameter which relates to the dynamic experiments has three entries - for enc-self-attn, dec-self-attn and enc-dec-attn.
 For instance, the following command line will perform a dynamic experiment where (all attention types hold the same hyper-parameters) :
-* The head confidence method is the *avarage* l2 distance.
+* The head confidence method is the **avarage l2 distance**.
 * The type of algorithm is **Soft**.
 * The dynamic swapping begins at the **second** epoch.
 * The dynamic swapping begins at the **twentieth** epoch and then training continues 'regularly'.
